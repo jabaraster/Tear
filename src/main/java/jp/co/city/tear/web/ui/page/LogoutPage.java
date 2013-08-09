@@ -21,7 +21,7 @@ public class LogoutPage extends WebPageBase {
      * 
      */
     public LogoutPage() {
-        this.add(new BookmarkablePageLink<Object>("goLogin", LoginPage.class)); //$NON-NLS-1$
+        this.add(new BookmarkablePageLink<>("goLogin", LoginPage.class)); //$NON-NLS-1$
     }
 
     /**

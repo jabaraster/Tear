@@ -77,7 +77,7 @@ public class UserListPage extends AdministrationPageBase {
 
     private AjaxFallbackDefaultDataTable<EUser, String> getUsers() {
         if (this.users == null) {
-            final List<IColumn<EUser, String>> columns = new ArrayList<IColumn<EUser, String>>();
+            final List<IColumn<EUser, String>> columns = new ArrayList<>();
             columns.add(new Column(EntityBase_.id));
             columns.add(new Column(EUser_.userId));
             columns.add(new Column(EUser_.administrator));
@@ -86,7 +86,7 @@ public class UserListPage extends AdministrationPageBase {
             columns.add(new LinkColumn(Models.of("編集"), UserUpdatePage.class)); //$NON-NLS-1$
             columns.add(new LinkColumn(Models.of("削除"), UserDeletePage.class)); //$NON-NLS-1$
 
-            this.users = new AjaxFallbackDefaultDataTable<EUser, String>( //
+            this.users = new AjaxFallbackDefaultDataTable<>( //
                     "users" // //$NON-NLS-1$
                     , columns //
                     , new UserDataProvider(this.userService) //

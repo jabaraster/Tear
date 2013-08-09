@@ -56,7 +56,7 @@ public class TopPage extends RestrictedPageBase {
 
     private Link<?> getGoLogout() {
         if (this.goLogout == null) {
-            this.goLogout = new BookmarkablePageLink<Object>("goLogout", LogoutPage.class); //$NON-NLS-1$
+            this.goLogout = new BookmarkablePageLink<>("goLogout", LogoutPage.class); //$NON-NLS-1$
         }
         return this.goLogout;
     }

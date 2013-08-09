@@ -18,7 +18,7 @@ public class RestApplication extends Application {
      */
     @Override
     public Set<Class<?>> getClasses() {
-        return new HashSet<Class<?>>(Arrays.asList(new Class<?>[] { //
+        return new HashSet<>(Arrays.asList(new Class<?>[] { //
                 JsonMessageBodyReaderWriter.class // JSONをきれいに返すにはこのクラスが必要.
                         , UserResource.class //
                 }));

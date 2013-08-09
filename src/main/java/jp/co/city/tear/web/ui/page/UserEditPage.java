@@ -108,7 +108,7 @@ public abstract class UserEditPage extends AdministrationPageBase {
 
     private BeanEditor<EUser> getEditor() {
         if (this.editor == null) {
-            this.editor = new BeanEditor<EUser>("editor", this.userValue); //$NON-NLS-1$
+            this.editor = new BeanEditor<>("editor", this.userValue); //$NON-NLS-1$
         }
         return this.editor;
     }
