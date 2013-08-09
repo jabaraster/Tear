@@ -1,0 +1,146 @@
+@import "Common.less";
+
+@header-height: 60px;
+
+html body {
+	margin-right: 1em;
+	margin-left: 1em;
+    padding: 0;
+    background: @base-color;
+    
+    > div {
+        margin-top: 3em;
+        margin-bottom: 3em;
+    }
+}
+
+body h1 {
+	padding: 0;
+	margin-top: 0.3em;
+    color: @accent-color;
+    text-shadow: rgba(0,0,0,.3) 1px 1px;
+}
+
+h2, h3, h4, h5, h6  {
+    color: @main-color;
+    text-shadow: rgba(0,0,0,.3) 1px 1px;
+}
+
+body textarea {
+	width: 90%;
+	height: 20em;
+    border-radius: @border-radius-small;
+}
+
+input[type='text'], input[type='password'] {
+    border-radius: @border-radius-small;
+    height: 1.3em;
+    font-size: x-large;
+}
+
+.header-footer () {
+    @offset: 8px;
+    background: @main-color;
+    box-shadow: rgba(0,0,0,.3) 1px 1px;
+    left: @offset;
+    right: @offset;
+}
+
+.top-radius (@radius) {
+    border-bottom-left-radius: @radius;
+    border-bottom-right-radius: @radius;
+}
+
+.bottom-radius (@radius) {
+    border-top-left-radius: @radius;
+    border-top-right-radius: @radius;
+}
+
+header {
+	.header-footer();
+    .top-radius(@border-radius-small);
+
+    top: 0;
+    position: fixed;
+    padding-top: 5px;
+    background: @main-color;
+    height: @header-height;
+
+    li {
+       display: inline-block;
+       margin-right: 10px;
+       a {
+           color: @link-in-nav;
+       }
+    }
+
+    li:last-child {
+        width: 300px;
+        text-align: right;
+    }
+
+    > div.logo {
+        font-size: xx-large;
+        margin-top: 8px;
+        margin-left: 8px;
+        margin-bottom: 8px;
+        color: @base-color;
+        text-shadow: rgba(255,0,100,.3) 2px 1px
+    }
+}
+
+footer {
+	.header-footer();
+    .bottom-radius(@border-radius-small);
+
+    bottom: 0;
+    position: fixed;
+    padding-top: 0.3em;
+	margin-top: .1em;
+
+    color: @base-color;
+    text-align: right;
+    padding-right: 0.3em;
+    text-shadow: rgba(0,0,0,1) 3px 3px;
+}
+
+div.mainContent {
+    margin-top: @header-height + 14;
+}
+
+span.required:after {
+	content: '(*)';
+	color: red;
+}
+
+input.error, textarea.error {
+	color: @error-input-color;
+	background: @error-input-background;
+}
+
+ul {
+    list-style-type: none;
+}
+
+body form {
+    margin-bottom: 0.1em;
+}
+
+article span.keyword {
+    text-shadow: none;
+    padding: 0.2em;
+    border: solid 1px #333333;
+    border-radius: @border-radius-small;
+    margin-right: 0.3em;
+    background: @cell-background;
+    font-size: smaller;
+    a {
+        cursor: pointer;
+    }
+}
+
+li.feedbackPanelERROR {
+	padding-left: 10px;
+	color: @error-color;
+	background: @error-background;
+}

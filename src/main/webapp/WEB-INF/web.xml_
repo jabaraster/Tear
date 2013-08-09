@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!--
+Servlet3.0からはweb.xmlは必須ではないので、名前をweb.xml_としています.
+もし必要になったら、web.xmlにリネームして使って下さい.
+
+なおmvn packageでWARを作るとき、デフォルトの設定ではweb.xmlがないと失敗してしまいます.
+このためpom.xmlのmaven-war-pluginのプラグイン設定にfailOnMissingWebXml=falseを設定しています. 
+-->
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+      version="3.0">
+    <display-name>Tear Web Application</display-name>
+    <session-config>
+        <session-timeout>360</session-timeout> <!-- 360分=6時間 -->
+    </session-config>
+</web-app>

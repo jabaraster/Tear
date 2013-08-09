@@ -1,0 +1,30 @@
+<wicket:extend>
+
+  <div class="container-fluid">
+
+      <div class="row-fluid">
+          <aside class="span1"></aside>
+          <div class="span8 mainBox">
+              <h1>ログアウトしました</h1>
+              <p>
+                  <span id="delay">5</span>秒後にログイン画面に移動します。<br/>自動的に移動しない場合は<a wicket:id="goLogin">ここ</a>をクリックして下さい。
+              </p>
+          </div>
+
+          <aside class="span1"></aside>
+      </div>
+  </div>
+  <script>
+    function countDown(pInitial) {
+      var delay = pInitial;
+      setInterval(function() {
+        document.getElementById('delay').innerText = delay;
+        if (delay === 0) {
+          location.href = './';
+        }
+        delay -= 1;
+      }, 1000);
+    }
+  </script>
+
+</wicket:extend>

@@ -1,0 +1,21 @@
+<wicket:extend>
+
+  <form wicket:id="form">
+    <div wicket:id="feedback"></div>
+    <ul>
+      <wicket:container wicket:id="editor"></wicket:container>
+      <li class="input">
+        <span class="label">パスワード</span>
+        <input type="password" wicket:id="password"/>
+        <div wicket:id="passwordFeedback"></div>
+      </li>
+      <li class="input">
+        <span class="label">パスワード（確認）</span>
+        <input type="password" wicket:id="passwordConfirmation"/>
+        <div wicket:id="passwordConfirmationFeedback"></div>
+      </li>
+    </ul>
+    <button wicket:id="submitter" class="btn btn-primary btn-large"><i class="icon-white icon-ok"></i>送信</button>
+  </form>
+
+</wicket:extend>

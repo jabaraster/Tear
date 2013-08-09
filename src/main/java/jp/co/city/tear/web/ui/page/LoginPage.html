@@ -1,0 +1,29 @@
+<wicket:extend>
+
+<div class="LoginPage">
+
+  <h1>ログイン</h1>
+  <p>
+    あらかじめ管理者ユーザが１つ登録されています. <br/>
+    ユーザID/パスワードは"<span wicket:id="defaultAdministratorUserId"></span>/<span wicket:id="defaultAdministratorPassword"></span>"です.
+  </p>
+  <div wicket:id="feedback"></div>
+  <form wicket:id="form">
+    <ul>
+      <li class="input">
+        <span class="label">ユーザID</span>
+        <input type="text" wicket:id="userId" />
+        <div wicket:id="userIdFeedback"></div>
+      </li>
+      <li class="input">
+        <span class="label">パスワード</span>
+        <input type="password" wicket:id="password" />
+        <div wicket:id="passwordFeedback"></div>
+      </li>
+    </ul>
+    <button wicket:id="submitter" class="btn btn-success btn-large"><i class="icon-white icon-user"></i> ログイン</button>
+  </form>
+
+</div>
+
+</wicket:extend>
