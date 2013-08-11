@@ -18,6 +18,7 @@ import jp.co.city.tear.entity.EUserPassword;
 import jp.co.city.tear.entity.EUserPassword_;
 import jp.co.city.tear.entity.EUser_;
 import jp.co.city.tear.model.FailAuthentication;
+import jp.co.city.tear.model.LoginUser;
 import jp.co.city.tear.service.IAuthenticationService;
 
 /**
@@ -38,7 +39,7 @@ public class AuthenticationServiceImpl extends JpaDaoBase implements IAuthentica
      * @see jp.co.city.tear.service.IAuthenticationService#login(java.lang.String, java.lang.String)
      */
     @Override
-    public AuthenticatedAs login(final String pUserId, final String pPassword) throws FailAuthentication {
+    public LoginUser login(final String pUserId, final String pPassword) throws FailAuthentication {
         ArgUtil.checkNullOrEmpty(pUserId, "pUserId"); //$NON-NLS-1$
 
         final EntityManager em = getEntityManager();
@@ -59,7 +60,7 @@ public class AuthenticationServiceImpl extends JpaDaoBase implements IAuthentica
                 throw FailAuthentication.INSTANCE;
             }
 
-            return member.getUser().isAdministrator() ? AuthenticatedAs.ADMINISTRATOR : AuthenticatedAs.NORMAL_USER;
+            return new LoginUser(member.getUser());
 
         } catch (final NotFound e) {
             throw FailAuthentication.INSTANCE;

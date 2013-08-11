@@ -16,7 +16,10 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.annotation.WebListener;
 
 import jp.co.city.tear.Environment;
+import jp.co.city.tear.service.IDataStore;
 import jp.co.city.tear.service.IUserService;
+import jp.co.city.tear.service.impl.FileDataStore;
+import jp.co.city.tear.service.impl.S3DataStore;
 import jp.co.city.tear.web.rest.RestApplication;
 import jp.co.city.tear.web.ui.WicketApplication;
 
@@ -28,6 +31,7 @@ import org.eclipse.jetty.servlets.GzipFilter;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.Provider;
 import com.google.inject.servlet.GuiceFilter;
 import com.google.inject.servlet.GuiceServletContextListener;
 import com.sun.jersey.guice.JerseyServletModule;
@@ -99,12 +103,18 @@ public class WebInitializer extends GuiceServletContextListener {
                 ));
                 initializeJersey();
                 initializeWicket();
+                initializeServices();
             }
 
             private void initializeJersey() {
                 final Map<String, String> params = new HashMap<>();
                 params.put(ServletContainer.APPLICATION_CONFIG_CLASS, RestApplication.class.getName());
                 serve(PATH_REST + WILD_CARD).with(GuiceContainer.class, params);
+            }
+
+            @SuppressWarnings("synthetic-access")
+            private void initializeServices() {
+                this.bind(IDataStore.class).toProvider(new DataStoreProvider());
             }
 
             private void initializeWicket() {
@@ -177,6 +187,21 @@ public class WebInitializer extends GuiceServletContextListener {
         public void destroy(@SuppressWarnings("unused") final WicketFilter pFilter) {
             // 処理なし
         }
+    }
+
+    private static class DataStoreProvider implements Provider<IDataStore> {
+        @Override
+        public IDataStore get() {
+            switch (Environment.getDataStoreMode()) {
+            case FILE:
+                return new FileDataStore();
+            case S3:
+                return new S3DataStore();
+            default:
+                throw new IllegalStateException();
+            }
+        }
+
     }
 
     /**

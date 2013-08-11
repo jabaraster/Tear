@@ -1,0 +1,22 @@
+<wicket:extend>
+
+  <form wicket:id="form">
+    <div wicket:id="feedback"></div>
+    <ul>
+      <li class="input">
+        <span class="label">ARタイトル</span>
+        <input wicket:id="title" type="text" />
+      </li>
+      <li class="input">
+        <span class="label">マーカ画像</span>
+        <input wicket:id="marker" type="file" />
+      </li>
+      <li class="input">
+        <span class="label">コンテンツ</span>
+        <input wicket:id="contents" type="file" />
+      </li>
+    </ul>
+    <button wicket:id="submitter" class="btn btn-primary btn-large"><i class="icon-white icon-ok"></i>送信</button>
+  </form>
+
+</wicket:extend>

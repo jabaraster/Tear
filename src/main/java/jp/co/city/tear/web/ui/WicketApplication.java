@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import jp.co.city.tear.web.ui.page.AdministrationPageBase;
+import jp.co.city.tear.web.ui.page.ArContentsEditPage;
 import jp.co.city.tear.web.ui.page.LoginPage;
 import jp.co.city.tear.web.ui.page.LogoutPage;
 import jp.co.city.tear.web.ui.page.RestrictedPageBase;
@@ -149,6 +150,8 @@ public class WicketApplication extends WebApplication {
         this.mountPage("mainte/user/new", UserInsertPage.class);
         this.mountPage("mainte/user/edit", UserUpdatePage.class);
         this.mountPage("mainte/user/delete", UserDeletePage.class);
+
+        this.mountPage("mainte/contents/new", ArContentsEditPage.class);
     }
 
     /**

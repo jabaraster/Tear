@@ -3,7 +3,6 @@
  */
 package jp.co.city.tear.web.ui.page;
 
-import jabara.general.Empty;
 import jabara.general.NotFound;
 import jabara.wicket.CssUtil;
 import jabara.wicket.ErrorClassAppender;
@@ -33,7 +32,7 @@ import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
-import org.apache.wicket.util.string.StringValue;
+import org.apache.wicket.util.string.StringValueConversionException;
 
 /**
  * @author jabaraster
@@ -75,13 +74,12 @@ public abstract class UserEditPage extends AdministrationPageBase {
      */
     public UserEditPage(final PageParameters pParameters) {
         super(pParameters);
-        final StringValue userIdValue = pParameters.get(0);
         try {
-            this.userValue = this.userService.findById(Long.parseLong(userIdValue.toString(Empty.STRING)));
-        } catch (NumberFormatException | NotFound e) {
+            this.userValue = this.userService.findById(pParameters.get(0).toLong());
+            initialize();
+        } catch (StringValueConversionException | NotFound e) {
             throw new RestartResponseException(WebApplication.get().getHomePage());
         }
-        initialize();
     }
 
     /**

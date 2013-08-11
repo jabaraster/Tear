@@ -19,14 +19,29 @@
 	<classpathentry kind="var" path="M2_REPO/asm/asm/3.1/asm-3.1.jar" sourcepath="M2_REPO/asm/asm/3.1/asm-3.1-sources.jar"/>
 	<classpathentry kind="var" path="M2_REPO/asm/asm-commons/3.3.1/asm-commons-3.3.1.jar"/>
 	<classpathentry kind="var" path="M2_REPO/asm/asm-tree/3.3.1/asm-tree-3.3.1.jar"/>
+	<classpathentry kind="var" path="M2_REPO/com/amazonaws/aws-java-sdk/1.5.0/aws-java-sdk-1.5.0.jar" sourcepath="M2_REPO/com/amazonaws/aws-java-sdk/1.5.0/aws-java-sdk-1.5.0-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Users/jabaraster/.m2/repository/com/amazonaws/aws-java-sdk/1.5.0/aws-java-sdk-1.5.0-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="var" path="M2_REPO/cglib/cglib/2.2.2/cglib-2.2.2.jar" sourcepath="M2_REPO/cglib/cglib/2.2.2/cglib-2.2.2-sources.jar">
 		<attributes>
 			<attribute name="javadoc_location" value="jar:file:/Users/jabaraster/.m2/repository/cglib/cglib/2.2.2/cglib-2.2.2-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="var" path="M2_REPO/commons-codec/commons-codec/1.5/commons-codec-1.5.jar" sourcepath="M2_REPO/commons-codec/commons-codec/1.5/commons-codec-1.5-sources.jar">
+	<classpathentry kind="var" path="M2_REPO/commons-codec/commons-codec/1.3/commons-codec-1.3.jar" sourcepath="M2_REPO/commons-codec/commons-codec/1.3/commons-codec-1.3-sources.jar">
 		<attributes>
-			<attribute name="javadoc_location" value="jar:file:/Users/jabaraster/.m2/repository/commons-codec/commons-codec/1.5/commons-codec-1.5-javadoc.jar!/"/>
+			<attribute name="javadoc_location" value="jar:file:/Users/jabaraster/.m2/repository/commons-codec/commons-codec/1.3/commons-codec-1.3-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/commons-io/commons-io/2.4/commons-io-2.4.jar" sourcepath="M2_REPO/commons-io/commons-io/2.4/commons-io-2.4-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Users/jabaraster/.m2/repository/commons-io/commons-io/2.4/commons-io-2.4-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1.jar" sourcepath="M2_REPO/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Users/jabaraster/.m2/repository/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="var" path="M2_REPO/org/eclipse/jdt/core/3.1.1/core-3.1.1.jar"/>
@@ -60,6 +75,8 @@
 			<attribute name="javadoc_location" value="jar:file:/Users/jabaraster/.m2/repository/org/hibernate/hibernate-validator/4.1.0.Final/hibernate-validator-4.1.0.Final-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/org/apache/httpcomponents/httpclient/4.2/httpclient-4.2.jar" sourcepath="M2_REPO/org/apache/httpcomponents/httpclient/4.2/httpclient-4.2-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/httpcomponents/httpcore/4.2/httpcore-4.2.jar" sourcepath="M2_REPO/org/apache/httpcomponents/httpcore/4.2/httpcore-4.2-sources.jar"/>
 	<classpathentry kind="var" path="M2_REPO/jabaraster/jabara-jax-rs/1.0/jabara-jax-rs-1.0.jar" sourcepath="M2_REPO/jabaraster/jabara-jax-rs/1.0/jabara-jax-rs-1.0-sources.jar">
 		<attributes>
 			<attribute name="javadoc_location" value="jar:file:/Users/jabaraster/.m2/repository/jabaraster/jabara-jax-rs/1.0/jabara-jax-rs-1.0-javadoc.jar!/"/>
@@ -85,6 +102,8 @@
 			<attribute name="javadoc_location" value="jar:file:/Users/jabaraster/.m2/repository/jabaraster/jabara-servlet/1.1/jabara-servlet-1.1-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/org/codehaus/jackson/jackson-core-asl/1.8.9/jackson-core-asl-1.8.9.jar" sourcepath="M2_REPO/org/codehaus/jackson/jackson-core-asl/1.8.9/jackson-core-asl-1.8.9-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/codehaus/jackson/jackson-mapper-asl/1.8.9/jackson-mapper-asl-1.8.9.jar" sourcepath="M2_REPO/org/codehaus/jackson/jackson-mapper-asl/1.8.9/jackson-mapper-asl-1.8.9-sources.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/javassist/javassist/3.15.0-GA/javassist-3.15.0-GA.jar" sourcepath="M2_REPO/org/javassist/javassist/3.15.0-GA/javassist-3.15.0-GA-sources.jar">
 		<attributes>
 			<attribute name="javadoc_location" value="jar:file:/Users/jabaraster/.m2/repository/org/javassist/javassist/3.15.0-GA/javassist-3.15.0-GA-javadoc.jar!/"/>
@@ -142,7 +161,7 @@
 			<attribute name="javadoc_location" value="jar:file:/Users/jabaraster/.m2/repository/org/codehaus/jettison/jettison/1.1/jettison-1.1-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/jetty-annotations/8.1.5.v20120716/jetty-annotations-8.1.5.v20120716.jar" sourcepath="M2_REPO/org/eclipse/jetty/jetty-annotations/8.1.5.v20120716/jetty-annotations-8.1.5.v20120716-sources.jar">
+	<classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/jetty-annotations/8.1.5.v20120716/jetty-annotations-8.1.5.v20120716.jar">
 		<attributes>
 			<attribute name="javadoc_location" value="jar:file:/Users/jabaraster/.m2/repository/org/eclipse/jetty/jetty-annotations/8.1.5.v20120716/jetty-annotations-8.1.5.v20120716-javadoc.jar!/"/>
 		</attributes>
@@ -187,7 +206,7 @@
 			<attribute name="javadoc_location" value="jar:file:/Users/jabaraster/.m2/repository/com/geishatokyo/jetty/jetty-nosql-memcached/0.3.1/jetty-nosql-memcached-0.3.1-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/jetty-plus/8.1.5.v20120716/jetty-plus-8.1.5.v20120716.jar" sourcepath="M2_REPO/org/eclipse/jetty/jetty-plus/8.1.5.v20120716/jetty-plus-8.1.5.v20120716-sources.jar">
+	<classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/jetty-plus/8.1.5.v20120716/jetty-plus-8.1.5.v20120716.jar">
 		<attributes>
 			<attribute name="javadoc_location" value="jar:file:/Users/jabaraster/.m2/repository/org/eclipse/jetty/jetty-plus/8.1.5.v20120716/jetty-plus-8.1.5.v20120716-javadoc.jar!/"/>
 		</attributes>
@@ -342,14 +361,10 @@
 			<attribute name="javadoc_location" value="jar:file:/Users/jabaraster/.m2/repository/com/thoughtworks/xstream/xstream/1.4.1/xstream-1.4.1-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JDK7"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jabara-bean"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jabara-general"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jabara-jpa"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jabara-wicket"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7">
-		<attributes>
-			<attribute name="owner.project.facets" value="java"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry combineaccessrules="false" kind="src" path="/jabara-bean"/>
 	<classpathentry kind="output" path="src/main/webapp/WEB-INF/classes"/>
 </classpath>

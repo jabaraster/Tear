@@ -5,8 +5,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import javax.servlet.http.HttpServletRequest;
 
 import jp.co.city.tear.model.FailAuthentication;
+import jp.co.city.tear.model.LoginUser;
 import jp.co.city.tear.service.IAuthenticationService;
-import jp.co.city.tear.service.IAuthenticationService.AuthenticatedAs;
 
 import org.apache.wicket.Session;
 import org.apache.wicket.protocol.http.WebSession;
@@ -17,9 +17,9 @@ import org.apache.wicket.request.cycle.RequestCycle;
  * 
  */
 public class AppSession extends WebSession {
-    private static final long                      serialVersionUID = -5522467353190211133L;
+    private static final long                serialVersionUID = -5522467353190211133L;
 
-    private final AtomicReference<AuthenticatedAs> authenticated    = new AtomicReference<>();
+    private final AtomicReference<LoginUser> authenticated    = new AtomicReference<>();
 
     /**
      * @param pRequest -
@@ -35,14 +35,19 @@ public class AppSession extends WebSession {
         if (!isAuthenticatedCore()) {
             return false;
         }
-        switch (this.authenticated.get()) {
-        case NORMAL_USER:
-            return false;
-        case ADMINISTRATOR:
-            return true;
-        default:
+        return this.authenticated.get().isAdministrator();
+    }
+
+    /**
+     * @return -
+     * @throws IllegalStateException 未ログインの場合.
+     */
+    public LoginUser getLoginUser() throws IllegalStateException {
+        final LoginUser ret = this.authenticated.get();
+        if (ret == null) {
             throw new IllegalStateException();
         }
+        return ret;
     }
 
     /**

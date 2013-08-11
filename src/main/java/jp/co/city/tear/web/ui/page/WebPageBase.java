@@ -1,6 +1,7 @@
 package jp.co.city.tear.web.ui.page;
 
 import jabara.general.ArgUtil;
+import jabara.wicket.JavaScriptUtil;
 import jabara.wicket.Models;
 import jp.co.city.tear.Environment;
 
@@ -132,7 +133,6 @@ public abstract class WebPageBase extends WebPage {
         ArgUtil.checkNull(pResponse, "pResponse"); //$NON-NLS-1$
         pResponse.render(CssHeaderItem.forReference(new CssResourceReference(WebPageBase.class, "bootstrap/css/bootstrap.min.css"))); //$NON-NLS-1$
         pResponse.render(CssHeaderItem.forReference(new CssResourceReference(WebPageBase.class, "App.css"))); //$NON-NLS-1$
-        pResponse.render(JavaScriptHeaderItem.forReference(new JavaScriptResourceReference(WebPageBase.class, JavaScriptUtil.COMMON_JS_FILE_PATH)));
+        JavaScriptUtil.addJQuery1_9_1Reference(pResponse);
     }
-
 }

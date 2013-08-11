@@ -1,7 +1,9 @@
 package jp.co.city.tear.web.ui.page;
 
 import jabara.general.Empty;
+import jabara.wicket.CssUtil;
 import jabara.wicket.ErrorClassAppender;
+import jabara.wicket.JavaScriptUtil;
 import jabara.wicket.Models;
 
 import java.io.Serializable;
@@ -11,7 +13,6 @@ import jp.co.city.tear.model.FailAuthentication;
 import jp.co.city.tear.web.ui.AppSession;
 
 import org.apache.wicket.markup.head.IHeaderResponse;
-import org.apache.wicket.markup.head.OnDomReadyHeaderItem;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.PasswordTextField;
@@ -61,8 +62,8 @@ public class LoginPage extends WebPageBase {
     @Override
     public void renderHead(final IHeaderResponse pResponse) {
         super.renderHead(pResponse);
-        addPageCssReference(pResponse, getPageClass());
-        pResponse.render(OnDomReadyHeaderItem.forScript(JavaScriptUtil.getFocusScript(getUserId())));
+        CssUtil.addComponentCssReference(pResponse, LoginPage.class);
+        JavaScriptUtil.addFocusScript(pResponse, getUserId());
     }
 
     /**
