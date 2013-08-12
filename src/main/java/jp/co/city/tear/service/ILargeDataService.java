@@ -3,6 +3,10 @@
  */
 package jp.co.city.tear.service;
 
+import jabara.general.NotFound;
+
+import java.io.InputStream;
+
 import jp.co.city.tear.entity.ELargeData;
 import jp.co.city.tear.service.impl.LargeDataServiceImpl;
 
@@ -18,6 +22,13 @@ public interface ILargeDataService {
      * @param pData nullの場合は何も処理を行いません.
      */
     void delete(ELargeData pData);
+
+    /**
+     * @param pData -
+     * @return -
+     * @throws NotFound -
+     */
+    InputStream getDataInputStream(ELargeData pData) throws NotFound;
 
     /**
      * @param pData nullの場合は何も処理を行いません. <br>

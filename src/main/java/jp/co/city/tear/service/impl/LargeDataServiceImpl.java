@@ -4,7 +4,10 @@
 package jp.co.city.tear.service.impl;
 
 import jabara.general.ArgUtil;
+import jabara.general.NotFound;
 import jabara.jpa.JpaDaoBase;
+
+import java.io.InputStream;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManagerFactory;
@@ -44,6 +47,17 @@ public class LargeDataServiceImpl extends JpaDaoBase implements ILargeDataServic
         }
         getEntityManager().remove(pData);
         this.dataStore.delete(pData);
+    }
+
+    /**
+     * @see jp.co.city.tear.service.ILargeDataService#getDataInputStream(jp.co.city.tear.entity.ELargeData)
+     */
+    @Override
+    public InputStream getDataInputStream(final ELargeData pData) throws NotFound {
+        if (pData == null) {
+            throw NotFound.GLOBAL;
+        }
+        return this.dataStore.getDataInputStream(pData);
     }
 
     /**

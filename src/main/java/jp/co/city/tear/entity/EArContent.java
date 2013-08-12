@@ -6,6 +6,7 @@ package jp.co.city.tear.entity;
 import jabara.bean.BeanProperties;
 import jabara.bean.annotation.Localized;
 import jabara.bean.annotation.Order;
+import jabara.general.ArgUtil;
 import jabara.jpa.entity.EntityBase;
 
 import java.util.Date;
@@ -61,6 +62,16 @@ public class EArContent extends EntityBase<EArContent> {
     @OneToOne
     @JoinColumn(nullable = true)
     protected ELargeData                content;
+
+    /**
+     * @param pOperation -
+     */
+    public void contentOperation(final IOperation pOperation) {
+        ArgUtil.checkNull(pOperation, "pOperation"); //$NON-NLS-1$
+        if (this.content != null) {
+            pOperation.run(this.content);
+        }
+    }
 
     /**
      * @return contentsを返す.
@@ -139,6 +150,16 @@ public class EArContent extends EntityBase<EArContent> {
     }
 
     /**
+     * @param pOperation markerがnullでないときに実行する処理.
+     */
+    public void markerOperation(final IOperation pOperation) {
+        ArgUtil.checkNull(pOperation, "pOperation"); //$NON-NLS-1$
+        if (this.marker != null) {
+            pOperation.run(this.marker);
+        }
+    }
+
+    /**
      * @param pContent contentを設定.
      */
     public void setContent(final ELargeData pContent) {
@@ -171,5 +192,15 @@ public class EArContent extends EntityBase<EArContent> {
      */
     public static BeanProperties getMeta() {
         return _properties;
+    }
+
+    /**
+     * @author jabaraster
+     */
+    public interface IOperation {
+        /**
+         * @param pData
+         */
+        void run(ELargeData pData);
     }
 }

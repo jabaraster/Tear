@@ -6,9 +6,11 @@ package jp.co.city.tear.service;
 import jabara.general.NotFound;
 import jabara.general.Sort;
 
+import java.io.InputStream;
 import java.util.List;
 
 import jp.co.city.tear.entity.EArContent;
+import jp.co.city.tear.entity.ELargeData;
 import jp.co.city.tear.model.LoginUser;
 import jp.co.city.tear.service.impl.ArContentServiceImpl;
 
@@ -47,6 +49,13 @@ public interface IArContentService {
      * @throws NotFound -
      */
     EArContent findById(LoginUser pUser, long pId) throws NotFound;
+
+    /**
+     * @param pData -
+     * @return -
+     * @throws NotFound -
+     */
+    InputStream getDataInputStream(ELargeData pData) throws NotFound;
 
     /**
      * @param pLoginUser -

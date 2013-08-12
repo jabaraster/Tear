@@ -5,6 +5,10 @@ package jp.co.city.tear.service.impl;
 
 import jabara.general.ArgUtil;
 import jabara.general.IoUtil;
+import jabara.general.NotFound;
+
+import java.io.InputStream;
+
 import jp.co.city.tear.Environment;
 import jp.co.city.tear.entity.ELargeData;
 import jp.co.city.tear.service.IDataStore;
@@ -33,6 +37,15 @@ public class S3DataStore implements IDataStore {
         final AmazonS3Client s3Client = createS3Client();
 
         s3Client.deleteObject(request);
+    }
+
+    /**
+     * @see jp.co.city.tear.service.IDataStore#getDataInputStream(jp.co.city.tear.entity.ELargeData)
+     */
+    @Override
+    public InputStream getDataInputStream(final ELargeData pData) throws NotFound {
+        // TODO Auto-generated method stub
+        return null;
     }
 
     /**

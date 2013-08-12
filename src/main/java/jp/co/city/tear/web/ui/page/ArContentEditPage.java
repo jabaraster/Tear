@@ -18,11 +18,13 @@ import java.io.Serializable;
 import javax.inject.Inject;
 
 import jp.co.city.tear.entity.EArContent;
+import jp.co.city.tear.entity.EArContent.IOperation;
 import jp.co.city.tear.entity.EArContent_;
 import jp.co.city.tear.entity.ELargeData;
 import jp.co.city.tear.service.IArContentService;
 import jp.co.city.tear.web.ui.AppSession;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.form.Button;
@@ -30,11 +32,15 @@ import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.form.upload.FileUpload;
 import org.apache.wicket.markup.html.form.upload.FileUploadField;
+import org.apache.wicket.markup.html.image.Image;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
+import org.apache.wicket.request.resource.ResourceStreamResource;
+import org.apache.wicket.util.resource.AbstractResourceStream;
+import org.apache.wicket.util.resource.ResourceStreamNotFoundException;
 import org.apache.wicket.util.string.StringValueConversionException;
 
 /**
@@ -57,6 +63,8 @@ public class ArContentEditPage extends RestrictedPageBase {
     private FileUploadField   marker;
     private FileUploadField   contents;
     private Button            submitter;
+
+    private Image             markerImage;
 
     /**
      * 
@@ -138,6 +146,13 @@ public class ArContentEditPage extends RestrictedPageBase {
         return this.marker;
     }
 
+    private Image getMarkerImage() {
+        if (this.markerImage == null) {
+            this.markerImage = new Image("markerImage", new ResourceStreamResource(new R(this.arContent.getMarker()))); //$NON-NLS-1$
+        }
+        return this.markerImage;
+    }
+
     private Button getSubmitter() {
         if (this.submitter == null) {
             this.submitter = new Button("submitter") { //$NON-NLS-1$
@@ -160,6 +175,7 @@ public class ArContentEditPage extends RestrictedPageBase {
 
     private void initialize() {
         this.add(getForm());
+        this.add(getMarkerImage());
     }
 
     /**
@@ -198,11 +214,49 @@ public class ArContentEditPage extends RestrictedPageBase {
                         , ArContentEditPage.this.arContent //
                         );
 
+                // 直列化からの復元時にエラーを防ぐためにストリームにnullを設定する.
+                final IOperation o = new IOperation() {
+                    @Override
+                    public void run(final ELargeData pPdata) {
+                        pPdata.setData(null);
+                    }
+                };
+                ArContentEditPage.this.arContent.markerOperation(o);
+                ArContentEditPage.this.arContent.contentOperation(o);
+
                 setResponsePage(ArContentListPage.class);
 
             } catch (final IOException e) {
                 throw ExceptionUtil.rethrow(e);
             }
         }
+    }
+
+    private class R extends AbstractResourceStream {
+
+        private final ELargeData data;
+        private InputStream      in;
+
+        R(final ELargeData pData) {
+            this.data = pData;
+        }
+
+        @Override
+        public void close() {
+            IOUtils.closeQuietly(this.in);
+        }
+
+        @Override
+        public InputStream getInputStream() throws ResourceStreamNotFoundException {
+            if (this.data == null) {
+                throw new ResourceStreamNotFoundException();
+            }
+            try {
+                return ArContentEditPage.this.arContentService.getDataInputStream(this.data);
+            } catch (final NotFound e) {
+                throw new ResourceStreamNotFoundException();
+            }
+        }
+
     }
 }

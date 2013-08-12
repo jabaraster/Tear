@@ -10,6 +10,7 @@ import jabara.general.Sort;
 import jabara.jpa.JpaDaoBase;
 import jabara.jpa.entity.EntityBase_;
 
+import java.io.InputStream;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -22,6 +23,7 @@ import javax.persistence.criteria.Root;
 
 import jp.co.city.tear.entity.EArContent;
 import jp.co.city.tear.entity.EArContent_;
+import jp.co.city.tear.entity.ELargeData;
 import jp.co.city.tear.entity.EUser;
 import jp.co.city.tear.model.LoginUser;
 import jp.co.city.tear.service.IArContentService;
@@ -138,6 +140,15 @@ public class ArContentServiceImpl extends JpaDaoBase implements IArContentServic
             throw NotFound.GLOBAL;
         }
         return ret;
+    }
+
+    /**
+     * @see jp.co.city.tear.service.IArContentService#getDataInputStream(jp.co.city.tear.entity.ELargeData)
+     */
+    @Override
+    public InputStream getDataInputStream(final ELargeData pData) throws NotFound {
+        ArgUtil.checkNull(pData, "pData"); //$NON-NLS-1$
+        return this.largeDataService.getDataInputStream(pData);
     }
 
     /**

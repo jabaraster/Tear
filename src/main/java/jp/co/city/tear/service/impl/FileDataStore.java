@@ -6,11 +6,16 @@ package jp.co.city.tear.service.impl;
 import jabara.general.ArgUtil;
 import jabara.general.ExceptionUtil;
 import jabara.general.IoUtil;
+import jabara.general.NotFound;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 
 import jp.co.city.tear.Environment;
@@ -32,6 +37,18 @@ public class FileDataStore implements IDataStore {
     public void delete(final ELargeData pData) {
         ArgUtil.checkNull(pData, "pData"); //$NON-NLS-1$
         buildPath(pData.getId().longValue()).delete();
+    }
+
+    /**
+     * @see jp.co.city.tear.service.IDataStore#getDataInputStream(jp.co.city.tear.entity.ELargeData)
+     */
+    @Override
+    public InputStream getDataInputStream(final ELargeData pData) throws NotFound {
+        try {
+            return new BufferedInputStream(new FileInputStream(buildPath(pData.getId().longValue())));
+        } catch (final FileNotFoundException e) {
+            throw NotFound.GLOBAL;
+        }
     }
 
     /**
