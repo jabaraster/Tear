@@ -51,16 +51,11 @@ public class LargeDataServiceImpl extends JpaDaoBase implements ILargeDataServic
      */
     @Override
     public void insert(final ELargeData pData) {
-        if (pData == null) {
+        if (pData == null || pData.getData() == null) {
             return;
         }
 
         getEntityManager().persist(pData);
-
-        if (pData.getData() == null) {
-            pData.setLength(0);
-            return;
-        }
 
         final int length = this.dataStore.save(pData);
         pData.setLength(length);

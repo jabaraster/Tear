@@ -20,7 +20,8 @@ public interface ILargeDataService {
     void delete(ELargeData pData);
 
     /**
-     * @param pData nullの場合は何も処理を行いません.
+     * @param pData nullの場合は何も処理を行いません. <br>
+     *            また、{@link ELargeData#getData()}がnullの場合も何も処理を行いません.
      */
     void insert(ELargeData pData);
 

@@ -3,6 +3,7 @@
  */
 package jp.co.city.tear.web.ui.page;
 
+import jabara.general.ArgUtil;
 import jabara.general.NotFound;
 import jabara.wicket.CssUtil;
 import jabara.wicket.ErrorClassAppender;
@@ -183,6 +184,21 @@ public abstract class UserEditPage extends AdministrationPageBase {
 
     private void initialize() {
         this.add(getForm());
+    }
+
+    /**
+     * @param pUser -
+     * @return -
+     */
+    public static PageParameters createParameters(final EUser pUser) {
+        ArgUtil.checkNull(pUser, "pUser"); //$NON-NLS-1$
+        if (!pUser.isPersisted()) {
+            throw new IllegalArgumentException("永続化されていないエンティティは処理出来ません."); //$NON-NLS-1$
+        }
+
+        final PageParameters ret = new PageParameters();
+        ret.set(0, pUser.getId());
+        return ret;
     }
 
     private class Handler implements Serializable {

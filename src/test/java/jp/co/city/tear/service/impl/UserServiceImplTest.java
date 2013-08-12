@@ -3,8 +3,6 @@
  */
 package jp.co.city.tear.service.impl;
 
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 import jabara.general.Sort;
 import jabara.jpa.entity.EntityBase_;
 
@@ -19,6 +17,10 @@ import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 
+import static org.junit.Assert.assertThat;
+
+import static org.hamcrest.core.Is.is;
+
 /**
  * @author jabaraster
  */
@@ -26,7 +28,7 @@ import org.junit.runner.RunWith;
 public class UserServiceImplTest {
 
     /**
-     * @throws NamingException
+     * @throws NamingException -
      */
     @BeforeClass
     public static void beforeClass() throws NamingException {

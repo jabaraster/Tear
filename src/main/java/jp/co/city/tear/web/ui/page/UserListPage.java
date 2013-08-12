@@ -3,37 +3,31 @@
  */
 package jp.co.city.tear.web.ui.page;
 
+import jabara.general.IProducer2;
 import jabara.general.Sort;
 import jabara.jpa.entity.EntityBase_;
 import jabara.wicket.CssUtil;
 import jabara.wicket.Models;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import javax.inject.Inject;
-import javax.persistence.metamodel.SingularAttribute;
 
 import jp.co.city.tear.entity.EUser;
 import jp.co.city.tear.entity.EUser_;
 import jp.co.city.tear.service.IUserService;
+import jp.co.city.tear.web.ui.component.AttributeColumn;
+import jp.co.city.tear.web.ui.component.LinkColumn;
 
-import org.apache.wicket.Page;
 import org.apache.wicket.extensions.ajax.markup.html.repeater.data.table.AjaxFallbackDefaultDataTable;
-import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
-import org.apache.wicket.extensions.markup.html.repeater.data.table.AbstractColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
-import org.apache.wicket.extensions.markup.html.repeater.data.table.PropertyColumn;
 import org.apache.wicket.extensions.markup.html.repeater.util.SortParam;
 import org.apache.wicket.extensions.markup.html.repeater.util.SortableDataProvider;
 import org.apache.wicket.markup.head.IHeaderResponse;
-import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.link.BookmarkablePageLink;
-import org.apache.wicket.markup.html.link.Link;
-import org.apache.wicket.markup.html.panel.Panel;
-import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
@@ -41,6 +35,7 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 /**
  * @author jabaraster
  */
+@SuppressWarnings("synthetic-access")
 public class UserListPage extends AdministrationPageBase {
     private static final long                           serialVersionUID     = 1125709413157102080L;
 
@@ -78,13 +73,15 @@ public class UserListPage extends AdministrationPageBase {
     private AjaxFallbackDefaultDataTable<EUser, String> getUsers() {
         if (this.users == null) {
             final List<IColumn<EUser, String>> columns = new ArrayList<>();
-            columns.add(new Column(EntityBase_.id));
-            columns.add(new Column(EUser_.userId));
-            columns.add(new Column(EUser_.administrator));
-            columns.add(new Column(EntityBase_.created));
-            columns.add(new Column(EntityBase_.updated));
-            columns.add(new LinkColumn(Models.of("編集"), UserUpdatePage.class)); //$NON-NLS-1$
-            columns.add(new LinkColumn(Models.of("削除"), UserDeletePage.class)); //$NON-NLS-1$
+            columns.add(new AttributeColumn<EUser>(EUser.getMeta(), EntityBase_.id));
+            columns.add(new AttributeColumn<EUser>(EUser.getMeta(), EUser_.userId));
+            columns.add(new AttributeColumn<EUser>(EUser.getMeta(), EUser_.administrator));
+            columns.add(new AttributeColumn<EUser>(EUser.getMeta(), EntityBase_.created));
+            columns.add(new AttributeColumn<EUser>(EUser.getMeta(), EntityBase_.updated));
+
+            final ParametersProducer p = new ParametersProducer();
+            columns.add(new LinkColumn<EUser>(Models.readOnly("編集"), UserUpdatePage.class, p)); //$NON-NLS-1$
+            columns.add(new LinkColumn<EUser>(Models.readOnly("削除"), UserDeletePage.class, p)); //$NON-NLS-1$
 
             this.users = new AjaxFallbackDefaultDataTable<>( //
                     "users" // //$NON-NLS-1$
@@ -96,94 +93,12 @@ public class UserListPage extends AdministrationPageBase {
         return this.users;
     }
 
-    /**
-     * @param pUser -
-     * @return -
-     */
-    public static PageParameters createParameterForUserId(final EUser pUser) {
-        final PageParameters ret = new PageParameters();
-        ret.set(0, pUser.getId());
-        return ret;
-    }
-
-    private static class Column extends PropertyColumn<EUser, String> {
-        private static final long serialVersionUID = 1290184092925657774L;
-
-        Column(final SingularAttribute<?, ? extends Comparable<?>> pAttribute) {
-            super(Models.of(EUser.getMeta().get(pAttribute.getName()).getLocalizedName()), pAttribute.getName(), pAttribute.getName());
-        }
-    }
-
-    private static class LinkColumn extends AbstractColumn<EUser, String> {
-        private static final long           serialVersionUID  = 7430577515667494582L;
-
-        private static final IModel<String> EMPTY_LABEL_MODEL = Models.readOnly("　"); //$NON-NLS-1$
-
-        private final IModel<String>        linkLabelModel;
-        private final Class<? extends Page> destination;
-
-        /**
-         * @param pLinkLabelModel -
-         * @param pDestination -
-         */
-        public LinkColumn( //
-                final IModel<String> pLinkLabelModel //
-                , final Class<? extends Page> pDestination //
-        ) {
-            super(EMPTY_LABEL_MODEL);
-            this.linkLabelModel = pLinkLabelModel;
-            this.destination = pDestination;
-        }
+    private static class ParametersProducer implements IProducer2<EUser, PageParameters>, Serializable {
+        private static final long serialVersionUID = 8441044903072325348L;
 
         @Override
-        public void populateItem(final Item<ICellPopulator<EUser>> pCellItem, final String pComponentId, final IModel<EUser> pRowModel) {
-            final PageParameters params = createParameterForUserId(pRowModel.getObject());
-            pCellItem.add(new LinkPanel(pComponentId, this.linkLabelModel, params, this.destination));
-        }
-    }
-
-    private static class LinkPanel extends Panel {
-        private static final long           serialVersionUID = -870163225127196393L;
-
-        private final IModel<String>        linkLabelModel;
-        private final PageParameters        destinationParameter;
-        private final Class<? extends Page> destination;
-
-        private Link<?>                     link;
-        private Label                       linkLabel;
-
-        /**
-         * @param pId -
-         * @param pLinkLabelModel -
-         * @param pDestinationParameter -
-         * @param pDestination -
-         */
-        public LinkPanel( //
-                final String pId //
-                , final IModel<String> pLinkLabelModel //
-                , final PageParameters pDestinationParameter //
-                , final Class<? extends Page> pDestination //
-        ) {
-            super(pId);
-            this.destinationParameter = pDestinationParameter;
-            this.destination = pDestination;
-            this.linkLabelModel = pLinkLabelModel;
-            this.add(getLink());
-        }
-
-        private Link<?> getLink() {
-            if (this.link == null) {
-                this.link = new BookmarkablePageLink<>("go", this.destination, this.destinationParameter); //$NON-NLS-1$
-                this.link.add(getLinkLabel());
-            }
-            return this.link;
-        }
-
-        private Label getLinkLabel() {
-            if (this.linkLabel == null) {
-                this.linkLabel = new Label("linkLabel", this.linkLabelModel); //$NON-NLS-1$
-            }
-            return this.linkLabel;
+        public PageParameters produce(final EUser pArgument) {
+            return UserEditPage.createParameters(pArgument);
         }
     }
 

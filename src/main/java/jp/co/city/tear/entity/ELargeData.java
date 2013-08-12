@@ -3,7 +3,6 @@
  */
 package jp.co.city.tear.entity;
 
-import jabara.general.ArgUtil;
 import jabara.jpa.entity.EntityBase;
 
 import java.io.InputStream;
@@ -17,19 +16,19 @@ import javax.persistence.Transient;
  */
 @Entity
 public class ELargeData extends EntityBase<ELargeData> {
-    private static final long       serialVersionUID = -7306088955859680620L;
-
-    /**
-     * 
-     */
-    @Transient
-    protected transient InputStream data;
+    private static final long serialVersionUID = -7306088955859680620L;
 
     /**
      * 
      */
     @Column(nullable = true)
-    protected Integer               length;
+    protected Integer         length;
+
+    /**
+     * 
+     */
+    @Transient
+    protected InputStream     data;
 
     /**
      * 
@@ -42,12 +41,11 @@ public class ELargeData extends EntityBase<ELargeData> {
      * @param pData -
      */
     public ELargeData(final InputStream pData) {
-        ArgUtil.checkNull(pData, "pData"); //$NON-NLS-1$
         setData(pData);
     }
 
     /**
-     * @return -
+     * @return the data
      */
     public InputStream getData() {
         return this.data;
@@ -61,7 +59,7 @@ public class ELargeData extends EntityBase<ELargeData> {
     }
 
     /**
-     * @param pData dataを設定.
+     * @param pData the data to set
      */
     public void setData(final InputStream pData) {
         this.data = pData;
@@ -73,5 +71,4 @@ public class ELargeData extends EntityBase<ELargeData> {
     public void setLength(final int pLength) {
         this.length = Integer.valueOf(pLength);
     }
-
 }

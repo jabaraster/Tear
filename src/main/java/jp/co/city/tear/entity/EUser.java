@@ -57,8 +57,8 @@ public class EUser extends EntityBase<EUser> {
      * @see jabara.jpa.entity.EntityBase#getCreated()
      */
     @Override
-    @Order(200)
     @Localized
+    @Hidden
     public Date getCreated() {
         return super.getCreated();
     }
@@ -77,8 +77,8 @@ public class EUser extends EntityBase<EUser> {
      * @see jabara.jpa.entity.EntityBase#getUpdated()
      */
     @Override
-    @Order(300)
     @Localized
+    @Hidden
     public Date getUpdated() {
         return super.getUpdated();
     }

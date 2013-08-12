@@ -3,6 +3,7 @@ package jp.co.city.tear.web.ui;
 import jabara.general.ArgUtil;
 import jabara.wicket.LoginPageInstantiationAuthorizer;
 import jabara.wicket.MarkupIdForceOutputer;
+import jabara.wicket.Models;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -10,7 +11,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import jp.co.city.tear.web.ui.page.AdministrationPageBase;
-import jp.co.city.tear.web.ui.page.ArContentsEditPage;
+import jp.co.city.tear.web.ui.page.ArContentDeletePage;
+import jp.co.city.tear.web.ui.page.ArContentInsertPage;
+import jp.co.city.tear.web.ui.page.ArContentListPage;
+import jp.co.city.tear.web.ui.page.ArContentUpdatePage;
 import jp.co.city.tear.web.ui.page.LoginPage;
 import jp.co.city.tear.web.ui.page.LogoutPage;
 import jp.co.city.tear.web.ui.page.RestrictedPageBase;
@@ -19,13 +23,13 @@ import jp.co.city.tear.web.ui.page.UserDeletePage;
 import jp.co.city.tear.web.ui.page.UserInsertPage;
 import jp.co.city.tear.web.ui.page.UserListPage;
 import jp.co.city.tear.web.ui.page.UserUpdatePage;
+import jp.co.city.tear.web.ui.page.WebPageBase;
 
 import org.apache.wicket.Page;
 import org.apache.wicket.Session;
 import org.apache.wicket.guice.GuiceComponentInjector;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.Model;
 import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.request.Request;
 import org.apache.wicket.request.Response;
@@ -40,8 +44,11 @@ public class WicketApplication extends WebApplication {
 
     @SuppressWarnings("nls")
     private static final List<MenuInfo> _menuInfoList = Arrays.asList( //
-                                                              new MenuInfo(Model.of("ユーザ一覧"), UserListPage.class) //
-                                                              , new MenuInfo(Model.of("ユーザ新規登録"), UserInsertPage.class) //
+                                                              new MenuInfo(Models.readOnly("ユーザ一覧"), UserListPage.class) //
+                                                              , new MenuInfo(Models.readOnly("ユーザ新規登録"), UserInsertPage.class) //
+                                                              , new MenuInfo(Models.readOnly("ARコンテンツ一覧"), ArContentListPage.class) //
+                                                              , new MenuInfo(Models.readOnly("ARコンテンツ新規登録"), ArContentInsertPage.class) //
+                                                              , new MenuInfo(Models.readOnly("ログアウト"), LogoutPage.class) //
                                                       );
 
     private static final String         ENC           = "UTF-8"; //$NON-NLS-1$
@@ -61,7 +68,7 @@ public class WicketApplication extends WebApplication {
      */
     @Override
     public Class<? extends Page> getHomePage() {
-        return TopPage.class;
+        return ArContentListPage.class;
     }
 
     /**
@@ -151,7 +158,11 @@ public class WicketApplication extends WebApplication {
         this.mountPage("mainte/user/edit", UserUpdatePage.class);
         this.mountPage("mainte/user/delete", UserDeletePage.class);
 
-        this.mountPage("mainte/contents/new", ArContentsEditPage.class);
+        this.mountPage("mainte/content/", ArContentListPage.class);
+        this.mountPage("mainte/content/index", ArContentListPage.class);
+        this.mountPage("mainte/content/new", ArContentInsertPage.class);
+        this.mountPage("mainte/content/edit", ArContentUpdatePage.class);
+        this.mountPage("mainte/content/delete", ArContentDeletePage.class);
     }
 
     /**
@@ -165,23 +176,33 @@ public class WicketApplication extends WebApplication {
      * @return -
      */
     public static List<MenuInfo> getMenuInfo() {
-        return new ArrayList<>(_menuInfoList);
+        if (AppSession.get().currentUserIsAdministrator()) {
+            return new ArrayList<>(_menuInfoList);
+        }
+
+        final List<MenuInfo> ret = new ArrayList<>();
+        for (final MenuInfo mi : _menuInfoList) {
+            if (!AdministrationPageBase.class.isAssignableFrom(mi.getPage())) {
+                ret.add(mi);
+            }
+        }
+        return ret;
     }
 
     /**
      * @author jabaraster
      */
     public static class MenuInfo implements Serializable {
-        private static final long                         serialVersionUID = -7238828499283607277L;
+        private static final long                  serialVersionUID = -7238828499283607277L;
 
-        private final IModel<String>                      linkLabel;
-        private final Class<? extends RestrictedPageBase> page;
+        private final IModel<String>               linkLabel;
+        private final Class<? extends WebPageBase> page;
 
         /**
          * @param pLinkLabel -
          * @param pPage -
          */
-        public MenuInfo(final IModel<String> pLinkLabel, final Class<? extends RestrictedPageBase> pPage) {
+        public MenuInfo(final IModel<String> pLinkLabel, final Class<? extends WebPageBase> pPage) {
             ArgUtil.checkNull(pLinkLabel, "pLinkLabel"); //$NON-NLS-1$
             ArgUtil.checkNull(pPage, "pPage"); //$NON-NLS-1$
             this.linkLabel = pLinkLabel;
@@ -198,7 +219,7 @@ public class WicketApplication extends WebApplication {
         /**
          * @return -
          */
-        public Class<? extends RestrictedPageBase> getPage() {
+        public Class<? extends WebPageBase> getPage() {
             return this.page;
         }
     }

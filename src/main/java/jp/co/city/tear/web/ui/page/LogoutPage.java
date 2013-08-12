@@ -6,6 +6,7 @@ import org.apache.wicket.Session;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.head.OnDomReadyHeaderItem;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
+import org.apache.wicket.markup.html.panel.EmptyPanel;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
 
@@ -39,7 +40,7 @@ public class LogoutPage extends WebPageBase {
      */
     @Override
     protected Panel createHeaderPanel(final String pId) {
-        return createHeaderPanel(pId);
+        return new EmptyPanel(pId);
     }
 
     /**

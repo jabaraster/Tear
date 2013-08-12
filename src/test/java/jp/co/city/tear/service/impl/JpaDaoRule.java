@@ -35,7 +35,7 @@ public abstract class JpaDaoRule<S> implements TestRule {
             @SuppressWarnings("synthetic-access")
             @Override
             public void evaluate() throws Throwable {
-                final EntityManagerFactory original = Persistence.createEntityManagerFactory(Environment.getApplicationName());
+                final EntityManagerFactory original = Persistence.createEntityManagerFactory(Environment.getApplicationName() + "_Test"); //$NON-NLS-1$
                 JpaDaoRule.this.entityManagerFactory = ThreadLocalEntityManagerFactoryHandler.wrap(original);
                 JpaDaoRule.this.entityManager = JpaDaoRule.this.entityManagerFactory.createEntityManager();
                 JpaDaoRule.this.sut = createService(JpaDaoRule.this.entityManagerFactory);
@@ -46,6 +46,7 @@ public abstract class JpaDaoRule<S> implements TestRule {
                 } finally {
                     try {
                         JpaDaoRule.this.entityManager.getTransaction().rollback();
+                        // JpaDaoRule.this.entityManager.getTransaction().commit();
                     } catch (final Throwable e) {
                         e.printStackTrace();
                     }
@@ -61,6 +62,13 @@ public abstract class JpaDaoRule<S> implements TestRule {
      */
     public EntityManager getEntityManager() {
         return this.entityManager;
+    }
+
+    /**
+     * @return -
+     */
+    public EntityManagerFactory getEntityManagerFactory() {
+        return this.entityManagerFactory;
     }
 
     /**

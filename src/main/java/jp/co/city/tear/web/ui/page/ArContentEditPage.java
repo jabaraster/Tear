@@ -17,10 +17,10 @@ import java.io.Serializable;
 
 import javax.inject.Inject;
 
-import jp.co.city.tear.entity.EArContents;
-import jp.co.city.tear.entity.EArContents_;
+import jp.co.city.tear.entity.EArContent;
+import jp.co.city.tear.entity.EArContent_;
 import jp.co.city.tear.entity.ELargeData;
-import jp.co.city.tear.service.IArContentsService;
+import jp.co.city.tear.service.IArContentService;
 import jp.co.city.tear.web.ui.AppSession;
 
 import org.apache.wicket.RestartResponseException;
@@ -41,15 +41,15 @@ import org.apache.wicket.util.string.StringValueConversionException;
  * @author jabaraster
  */
 @SuppressWarnings({ "synthetic-access", "serial" })
-public class ArContentsEditPage extends RestrictedPageBase {
+public class ArContentEditPage extends RestrictedPageBase {
     private static final long serialVersionUID = -4884364205385771240L;
 
-    private final EArContents arContents;
+    private final EArContent  arContent;
 
     private final Handler     handler          = new Handler();
 
     @Inject
-    IArContentsService        arContentsService;
+    IArContentService         arContentService;
 
     private FeedbackPanel     feedback;
     private Form<?>           form;
@@ -61,26 +61,26 @@ public class ArContentsEditPage extends RestrictedPageBase {
     /**
      * 
      */
-    public ArContentsEditPage() {
-        this(new EArContents());
+    public ArContentEditPage() {
+        this(new EArContent());
     }
 
     /**
-     * @param pArContents -
+     * @param pArContent -
      */
-    public ArContentsEditPage(final EArContents pArContents) {
-        ArgUtil.checkNull(pArContents, "pArContents"); //$NON-NLS-1$
-        this.arContents = pArContents;
+    public ArContentEditPage(final EArContent pArContent) {
+        ArgUtil.checkNull(pArContent, "pArContents"); //$NON-NLS-1$
+        this.arContent = pArContent;
         initialize();
     }
 
     /**
      * @param pParameters -
      */
-    public ArContentsEditPage(final PageParameters pParameters) {
+    public ArContentEditPage(final PageParameters pParameters) {
         super(pParameters);
         try {
-            this.arContents = this.arContentsService.findById(AppSession.get().getLoginUser(), pParameters.get(0).toLong());
+            this.arContent = this.arContentService.findById(AppSession.get().getLoginUser(), pParameters.get(0).toLong());
             initialize();
         } catch (StringValueConversionException | NotFound e) {
             throw new RestartResponseException(WebApplication.get().getHomePage());
@@ -93,7 +93,7 @@ public class ArContentsEditPage extends RestrictedPageBase {
     @Override
     public void renderHead(final IHeaderResponse pResponse) {
         super.renderHead(pResponse);
-        CssUtil.addComponentCssReference(pResponse, ArContentsEditPage.class);
+        CssUtil.addComponentCssReference(pResponse, ArContentEditPage.class);
         JavaScriptUtil.addFocusScript(pResponse, getTitle());
     }
 
@@ -107,7 +107,7 @@ public class ArContentsEditPage extends RestrictedPageBase {
 
     private FileUploadField getContents() {
         if (this.contents == null) {
-            this.contents = new FileUploadField(EArContents_.contents.getName());
+            this.contents = new FileUploadField(EArContent_.content.getName());
         }
         return this.contents;
     }
@@ -133,7 +133,7 @@ public class ArContentsEditPage extends RestrictedPageBase {
 
     private FileUploadField getMarker() {
         if (this.marker == null) {
-            this.marker = new FileUploadField(EArContents_.marker.getName());
+            this.marker = new FileUploadField(EArContent_.marker.getName());
         }
         return this.marker;
     }
@@ -143,7 +143,7 @@ public class ArContentsEditPage extends RestrictedPageBase {
             this.submitter = new Button("submitter") { //$NON-NLS-1$
                 @Override
                 public void onSubmit() {
-                    ArContentsEditPage.this.handler.onSubmit();
+                    ArContentEditPage.this.handler.onSubmit();
                 }
             };
         }
@@ -152,14 +152,29 @@ public class ArContentsEditPage extends RestrictedPageBase {
 
     private TextField<String> getTitle() {
         if (this.title == null) {
-            this.title = new TextField<>(EArContents_.title.getName(), new PropertyModel<String>(this.arContents, EArContents_.title.getName()));
-            ValidatorUtil.setSimpleStringValidator(this.title, EArContents.class, EArContents_.title);
+            this.title = new TextField<>(EArContent_.title.getName(), new PropertyModel<String>(this.arContent, EArContent_.title.getName()));
+            ValidatorUtil.setSimpleStringValidator(this.title, EArContent.class, EArContent_.title);
         }
         return this.title;
     }
 
     private void initialize() {
         this.add(getForm());
+    }
+
+    /**
+     * @param pArContent -
+     * @return -
+     */
+    public static PageParameters createParameters(final EArContent pArContent) {
+        ArgUtil.checkNull(pArContent, "pArContent"); //$NON-NLS-1$
+        if (!pArContent.isPersisted()) {
+            throw new IllegalArgumentException("永続化されていないエンティティは処理出来ません."); //$NON-NLS-1$
+        }
+
+        final PageParameters ret = new PageParameters();
+        ret.set(0, pArContent.getId());
+        return ret;
     }
 
     private static InputStream getDataFromFileUpload(final FileUploadField pField) throws IOException {
@@ -176,12 +191,15 @@ public class ArContentsEditPage extends RestrictedPageBase {
             try (final InputStream markerData = getDataFromFileUpload(getMarker()); //
                     final InputStream contentsData = getDataFromFileUpload(getContents()) //
             ) {
-                ArContentsEditPage.this.arContents.setMarker(new ELargeData(markerData));
-                ArContentsEditPage.this.arContents.setContents(new ELargeData(contentsData));
-                ArContentsEditPage.this.arContentsService.insertOrUpdate( //
+                ArContentEditPage.this.arContent.setMarker(new ELargeData(markerData));
+                ArContentEditPage.this.arContent.setContent(new ELargeData(contentsData));
+                ArContentEditPage.this.arContentService.insertOrUpdate( //
                         AppSession.get().getLoginUser() //
-                        , ArContentsEditPage.this.arContents //
+                        , ArContentEditPage.this.arContent //
                         );
+
+                setResponsePage(ArContentListPage.class);
+
             } catch (final IOException e) {
                 throw ExceptionUtil.rethrow(e);
             }

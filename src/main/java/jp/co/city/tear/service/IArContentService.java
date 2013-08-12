@@ -4,20 +4,21 @@
 package jp.co.city.tear.service;
 
 import jabara.general.NotFound;
+import jabara.general.Sort;
 
 import java.util.List;
 
-import jp.co.city.tear.entity.EArContents;
+import jp.co.city.tear.entity.EArContent;
 import jp.co.city.tear.model.LoginUser;
-import jp.co.city.tear.service.impl.ArContentsServiceImpl;
+import jp.co.city.tear.service.impl.ArContentServiceImpl;
 
 import com.google.inject.ImplementedBy;
 
 /**
  * @author jabaraster
  */
-@ImplementedBy(ArContentsServiceImpl.class)
-public interface IArContentsService {
+@ImplementedBy(ArContentServiceImpl.class)
+public interface IArContentService {
 
     /**
      * @param pLoginUser -
@@ -26,12 +27,18 @@ public interface IArContentsService {
     long count(LoginUser pLoginUser);
 
     /**
+     * @param pArContent -
+     */
+    void delete(EArContent pArContent);
+
+    /**
      * @param pLoginUser -
      * @param pFirst -
      * @param pCount -
+     * @param pSort -
      * @return -
      */
-    List<EArContents> find(LoginUser pLoginUser, long pFirst, long pCount);
+    List<EArContent> find(LoginUser pLoginUser, long pFirst, long pCount, Sort pSort);
 
     /**
      * @param pUser -
@@ -39,11 +46,11 @@ public interface IArContentsService {
      * @return -
      * @throws NotFound -
      */
-    EArContents findById(LoginUser pUser, long pId) throws NotFound;
+    EArContent findById(LoginUser pUser, long pId) throws NotFound;
 
     /**
      * @param pLoginUser -
      * @param pArContents -
      */
-    void insertOrUpdate(LoginUser pLoginUser, EArContents pArContents);
+    void insertOrUpdate(LoginUser pLoginUser, EArContent pArContents);
 }
