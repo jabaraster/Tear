@@ -152,61 +152,44 @@ public class ArContentServiceImpl extends JpaDaoBase implements IArContentServic
     }
 
     /**
-     * @see jp.co.city.tear.service.IArContentService#insertOrUpdate(LoginUser, jp.co.city.tear.entity.EArContent)
+     * @see jp.co.city.tear.service.IArContentService#insertOrUpdate(jp.co.city.tear.model.LoginUser, jp.co.city.tear.entity.EArContent,
+     *      java.io.InputStream, java.io.InputStream)
      */
     @Override
     public void insertOrUpdate( //
             final LoginUser pLoginUser //
-            , final EArContent pArContents //
+            , final EArContent pArContent //
+            , final InputStream pMarkerData //
+            , final InputStream pContentData //
     ) {
-        ArgUtil.checkNull(pArContents, "pArContents"); //$NON-NLS-1$
+        ArgUtil.checkNull(pLoginUser, "pLoginUser"); //$NON-NLS-1$
+        ArgUtil.checkNull(pArContent, "pArContent"); //$NON-NLS-1$
 
         try {
             final EUser loginUser = this.userService.findById(pLoginUser.getId());
-            pArContents.setOwner(loginUser);
+            pArContent.setOwner(loginUser);
 
-            if (pArContents.isPersisted()) {
-                updateCore(pLoginUser, pArContents);
+            if (pArContent.isPersisted()) {
+                updateCore(pArContent, pMarkerData, pContentData);
             } else {
-                insertCore(pArContents);
+                insertCore(pArContent, pMarkerData, pContentData);
             }
-        } catch (final NotFound e) {
-            throw ExceptionUtil.rethrow(e);
-        }
-    }
-
-    private void insertCore(final EArContent pArContents) {
-        normalizeContentData(pArContents);
-        getEntityManager().persist(pArContents);
-    }
-
-    private void normalizeContentData(final EArContent pArContents) {
-        if (pArContents.hasMarker()) {
-            this.largeDataService.insert(pArContents.getMarker());
-        } else {
-            pArContents.setMarker(null);
-        }
-        if (pArContents.hasContent()) {
-            this.largeDataService.insert(pArContents.getContent());
-        } else {
-            pArContents.setContent(null);
-        }
-    }
-
-    private void updateCore(final LoginUser pUser, final EArContent pArContents) {
-        try {
-            final EArContent c = findById(pUser, pArContents.getId().longValue());
-            this.largeDataService.delete(c.getMarker());
-            this.largeDataService.delete(c.getContent());
-
-            normalizeContentData(pArContents);
-
-            c.setTitle(pArContents.getTitle());
-            c.setMarker(pArContents.getMarker());
-            c.setContent(pArContents.getContent());
 
         } catch (final NotFound e) {
             throw ExceptionUtil.rethrow(e);
         }
+    }
+
+    private void insertCore(final EArContent pArContent, final InputStream pMarkerData, final InputStream pContentData) {
+        this.largeDataService.insertOrUpdate(pArContent.getMarker(), pMarkerData);
+        this.largeDataService.insertOrUpdate(pArContent.getContent(), pContentData);
+        getEntityManager().persist(pArContent);
+    }
+
+    private void updateCore(final EArContent pArContent, final InputStream pMarkerData, final InputStream pContentData) {
+        this.largeDataService.insertOrUpdate(pArContent.getMarker(), pMarkerData);
+        this.largeDataService.insertOrUpdate(pArContent.getContent(), pContentData);
+        final EArContent inDb = getEntityManager().merge(pArContent);
+        inDb.setTitle(pArContent.getTitle());
     }
 }

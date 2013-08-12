@@ -18,7 +18,6 @@ import java.io.Serializable;
 import javax.inject.Inject;
 
 import jp.co.city.tear.entity.EArContent;
-import jp.co.city.tear.entity.EArContent.IOperation;
 import jp.co.city.tear.entity.EArContent_;
 import jp.co.city.tear.entity.ELargeData;
 import jp.co.city.tear.service.IArContentService;
@@ -27,6 +26,7 @@ import jp.co.city.tear.web.ui.AppSession;
 import org.apache.commons.io.IOUtils;
 import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.markup.head.IHeaderResponse;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.TextField;
@@ -34,6 +34,7 @@ import org.apache.wicket.markup.html.form.upload.FileUpload;
 import org.apache.wicket.markup.html.form.upload.FileUploadField;
 import org.apache.wicket.markup.html.image.Image;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
+import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.protocol.http.WebApplication;
@@ -63,6 +64,7 @@ public class ArContentEditPage extends RestrictedPageBase {
     private FileUploadField   marker;
     private Image             markerImage;
     private FileUploadField   contents;
+    private Label             contentLabel;
     private Button            submitter;
 
     /**
@@ -112,6 +114,54 @@ public class ArContentEditPage extends RestrictedPageBase {
         return Models.readOnly("ARコンテンツの編集"); //$NON-NLS-1$
     }
 
+    Form<?> getForm() {
+        if (this.form == null) {
+            this.form = new Form<>("form"); //$NON-NLS-1$
+            this.form.add(getFeedback());
+            this.form.add(getTitle());
+            this.form.add(getMarker());
+            this.form.add(getMarkerImage());
+            this.form.add(getContents());
+            this.form.add(getContentLabel());
+            this.form.add(getSubmitter());
+        }
+        return this.form;
+    }
+
+    Button getSubmitter() {
+        if (this.submitter == null) {
+            this.submitter = new Button("submitter") { //$NON-NLS-1$
+
+                @Override
+                public void onError() {
+                    super.onError();
+                }
+
+                @Override
+                public void onSubmit() {
+                    ArContentEditPage.this.handler.onSubmit();
+                }
+            };
+        }
+        return this.submitter;
+    }
+
+    @SuppressWarnings("nls")
+    private Label getContentLabel() {
+        if (this.contentLabel == null) {
+            this.contentLabel = new Label("contentLabel", new AbstractReadOnlyModel<String>() {
+                @Override
+                public String getObject() {
+                    return ArContentEditPage.this.arContent.getContent().hasData() //
+                    ? String.valueOf(ArContentEditPage.this.arContent.getContent().getLength()) //
+                            : "コンテンツが登録されていません";
+                }
+            });
+
+        }
+        return this.contentLabel;
+    }
+
     private FileUploadField getContents() {
         if (this.contents == null) {
             this.contents = new FileUploadField(EArContent_.content.getName());
@@ -124,19 +174,6 @@ public class ArContentEditPage extends RestrictedPageBase {
             this.feedback = new FeedbackPanel("feedback"); //$NON-NLS-1$
         }
         return this.feedback;
-    }
-
-    private Form<?> getForm() {
-        if (this.form == null) {
-            this.form = new Form<>("form"); //$NON-NLS-1$
-            this.form.add(getFeedback());
-            this.form.add(getTitle());
-            this.form.add(getMarker());
-            this.form.add(getMarkerImage());
-            this.form.add(getContents());
-            this.form.add(getSubmitter());
-        }
-        return this.form;
     }
 
     private FileUploadField getMarker() {
@@ -152,18 +189,6 @@ public class ArContentEditPage extends RestrictedPageBase {
             this.markerImage = new Image("markerImage", new ResourceStreamResource(new R(this.arContent.getMarker()))); //$NON-NLS-1$
         }
         return this.markerImage;
-    }
-
-    private Button getSubmitter() {
-        if (this.submitter == null) {
-            this.submitter = new Button("submitter") { //$NON-NLS-1$
-                @Override
-                public void onSubmit() {
-                    ArContentEditPage.this.handler.onSubmit();
-                }
-            };
-        }
-        return this.submitter;
     }
 
     private TextField<String> getTitle() {
@@ -205,24 +230,14 @@ public class ArContentEditPage extends RestrictedPageBase {
 
         void onSubmit() {
             try (final InputStream markerData = getDataFromFileUpload(getMarker()); //
-                    final InputStream contentsData = getDataFromFileUpload(getContents()) //
+                    final InputStream contentData = getDataFromFileUpload(getContents()) //
             ) {
-                ArContentEditPage.this.arContent.setMarker(new ELargeData(markerData));
-                ArContentEditPage.this.arContent.setContent(new ELargeData(contentsData));
                 ArContentEditPage.this.arContentService.insertOrUpdate( //
                         AppSession.get().getLoginUser() //
                         , ArContentEditPage.this.arContent //
+                        , markerData //
+                        , contentData //
                         );
-
-                // 直列化からの復元時にエラーを防ぐためにストリームにnullを設定する.
-                final IOperation o = new IOperation() {
-                    @Override
-                    public void run(final ELargeData pPdata) {
-                        pPdata.setData(null);
-                    }
-                };
-                ArContentEditPage.this.arContent.markerOperation(o);
-                ArContentEditPage.this.arContent.contentOperation(o);
 
                 setResponsePage(ArContentListPage.class);
 

@@ -9,7 +9,6 @@ import jabara.jpa.entity.EntityBase_;
 import jabara.wicket.CssUtil;
 import jabara.wicket.Models;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -35,7 +34,6 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 /**
  * @author jabaraster
  */
-@SuppressWarnings("synthetic-access")
 public class UserListPage extends AdministrationPageBase {
     private static final long                           serialVersionUID     = 1125709413157102080L;
 
@@ -70,6 +68,7 @@ public class UserListPage extends AdministrationPageBase {
         return Models.of("ユーザ一覧"); //$NON-NLS-1$
     }
 
+    @SuppressWarnings("serial")
     private AjaxFallbackDefaultDataTable<EUser, String> getUsers() {
         if (this.users == null) {
             final List<IColumn<EUser, String>> columns = new ArrayList<>();
@@ -79,7 +78,12 @@ public class UserListPage extends AdministrationPageBase {
             columns.add(new AttributeColumn<EUser>(EUser.getMeta(), EntityBase_.created));
             columns.add(new AttributeColumn<EUser>(EUser.getMeta(), EntityBase_.updated));
 
-            final ParametersProducer p = new ParametersProducer();
+            final IProducer2<EUser, PageParameters> p = new IProducer2<EUser, PageParameters>() {
+                @Override
+                public PageParameters produce(final EUser pArgument) {
+                    return UserEditPage.createParameters(pArgument);
+                }
+            };
             columns.add(new LinkColumn<>(Models.readOnly("編集"), UserUpdatePage.class, p)); //$NON-NLS-1$
             columns.add(new LinkColumn<>(Models.readOnly("削除"), UserDeletePage.class, p)); //$NON-NLS-1$
 
@@ -91,15 +95,6 @@ public class UserListPage extends AdministrationPageBase {
             );
         }
         return this.users;
-    }
-
-    private static class ParametersProducer implements IProducer2<EUser, PageParameters>, Serializable {
-        private static final long serialVersionUID = 8441044903072325348L;
-
-        @Override
-        public PageParameters produce(final EUser pArgument) {
-            return UserEditPage.createParameters(pArgument);
-        }
     }
 
     private static class UserDataProvider extends SortableDataProvider<EUser, String> {
@@ -134,6 +129,5 @@ public class UserListPage extends AdministrationPageBase {
         public long size() {
             return this.userService.countAll();
         }
-
     }
 }

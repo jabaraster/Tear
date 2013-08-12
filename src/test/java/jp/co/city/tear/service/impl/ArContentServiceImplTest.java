@@ -3,6 +3,8 @@
  */
 package jp.co.city.tear.service.impl;
 
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
 import jabara.general.ExceptionUtil;
 import jabara.general.NotFound;
 import jabara.general.Sort;
@@ -21,7 +23,6 @@ import jp.co.city.tear.WebStarter;
 import jp.co.city.tear.WebStarter.Mode;
 import jp.co.city.tear.entity.EArContent;
 import jp.co.city.tear.entity.EArContent_;
-import jp.co.city.tear.entity.ELargeData;
 import jp.co.city.tear.entity.EUser;
 import jp.co.city.tear.entity.EUser_;
 import jp.co.city.tear.model.Duplicate;
@@ -33,10 +34,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
-
-import static org.junit.Assert.assertThat;
-
-import static org.hamcrest.core.Is.is;
 
 /**
  * @author jabaraster
@@ -84,12 +81,12 @@ public class ArContentServiceImplTest {
         }
     }
 
-    private static ELargeData getContentData() {
-        return new ELargeData(getResourceAsStream("AR01_content.jpg")); //$NON-NLS-1$
+    private static InputStream getContentData() {
+        return getResourceAsStream("AR01_content.jpg"); //$NON-NLS-1$
     }
 
-    private static ELargeData getMarkerData() {
-        return new ELargeData(getResourceAsStream("AR01_marker.jpg")); //$NON-NLS-1$
+    private static InputStream getMarkerData() {
+        return getResourceAsStream("AR01_marker.jpg"); //$NON-NLS-1$
     }
 
     private static InputStream getResourceAsStream(final String pString) {
@@ -118,6 +115,7 @@ public class ArContentServiceImplTest {
         /**
          * @throws NotFound -
          */
+        @SuppressWarnings("boxing")
         @Test
         public void _insert_makerの中のInputStreamがnullの場合はELargeDataはinsertされない() throws NotFound {
             final EntityManager em = this.rule.getEntityManager();
@@ -125,14 +123,15 @@ public class ArContentServiceImplTest {
 
             final EArContent ac = new EArContent();
             ac.setTitle("title"); //$NON-NLS-1$
-            this.rule.getSut().insertOrUpdate(loginUser, ac);
+            this.rule.getSut().insertOrUpdate(loginUser, ac, null, null);
 
+            em.flush();
             em.clear();
 
             final EArContent inDb = this.rule.getSut().findById(loginUser, ac.getId().longValue());
 
-            assertThat(inDb.getMarker(), is((Object) null));
-            assertThat(inDb.getContent(), is((Object) null));
+            assertThat(inDb.getMarker().hasData(), is(false));
+            assertThat(inDb.getContent().hasData(), is(false));
         }
     }
 
@@ -163,11 +162,11 @@ public class ArContentServiceImplTest {
             final EArContent ac = new EArContent();
             ac.setTitle("title"); //$NON-NLS-1$
 
-            this.tool.getSut().insertOrUpdate(loginUser, ac);
+            this.tool.getSut().insertOrUpdate(loginUser, ac, getMarkerData(), null);
             em.detach(ac);
 
             ac.setTitle("title_"); //$NON-NLS-1$
-            this.tool.getSut().insertOrUpdate(loginUser, ac);
+            this.tool.getSut().insertOrUpdate(loginUser, ac, null, getContentData());
 
             em.flush();
         }
@@ -288,10 +287,10 @@ public class ArContentServiceImplTest {
                 for (int i = 0; i < pInsertRowCount; i++) {
                     final EArContent ac = new EArContent();
                     ac.setTitle(i + "'th AR Contents."); //$NON-NLS-1$
-                    ac.setMarker(getMarkerData());
-                    ac.setContent(getContentData());
-                    this.rule.getSut().insertOrUpdate(o, ac);
+                    this.rule.getSut().insertOrUpdate(o, ac, getMarkerData(), null);
                 }
+                this.rule.getEntityManager().flush();
+
             } catch (final NotFound e) {
                 throw ExceptionUtil.rethrow(e);
             }

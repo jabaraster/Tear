@@ -14,6 +14,7 @@ import javax.persistence.EntityManagerFactory;
 
 import jp.co.city.tear.entity.ELargeData;
 import jp.co.city.tear.service.IDataStore;
+import jp.co.city.tear.service.IDataStore.EmptyData;
 import jp.co.city.tear.service.ILargeDataService;
 
 /**
@@ -46,7 +47,7 @@ public class LargeDataServiceImpl extends JpaDaoBase implements ILargeDataServic
             return;
         }
         getEntityManager().remove(pData);
-        this.dataStore.delete(pData);
+        this.dataStore.delete(pData.getId().longValue());
     }
 
     /**
@@ -57,21 +58,43 @@ public class LargeDataServiceImpl extends JpaDaoBase implements ILargeDataServic
         if (pData == null) {
             throw NotFound.GLOBAL;
         }
-        return this.dataStore.getDataInputStream(pData);
+        return this.dataStore.getDataInputStream(pData.getId().longValue());
     }
 
     /**
-     * @see jp.co.city.tear.service.ILargeDataService#insert(jp.co.city.tear.entity.ELargeData)
+     * @see jp.co.city.tear.service.ILargeDataService#insertOrUpdate(jp.co.city.tear.entity.ELargeData, java.io.InputStream)
      */
     @Override
-    public void insert(final ELargeData pData) {
-        if (pData == null || pData.getData() == null) {
-            return;
+    public void insertOrUpdate(final ELargeData pData, final InputStream pStream) {
+        ArgUtil.checkNull(pData, "pData"); //$NON-NLS-1$
+
+        if (pData.isPersisted()) {
+            updateCore(pData, pStream);
+        } else {
+            insertCore(pData, pStream);
         }
+    }
 
-        getEntityManager().persist(pData);
+    private void insertCore(final ELargeData pData, final InputStream pStream) {
+        try {
+            getEntityManager().persist(pData);
 
-        final int length = this.dataStore.save(pData);
-        pData.setLength(length);
+            final int len = this.dataStore.save(pData.getId().longValue(), pStream);
+            pData.setDataLength(len);
+        } catch (final EmptyData e) {
+            pData.clearData();
+        }
+    }
+
+    private void updateCore(final ELargeData pData, final InputStream pStream) {
+        final ELargeData inDb = getEntityManager().merge(pData);
+        this.dataStore.delete(pData.getId().longValue());
+
+        try {
+            final int len = this.dataStore.save(pData.getId().longValue(), pStream);
+            inDb.setDataLength(len);
+        } catch (final EmptyData e) {
+            inDb.clearData();
+        }
     }
 }
