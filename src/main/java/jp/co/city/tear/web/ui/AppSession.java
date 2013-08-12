@@ -3,10 +3,12 @@ package jp.co.city.tear.web.ui;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import jp.co.city.tear.model.FailAuthentication;
 import jp.co.city.tear.model.LoginUser;
 import jp.co.city.tear.service.IAuthenticationService;
+import jp.co.city.tear.web.LoginUserHolder;
 
 import org.apache.wicket.Session;
 import org.apache.wicket.protocol.http.WebSession;
@@ -81,7 +83,11 @@ public class AppSession extends WebSession {
      * @throws FailAuthentication 認証NGの場合にスローして下さい.
      */
     public void login(final String pUserId, final String pPassword) throws FailAuthentication {
-        this.authenticated.set(getAuthenticationService().login(pUserId, pPassword));
+        final LoginUser loginUser = getAuthenticationService().login(pUserId, pPassword);
+        this.authenticated.set(loginUser);
+
+        final HttpSession session = ((HttpServletRequest) RequestCycle.get().getRequest().getContainerRequest()).getSession();
+        LoginUserHolder.set(session, loginUser);
     }
 
     private boolean isAuthenticatedCore() {
@@ -100,7 +106,8 @@ public class AppSession extends WebSession {
     }
 
     private static void invalidateHttpSession() {
-        // Memcahcedによるセッション管理を行なっていると、Session.get()ではセッションが破棄されない.
-        ((HttpServletRequest) RequestCycle.get().getRequest().getContainerRequest()).getSession().invalidate();
+        // Memcahcedによるセッション管理を行なっていると、Session#invalidate()だけではセッションが完全には破棄されない.
+        final HttpSession session = ((HttpServletRequest) RequestCycle.get().getRequest().getContainerRequest()).getSession();
+        session.invalidate();
     }
 }

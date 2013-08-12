@@ -58,6 +58,9 @@ public class LargeDataServiceImpl extends JpaDaoBase implements ILargeDataServic
         if (pData == null) {
             throw NotFound.GLOBAL;
         }
+        if (!pData.isPersisted()) {
+            throw NotFound.GLOBAL;
+        }
         return this.dataStore.getDataInputStream(pData.getId().longValue());
     }
 

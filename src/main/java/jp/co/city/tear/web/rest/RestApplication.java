@@ -21,6 +21,7 @@ public class RestApplication extends Application {
         return new HashSet<>(Arrays.asList(new Class<?>[] { //
                 JsonMessageBodyReaderWriter.class // JSONをきれいに返すにはこのクラスが必要.
                         , UserResource.class //
+                        , ArContentResource.class //
                 }));
     }
 }

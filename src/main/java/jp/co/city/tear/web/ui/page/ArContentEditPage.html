@@ -21,4 +21,64 @@
     <button wicket:id="submitter" class="btn btn-primary btn-large"><i class="icon-white icon-ok"></i>送信</button>
   </form>
 
+  <style>
+    #progressContainer {
+      height: 20px;
+      width: 100%;
+      background: rgba(200,200,200,1);
+      border: solid 1px rgba(150,150,150,1);
+    }
+    #progressContainer > * {
+      position: absolute;
+    }
+    #progressContainer > span {
+      margin-left: 1em;
+    }
+    #progress {
+      background: rgba(0,255,0,.5);
+      height: 20px;
+      width: 0%;
+    }
+  </style>
+  <form id="uploadForm" enctype="multipart/form-data">
+    <input id="fileField" type="file" />
+    <button id="uploader">アップロード</button>
+    <div id="progressContainer">
+      <div id="progress"></div>
+      <span id="value">0/0</span>
+    </div>
+    <script>
+      $(function() { initialize(); });
+      function initialize() {
+        $('#uploader').click(function() {
+          var fd = new FormData();
+          fd.append("file", $('#fileField').get(0).files[0]);
+          $.ajax({
+            async: true,
+            url: '/rest/arContent/1/marker',
+            type: 'post',
+            xhr: function() {
+              var xhr = $.ajaxSettings.xhr();
+              if (!xhr.upload) {
+                return;
+              }
+              xhr.upload.addEventListener('progress',function(e){
+                var prog = 100 * e.loaded / e.total ;
+                $('#progress').css('width', prog + '%');
+                $('#value').text(e.loaded + '/' + e.total + '(' + prog + '%)');
+              });
+              return xhr;
+            },
+            data: fd,
+            contentType: false,
+            processData: false
+          }).done(function(e) {
+            console.log(e);
+          });
+          return false;
+        });
+      }
+    </script>
+  </form>
+
 </wicket:extend>
