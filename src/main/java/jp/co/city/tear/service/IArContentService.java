@@ -59,7 +59,9 @@ public interface IArContentService {
 
     /**
      * @param pLoginUser -
-     * @param pArContents -
+     * @param pArContent -
+     * @param pMarkerData -
+     * @param pContentData -
      */
-    void insertOrUpdate(LoginUser pLoginUser, EArContent pArContents);
+    void insertOrUpdate(LoginUser pLoginUser, EArContent pArContent, InputStream pMarkerData, InputStream pContentData);
 }

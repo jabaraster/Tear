@@ -9,7 +9,6 @@ import jabara.jpa.entity.EntityBase_;
 import jabara.wicket.CssUtil;
 import jabara.wicket.Models;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -18,6 +17,7 @@ import javax.inject.Inject;
 
 import jp.co.city.tear.entity.EArContent;
 import jp.co.city.tear.entity.EArContent_;
+import jp.co.city.tear.entity.ELargeData;
 import jp.co.city.tear.entity.EUser_;
 import jp.co.city.tear.service.IArContentService;
 import jp.co.city.tear.web.ui.AppSession;
@@ -41,7 +41,6 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 /**
  * @author jabaraster
  */
-@SuppressWarnings("synthetic-access")
 public class ArContentListPage extends RestrictedPageBase {
     private static final long                                serialVersionUID      = 5244239824791113862L;
 
@@ -76,18 +75,38 @@ public class ArContentListPage extends RestrictedPageBase {
         return Models.readOnly("ARコンテンツ一覧"); //$NON-NLS-1$
     }
 
+    @SuppressWarnings({ "nls", "serial" })
     private AjaxFallbackDefaultDataTable<EArContent, String> getArContents() {
         if (this.arContents == null) {
             final List<IColumn<EArContent, String>> columns = new ArrayList<>();
             columns.add(new AttributeColumn<EArContent>(EArContent.getMeta(), EntityBase_.id));
             columns.add(new AttributeColumn<EArContent>(EArContent.getMeta(), EArContent_.title));
             columns.add(new OwnerColumn());
+
+            columns.add(new DataColumn("マーカ画像", new IProducer2<EArContent, ELargeData>() {
+                @Override
+                public ELargeData produce(final EArContent pArgument) {
+                    return pArgument.getMarker();
+                }
+            }));
+            columns.add(new DataColumn("コンテンツ", new IProducer2<EArContent, ELargeData>() {
+                @Override
+                public ELargeData produce(final EArContent pArgument) {
+                    return pArgument.getContent();
+                }
+            }));
+
             columns.add(new AttributeColumn<EArContent>(EArContent.getMeta(), EntityBase_.created));
             columns.add(new AttributeColumn<EArContent>(EArContent.getMeta(), EntityBase_.updated));
 
-            final ParametersProducer p = new ParametersProducer();
-            columns.add(new LinkColumn<EArContent>(Models.readOnly("編集"), ArContentUpdatePage.class, p)); //$NON-NLS-1$
-            columns.add(new LinkColumn<EArContent>(Models.readOnly("削除"), ArContentDeletePage.class, p)); //$NON-NLS-1$
+            final IProducer2<EArContent, PageParameters> p = new IProducer2<EArContent, PageParameters>() {
+                @Override
+                public final PageParameters produce(final EArContent pArgument) {
+                    return ArContentEditPage.createParameters(pArgument);
+                }
+            };
+            columns.add(new LinkColumn<>(Models.readOnly("編集"), ArContentUpdatePage.class, p)); //$NON-NLS-1$
+            columns.add(new LinkColumn<>(Models.readOnly("削除"), ArContentDeletePage.class, p)); //$NON-NLS-1$
 
             this.arContents = new AjaxFallbackDefaultDataTable<>("arContents", columns, new ArContentsProvider(), DEFAULT_ROWS_PER_PAGE); //$NON-NLS-1$
         }
@@ -126,6 +145,24 @@ public class ArContentListPage extends RestrictedPageBase {
 
     }
 
+    private static class DataColumn extends AbstractColumn<EArContent, String> {
+        private static final long                        serialVersionUID = 4151926507136485310L;
+
+        private final IProducer2<EArContent, ELargeData> cellObjectProducer;
+
+        DataColumn(final String pDisplayLabel, final IProducer2<EArContent, ELargeData> pCellObjectProducer) {
+            super(Models.readOnly(pDisplayLabel));
+            this.cellObjectProducer = pCellObjectProducer;
+        }
+
+        @Override
+        public void populateItem(final Item<ICellPopulator<EArContent>> pCellItem, final String pComponentId, final IModel<EArContent> pRowModel) {
+            final ELargeData data = this.cellObjectProducer.produce(pRowModel.getObject());
+            final String s = data.hasData() ? "登録あり" : "登録なし"; //$NON-NLS-1$//$NON-NLS-2$
+            pCellItem.add(new Label(pComponentId, s));
+        }
+    }
+
     private static class OwnerColumn extends AbstractColumn<EArContent, String> {
         private static final long serialVersionUID = 3891966725239620408L;
 
@@ -139,15 +176,6 @@ public class ArContentListPage extends RestrictedPageBase {
         @Override
         public void populateItem(final Item<ICellPopulator<EArContent>> pCellItem, final String pComponentId, final IModel<EArContent> pRowModel) {
             pCellItem.add(new Label(pComponentId, pRowModel.getObject().getOwner().getUserId()));
-        }
-    }
-
-    private static class ParametersProducer implements IProducer2<EArContent, PageParameters>, Serializable {
-        private static final long serialVersionUID = 7424283512982530434L;
-
-        @Override
-        public PageParameters produce(final EArContent pArgument) {
-            return ArContentEditPage.createParameters(pArgument);
         }
     }
 }

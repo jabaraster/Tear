@@ -31,9 +31,8 @@ public interface ILargeDataService {
     InputStream getDataInputStream(ELargeData pData) throws NotFound;
 
     /**
-     * @param pData nullの場合は何も処理を行いません. <br>
-     *            また、{@link ELargeData#getData()}がnullの場合も何も処理を行いません.
+     * @param pData -
+     * @param pStream -
      */
-    void insert(ELargeData pData);
-
+    void insertOrUpdate(ELargeData pData, InputStream pStream);
 }

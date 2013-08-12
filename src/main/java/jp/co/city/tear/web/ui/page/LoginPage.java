@@ -8,12 +8,10 @@ import jabara.wicket.Models;
 
 import java.io.Serializable;
 
-import jp.co.city.tear.entity.EUser;
 import jp.co.city.tear.model.FailAuthentication;
 import jp.co.city.tear.web.ui.AppSession;
 
 import org.apache.wicket.markup.head.IHeaderResponse;
-import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.PasswordTextField;
 import org.apache.wicket.markup.html.form.StatelessForm;
@@ -35,9 +33,6 @@ public class LoginPage extends WebPageBase {
 
     private final Handler     handler          = new Handler();
 
-    private Label             defaultAdministratorUserId;
-    private Label             defaultAdministratorPassword;
-
     private FeedbackPanel     feedback;
     private StatelessForm<?>  form;
     private TextField<String> userId;
@@ -50,8 +45,6 @@ public class LoginPage extends WebPageBase {
      * 
      */
     public LoginPage() {
-        this.add(getDefaultAdministratorUserId());
-        this.add(getDefaultAdministratorPassword());
         this.add(getFeedback());
         this.add(getForm());
     }
@@ -80,20 +73,6 @@ public class LoginPage extends WebPageBase {
     @Override
     protected IModel<String> getTitleLabelModel() {
         return Models.readOnly(getString("pageTitle")); //$NON-NLS-1$
-    }
-
-    private Label getDefaultAdministratorPassword() {
-        if (this.defaultAdministratorPassword == null) {
-            this.defaultAdministratorPassword = new Label("defaultAdministratorPassword", EUser.DEFAULT_ADMINISTRATOR_PASSWORD); //$NON-NLS-1$
-        }
-        return this.defaultAdministratorPassword;
-    }
-
-    private Label getDefaultAdministratorUserId() {
-        if (this.defaultAdministratorUserId == null) {
-            this.defaultAdministratorUserId = new Label("defaultAdministratorUserId", EUser.DEFAULT_ADMINISTRATOR_USER_ID); //$NON-NLS-1$
-        }
-        return this.defaultAdministratorUserId;
     }
 
     private FeedbackPanel getFeedback() {

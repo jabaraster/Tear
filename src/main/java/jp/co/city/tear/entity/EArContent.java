@@ -53,15 +53,15 @@ public class EArContent extends EntityBase<EArContent> {
      * 
      */
     @OneToOne
-    @JoinColumn(nullable = true)
-    protected ELargeData                marker;
+    @JoinColumn(nullable = false)
+    protected ELargeData                marker               = new ELargeData();
 
     /**
      * 
      */
     @OneToOne
-    @JoinColumn(nullable = true)
-    protected ELargeData                content;
+    @JoinColumn(nullable = false)
+    protected ELargeData                content              = new ELargeData();
 
     /**
      * @param pOperation -
@@ -136,20 +136,6 @@ public class EArContent extends EntityBase<EArContent> {
     }
 
     /**
-     * @return -
-     */
-    public boolean hasContent() {
-        return this.content != null && this.content.getData() != null;
-    }
-
-    /**
-     * @return -
-     */
-    public boolean hasMarker() {
-        return this.marker != null && this.marker.getData() != null;
-    }
-
-    /**
      * @param pOperation markerがnullでないときに実行する処理.
      */
     public void markerOperation(final IOperation pOperation) {
@@ -157,20 +143,6 @@ public class EArContent extends EntityBase<EArContent> {
         if (this.marker != null) {
             pOperation.run(this.marker);
         }
-    }
-
-    /**
-     * @param pContent contentを設定.
-     */
-    public void setContent(final ELargeData pContent) {
-        this.content = pContent;
-    }
-
-    /**
-     * @param pMarker markerを設定.
-     */
-    public void setMarker(final ELargeData pMarker) {
-        this.marker = pMarker;
     }
 
     /**
