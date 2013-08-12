@@ -80,8 +80,8 @@ public class UserListPage extends AdministrationPageBase {
             columns.add(new AttributeColumn<EUser>(EUser.getMeta(), EntityBase_.updated));
 
             final ParametersProducer p = new ParametersProducer();
-            columns.add(new LinkColumn<EUser>(Models.readOnly("編集"), UserUpdatePage.class, p)); //$NON-NLS-1$
-            columns.add(new LinkColumn<EUser>(Models.readOnly("削除"), UserDeletePage.class, p)); //$NON-NLS-1$
+            columns.add(new LinkColumn<>(Models.readOnly("編集"), UserUpdatePage.class, p)); //$NON-NLS-1$
+            columns.add(new LinkColumn<>(Models.readOnly("削除"), UserDeletePage.class, p)); //$NON-NLS-1$
 
             this.users = new AjaxFallbackDefaultDataTable<>( //
                     "users" // //$NON-NLS-1$

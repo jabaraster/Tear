@@ -61,10 +61,9 @@ public class ArContentEditPage extends RestrictedPageBase {
     private Form<?>           form;
     private TextField<String> title;
     private FileUploadField   marker;
+    private Image             markerImage;
     private FileUploadField   contents;
     private Button            submitter;
-
-    private Image             markerImage;
 
     /**
      * 
@@ -133,6 +132,7 @@ public class ArContentEditPage extends RestrictedPageBase {
             this.form.add(getFeedback());
             this.form.add(getTitle());
             this.form.add(getMarker());
+            this.form.add(getMarkerImage());
             this.form.add(getContents());
             this.form.add(getSubmitter());
         }
@@ -146,6 +146,7 @@ public class ArContentEditPage extends RestrictedPageBase {
         return this.marker;
     }
 
+    @SuppressWarnings("resource")
     private Image getMarkerImage() {
         if (this.markerImage == null) {
             this.markerImage = new Image("markerImage", new ResourceStreamResource(new R(this.arContent.getMarker()))); //$NON-NLS-1$
@@ -175,7 +176,6 @@ public class ArContentEditPage extends RestrictedPageBase {
 
     private void initialize() {
         this.add(getForm());
-        this.add(getMarkerImage());
     }
 
     /**
