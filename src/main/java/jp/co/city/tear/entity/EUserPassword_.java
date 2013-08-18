@@ -5,7 +5,7 @@ import javax.annotation.Generated;
 import javax.persistence.metamodel.SingularAttribute;
 import javax.persistence.metamodel.StaticMetamodel;
 
-@Generated(value="Dali", date="2013-08-12T19:03:41.487+0900")
+@Generated(value="Dali", date="2013-08-19T08:14:13.740+0900")
 @StaticMetamodel(EUserPassword.class)
 public class EUserPassword_ extends EntityBase_ {
 	public static volatile SingularAttribute<EUserPassword, byte[]> password;
