@@ -39,13 +39,12 @@ public class ArContentResource {
      * @param pIn -
      * @return -
      */
-    @SuppressWarnings("static-method")
     @Consumes({ MediaType.MULTIPART_FORM_DATA })
-    @Path("{id}/marker")
+    @Path("{id}/content")
     @POST
-    public Response postMarker( //
+    public Response postContent( //
             @PathParam("id") final long pArContentId //
-            , @FormDataParam("file") final InputStream pIn //
+            , @FormDataParam("data") final InputStream pIn //
     ) {
         for (final Enumeration<String> names = this.session.getAttributeNames(); names.hasMoreElements();) {
             final String k = names.nextElement();
