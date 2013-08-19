@@ -1,22 +1,42 @@
 <wicket:extend>
 
-  <form wicket:id="form">
-    <div wicket:id="feedback"></div>
+  <div wicket:id="feedback"></div>
+
+  <form wicket:id="form" class="submit">
+    <div class="buttonArea">
+      <button wicket:id="submitter" class="btn btn-primary btn-large"><i class="icon-white icon-ok"></i>保存</button>
+      <a wicket:id="cancelar" href="#" class="btn btn-warning btn-large"><i class="icon-white icon-remove"></i> キャンセル</a>
+    </div>
     <ul>
       <li class="input">
         <span class="label">ARタイトル</span>
         <input wicket:id="title" type="text" />
       </li>
+    </ul>
+  </form>
+
+  <form wicket:id="markerForm">
+    <ul>
       <li class="input">
         <span class="label">マーカ画像</span>
-        <input wicket:id="marker" type="file" />
+        <div wicket:id="markerUpload"></div>
         <img wicket:id="markerImage" />
       </li>
+    </ul>
+  </form>
+
+  <form wicket:id="contentForm">
+    <ul>
       <li class="input">
         <span class="label">コンテンツ</span>
         <input wicket:id="content" type="file" />
+        <button wicket:id="contentUploader">アップロード</button>
         <span wicket:id="contentLabel"></span>
       </li>
+    </ul>
+  </form>
+      
+    <ul>
       <li class="input progressable">
         <span class="label">コンテンツ</span>
         <input type="file" />
@@ -28,6 +48,5 @@
         </div>
       </li>
     </ul>
-    <button wicket:id="submitter" class="btn btn-primary btn-large"><i class="icon-white icon-ok"></i>送信</button>
-  </form>
+
 </wicket:extend>
