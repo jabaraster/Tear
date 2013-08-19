@@ -6,7 +6,6 @@ package jp.co.city.tear.service;
 import jabara.general.NotFound;
 import jabara.general.Sort;
 
-import java.io.File;
 import java.io.InputStream;
 import java.util.List;
 
@@ -65,10 +64,4 @@ public interface IArContentService {
      * @param pContentData -
      */
     void insertOrUpdate(LoginUser pLoginUser, EArContent pArContent, InputStream pMarkerData, InputStream pContentData);
-
-    /**
-     * @param pData -
-     * @return -
-     */
-    File saveTemporary(InputStream pData);
 }

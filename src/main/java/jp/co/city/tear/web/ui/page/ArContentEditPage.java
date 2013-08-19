@@ -4,15 +4,12 @@
 package jp.co.city.tear.web.ui.page;
 
 import jabara.general.ArgUtil;
-import jabara.general.ExceptionUtil;
 import jabara.general.NotFound;
 import jabara.wicket.CssUtil;
 import jabara.wicket.JavaScriptUtil;
 import jabara.wicket.Models;
 import jabara.wicket.ValidatorUtil;
 
-import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 
@@ -23,6 +20,8 @@ import jp.co.city.tear.entity.EArContent_;
 import jp.co.city.tear.entity.ELargeData;
 import jp.co.city.tear.service.IArContentService;
 import jp.co.city.tear.web.ui.AppSession;
+import jp.co.city.tear.web.ui.component.FileUploadPanel;
+import jp.co.city.tear.web.ui.component.FileUploadPanel.IOperation;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.wicket.RestartResponseException;
@@ -31,9 +30,10 @@ import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.TextField;
-import org.apache.wicket.markup.html.form.upload.FileUpload;
 import org.apache.wicket.markup.html.form.upload.FileUploadField;
 import org.apache.wicket.markup.html.image.Image;
+import org.apache.wicket.markup.html.link.BookmarkablePageLink;
+import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
@@ -50,33 +50,30 @@ import org.apache.wicket.util.string.StringValueConversionException;
  */
 @SuppressWarnings({ "synthetic-access", "serial" })
 public class ArContentEditPage extends RestrictedPageBase {
-    private static final long serialVersionUID = -4884364205385771240L;
+    private static final long       serialVersionUID = -4884364205385771240L;
 
-    private final EArContent  arContent;
+    private final EArContent        arContent;
 
-    private final Handler     handler          = new Handler();
+    private final Handler           handler          = new Handler();
 
     @Inject
-    IArContentService         arContentService;
+    IArContentService               arContentService;
 
-    private FeedbackPanel     feedback;
+    private FeedbackPanel           feedback;
 
-    private Form<?>           form;
-    private TextField<String> title;
-    private Button            submitter;
+    private Form<?>                 form;
+    private TextField<String>       title;
+    private Button                  submitter;
+    private BookmarkablePageLink<?> cancelar;
 
-    private Form<?>           markerForm;
-    private FileUploadField   marker;
-    private Image             markerImage;
-    private Button            markerUploader;
+    private Form<?>                 markerForm;
+    private FileUploadPanel         markerUpload;
+    private Image                   markerImage;
 
-    private Form<?>           contentForm;
-    private FileUploadField   content;
-    private Label             contentLabel;
-    private Button            contentUploader;
-
-    private File              temporaryContent;
-    private File              temporaryMarker;
+    private Form<?>                 contentForm;
+    private FileUploadField         content;
+    private Label                   contentLabel;
+    private Button                  contentUploader;
 
     /**
      * 
@@ -132,6 +129,7 @@ public class ArContentEditPage extends RestrictedPageBase {
             this.form = new Form<>("form"); //$NON-NLS-1$
             this.form.add(getTitle());
             this.form.add(getSubmitter());
+            this.form.add(getCancelar());
         }
         return this.form;
     }
@@ -147,11 +145,18 @@ public class ArContentEditPage extends RestrictedPageBase {
 
                 @Override
                 public void onSubmit() {
-                    ArContentEditPage.this.handler.save();
+                    // TODO
                 }
             };
         }
         return this.submitter;
+    }
+
+    private Link<?> getCancelar() {
+        if (this.cancelar == null) {
+            this.cancelar = new BookmarkablePageLink<>("cancelar", ArContentListPage.class); //$NON-NLS-1$
+        }
+        return this.cancelar;
     }
 
     private FileUploadField getContent() {
@@ -192,7 +197,7 @@ public class ArContentEditPage extends RestrictedPageBase {
             this.contentUploader = new Button("contentUploader") { //$NON-NLS-1$
                 @Override
                 public void onSubmit() {
-                    ArContentEditPage.this.handler.uploadContent();
+                    // TODO
                 }
             };
         }
@@ -206,19 +211,11 @@ public class ArContentEditPage extends RestrictedPageBase {
         return this.feedback;
     }
 
-    private FileUploadField getMarker() {
-        if (this.marker == null) {
-            this.marker = new FileUploadField(EArContent_.marker.getName());
-        }
-        return this.marker;
-    }
-
     private Form<?> getMarkerForm() {
         if (this.markerForm == null) {
             this.markerForm = new Form<>("markerForm"); //$NON-NLS-1$
-            this.markerForm.add(getMarker());
             this.markerForm.add(getMarkerImage());
-            this.markerForm.add(getMarkerUploader());
+            this.markerForm.add(getMarkerUpload());
         }
         return this.markerForm;
     }
@@ -231,16 +228,16 @@ public class ArContentEditPage extends RestrictedPageBase {
         return this.markerImage;
     }
 
-    private Button getMarkerUploader() {
-        if (this.markerUploader == null) {
-            this.markerUploader = new Button("markerUploader") { //$NON-NLS-1$
-                @Override
-                public void onSubmit() {
-                    ArContentEditPage.this.handler.uploadMarkerImage();
-                }
-            };
+    private FileUploadPanel getMarkerUpload() {
+        if (this.markerUpload == null) {
+            this.markerUpload = new FileUploadPanel("markerUpload", new IOperation() { //$NON-NLS-1$
+                        @Override
+                        public void run() {
+                            ArContentEditPage.this.handler.removeMarker();
+                        }
+                    });
         }
-        return this.markerUploader;
+        return this.markerUpload;
     }
 
     private TextField<String> getTitle() {
@@ -273,91 +270,22 @@ public class ArContentEditPage extends RestrictedPageBase {
         return ret;
     }
 
-    private static InputStream getDataFromFileUpload(final FileUploadField pField) {
-        try {
-            final FileUpload upload = pField.getFileUpload();
-            if (upload == null) {
-                return null;
-            }
-            return upload.getInputStream();
-        } catch (final IOException e) {
-            throw ExceptionUtil.rethrow(e);
-        }
-    }
-
-    private class DataSaver implements Serializable {
-        private final FileUploadField field;
-        private File                  temporary;
-
-        DataSaver(final FileUploadField pField) {
-            this.field = pField;
-        }
-
-        void save() {
-            try (InputStream data = getDataFromFileUpload(this.field)) {
-                final File temp = ArContentEditPage.this.arContentService.saveTemporary(data);
-                if (this.temporary != null) {
-                    this.temporary.delete();
-                }
-                this.temporary = temp;
-
-            } catch (final IOException e) {
-                throw ExceptionUtil.rethrow(e);
-            }
-        }
-    }
-
     private class Handler implements Serializable {
 
-        void save() {
-            try (final InputStream markerData = getDataFromFileUpload(getMarker()); //
-                    final InputStream contentData = getDataFromFileUpload(getContent()) //
-            ) {
-                ArContentEditPage.this.arContentService.insertOrUpdate( //
-                        AppSession.get().getLoginUser() //
-                        , ArContentEditPage.this.arContent //
-                        , markerData //
-                        , contentData //
-                        );
-
-                setResponsePage(ArContentListPage.class);
-
-            } catch (final IOException e) {
-                throw ExceptionUtil.rethrow(e);
-            }
+        void removeContent() {
+            ArContentEditPage.this.arContent.getContent().clearData();
         }
 
-        void uploadContent() {
-            try (InputStream data = getDataFromFileUpload(getContent())) {
-                final File temp = ArContentEditPage.this.arContentService.saveTemporary(data);
-                if (ArContentEditPage.this.temporaryContent != null) {
-                    ArContentEditPage.this.temporaryContent.delete();
-                }
-                ArContentEditPage.this.temporaryContent = temp;
-
-            } catch (final IOException e) {
-                throw ExceptionUtil.rethrow(e);
-            }
+        void removeMarker() {
+            ArContentEditPage.this.arContent.getMarker().clearData();
         }
 
-        void uploadMarkerImage() {
-            try (InputStream data = getDataFromFileUpload(getMarker())) {
-                final File temp = ArContentEditPage.this.arContentService.saveTemporary(data);
-                if (ArContentEditPage.this.temporaryMarker != null) {
-                    ArContentEditPage.this.temporaryMarker.delete();
-                }
-                ArContentEditPage.this.temporaryMarker = temp;
-
-            } catch (final IOException e) {
-                throw ExceptionUtil.rethrow(e);
-            }
-        }
     }
 
     private class R extends AbstractResourceStream {
 
-        private final ELargeData data;
-        private InputStream      in;
+        private final ELargeData      data;
+        private transient InputStream in;
 
         R(final ELargeData pData) {
             this.data = pData;
@@ -370,9 +298,21 @@ public class ArContentEditPage extends RestrictedPageBase {
 
         @Override
         public InputStream getInputStream() throws ResourceStreamNotFoundException {
+            this.in = getInputStreamCore();
+            return this.in;
+        }
+
+        private InputStream getInputStreamCore() throws ResourceStreamNotFoundException {
             if (this.data == null) {
                 throw new ResourceStreamNotFoundException();
             }
+
+            try {
+                return getMarkerUpload().getInputStream();
+            } catch (final NotFound e) {
+                // 次の処理へ.
+            }
+
             try {
                 return ArContentEditPage.this.arContentService.getDataInputStream(this.data);
             } catch (final NotFound e) {
