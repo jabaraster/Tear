@@ -49,7 +49,7 @@ public class LargeDataOperation implements AutoCloseable {
      */
     public InputStream getData() {
         if (this.data == null) {
-            throw new IllegalStateException();
+            return null;
         }
         return this.data;
     }

@@ -187,15 +187,9 @@ public class ArContentServiceImpl extends JpaDaoBase implements IArContentServic
             , final LargeDataOperation pMarkerDataOperation //
             , final LargeDataOperation pContentDataOperation) {
 
-        insertDataIfDataExists(pArContent.getMarker(), pMarkerDataOperation);
-        insertDataIfDataExists(pArContent.getContent(), pContentDataOperation);
+        this.largeDataService.insertOrUpdate(pArContent.getMarker(), pMarkerDataOperation.getData());
+        this.largeDataService.insertOrUpdate(pArContent.getContent(), pContentDataOperation.getData());
         getEntityManager().persist(pArContent);
-    }
-
-    private void insertDataIfDataExists(final ELargeData pData, final LargeDataOperation pDataOperation) {
-        if (pDataOperation.getMode() == LargeDataOperation.Mode.UPDATE) {
-            this.largeDataService.insertOrUpdate(pData, pDataOperation.getData());
-        }
     }
 
     private void updateCore( //
@@ -212,15 +206,15 @@ public class ArContentServiceImpl extends JpaDaoBase implements IArContentServic
 
     private void updateData(final ELargeData pData, final LargeDataOperation pDataOperation) {
         switch (pDataOperation.getMode()) {
-        case DELETE:
-            this.largeDataService.delete(pData);
-            break;
         case NOOP:
             // 処理なし
             break;
+        case DELETE:
         case UPDATE:
             this.largeDataService.insertOrUpdate(pData, pDataOperation.getData());
             break;
+        default:
+            throw new IllegalStateException();
         }
     }
 }

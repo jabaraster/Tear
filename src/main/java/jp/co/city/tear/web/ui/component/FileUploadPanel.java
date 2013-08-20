@@ -19,6 +19,7 @@ import java.io.OutputStream;
 import java.io.Serializable;
 
 import jp.co.city.tear.model.LargeDataOperation;
+import jp.co.city.tear.model.LargeDataOperation.Mode;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.wicket.markup.html.form.Button;
@@ -31,17 +32,17 @@ import org.apache.wicket.markup.html.panel.Panel;
  */
 @SuppressWarnings("synthetic-access")
 public class FileUploadPanel extends Panel {
-    private static final long             serialVersionUID = -2121159238236955334L;
+    private static final long       serialVersionUID = -2121159238236955334L;
 
-    private final Handler                 handler          = new Handler();
+    private final Handler           handler          = new Handler();
 
-    private final LargeDataOperation.Mode dataOperation    = LargeDataOperation.Mode.NOOP;
-    private File                          temporary;
+    private LargeDataOperation.Mode dataOperation    = LargeDataOperation.Mode.NOOP;
+    private File                    temporary;                                      // TODO 後始末
 
-    private FileUploadField               fileUpload;
-    private Button                        uploader;
-    private Button                        remover;
-    private Button                        restorer;
+    private FileUploadField         fileUpload;
+    private Button                  uploader;
+    private Button                  deleter;
+    private Button                  restorer;
 
     /**
      * @param pId -
@@ -51,8 +52,15 @@ public class FileUploadPanel extends Panel {
 
         this.add(getFileUpload());
         this.add(getUploader());
-        this.add(getRemover());
+        this.add(getDeleter());
         this.add(getRestorer());
+    }
+
+    /**
+     * 
+     */
+    public void clear() {
+        this.handler.restore();
     }
 
     /**
@@ -87,6 +95,8 @@ public class FileUploadPanel extends Panel {
             case UPDATE:
                 ret.update(new BufferedInputStream(new FileInputStream(this.temporary)));
                 break;
+            default:
+                throw new IllegalStateException();
             }
             return ret;
 
@@ -101,6 +111,19 @@ public class FileUploadPanel extends Panel {
         }
     }
 
+    @SuppressWarnings("serial")
+    private Button getDeleter() {
+        if (this.deleter == null) {
+            this.deleter = new Button("deleter") { //$NON-NLS-1$
+                @Override
+                public void onSubmit() {
+                    FileUploadPanel.this.handler.delete();
+                }
+            };
+        }
+        return this.deleter;
+    }
+
     private FileUploadField getFileUpload() {
         if (this.fileUpload == null) {
             this.fileUpload = new FileUploadField("fileUpload"); //$NON-NLS-1$
@@ -109,25 +132,12 @@ public class FileUploadPanel extends Panel {
     }
 
     @SuppressWarnings("serial")
-    private Button getRemover() {
-        if (this.remover == null) {
-            this.remover = new Button("remover") { //$NON-NLS-1$
-                @Override
-                public void onSubmit() {
-                    deleteTemporaryFile();
-                }
-            };
-        }
-        return this.remover;
-    }
-
-    @SuppressWarnings("serial")
     private Button getRestorer() {
         if (this.restorer == null) {
             this.restorer = new Button("restorer") { //$NON-NLS-1$
                 @Override
                 public void onSubmit() {
-                    deleteTemporaryFile();
+                    FileUploadPanel.this.handler.restore();
                 }
             };
         }
@@ -177,7 +187,17 @@ public class FileUploadPanel extends Panel {
     private class Handler implements Serializable {
         private static final long serialVersionUID = -2699703816024152769L;
 
-        void upload() {
+        private void delete() {
+            deleteTemporaryFile();
+            FileUploadPanel.this.dataOperation = Mode.DELETE;
+        }
+
+        private void restore() {
+            deleteTemporaryFile();
+            FileUploadPanel.this.dataOperation = Mode.NOOP;
+        }
+
+        private void upload() {
             try (InputStream data = getDataFromFileUpload(getFileUpload())) {
                 if (data == null) {
                     return;
@@ -185,6 +205,7 @@ public class FileUploadPanel extends Panel {
                 final File temp = save(data);
                 deleteTemporaryFile();
                 FileUploadPanel.this.temporary = temp;
+                FileUploadPanel.this.dataOperation = Mode.UPDATE;
 
             } catch (final IOException e) {
                 throw ExceptionUtil.rethrow(e);

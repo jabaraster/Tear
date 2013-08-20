@@ -1,8 +1,8 @@
 package jp.co.city.tear.web;
 
-import jabara.servlet.IRouter;
-import jabara.servlet.RouterBase;
-import jabara.servlet.RoutingFilterBase;
+import jabara.servlet.routing.IRouter;
+import jabara.servlet.routing.RouterBase;
+import jabara.servlet.routing.RoutingFilterBase;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 public class RoutingFilter extends RoutingFilterBase {
 
     /**
-     * @see jabara.servlet.RoutingFilterBase#createRouter(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+     * @see jabara.servlet.routing.RoutingFilterBase#createRouter(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
      */
     @Override
     protected IRouter createRouter(final HttpServletRequest pRequest, final HttpServletResponse pResponse) {

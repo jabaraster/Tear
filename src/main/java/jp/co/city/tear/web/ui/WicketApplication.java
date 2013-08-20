@@ -33,6 +33,8 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.request.Request;
 import org.apache.wicket.request.Response;
+import org.apache.wicket.session.HttpSessionStore;
+import org.apache.wicket.session.ISessionStore;
 import org.apache.wicket.util.IProvider;
 
 import com.google.inject.Injector;
@@ -98,6 +100,19 @@ public class WicketApplication extends WebApplication {
         initializeInjection();
         initializeSecurity();
         initializeOther();
+
+        setSessionStoreProvider(new IProvider<ISessionStore>() {
+
+            @Override
+            public ISessionStore get() {
+                return new HttpSessionStore() {
+                    @Override
+                    public void destroy() {
+                        super.destroy();
+                    }
+                };
+            }
+        });
     }
 
     private void initializeEncoding() {

@@ -19,7 +19,6 @@ import javax.inject.Inject;
 
 import jp.co.city.tear.entity.EArContent;
 import jp.co.city.tear.entity.EArContent_;
-import jp.co.city.tear.entity.ELargeData;
 import jp.co.city.tear.model.LargeDataOperation;
 import jp.co.city.tear.service.IArContentService;
 import jp.co.city.tear.web.ui.AppSession;
@@ -32,7 +31,6 @@ import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.TextField;
-import org.apache.wicket.markup.html.image.Image;
 import org.apache.wicket.markup.html.image.NonCachingImage;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.link.Link;
@@ -140,7 +138,7 @@ public class ArContentEditPage extends RestrictedPageBase {
             this.submitter = new Button("submitter") { //$NON-NLS-1$
                 @Override
                 public void onSubmit() {
-                    ArContentEditPage.this.handler.persist();
+                    ArContentEditPage.this.handler.save();
                 }
             };
         }
@@ -166,18 +164,7 @@ public class ArContentEditPage extends RestrictedPageBase {
     @SuppressWarnings("nls")
     private Label getContentLabel() {
         if (this.contentLabel == null) {
-            this.contentLabel = new Label("contentLabel", new AbstractReadOnlyModel<String>() {
-                @Override
-                public String getObject() {
-                    try (InputStream in = getInputStream(ArContentEditPage.this.arContent.getContent(), getContentUpload())) {
-                        return "コンテンツ有り.";
-                    } catch (final IOException e) {
-                        throw ExceptionUtil.rethrow(e);
-                    } catch (final NotFound e) {
-                        return "コンテンツが登録されていません.";
-                    }
-                }
-            });
+            this.contentLabel = new Label("contentLabel", new ContentLabelModel());
         }
         return this.contentLabel;
     }
@@ -196,14 +183,6 @@ public class ArContentEditPage extends RestrictedPageBase {
         return this.feedback;
     }
 
-    private InputStream getInputStream(final ELargeData pData, final FileUploadPanel pFileUpload) throws NotFound {
-        try {
-            return pFileUpload.getInputStream();
-        } catch (final NotFound e) {
-            return this.arContentService.getDataInputStream(pData);
-        }
-    }
-
     private Form<?> getMarkerForm() {
         if (this.markerForm == null) {
             this.markerForm = new Form<>("markerForm"); //$NON-NLS-1$
@@ -213,9 +192,12 @@ public class ArContentEditPage extends RestrictedPageBase {
         return this.markerForm;
     }
 
-    private Image getMarkerImage() {
+    private NonCachingImage getMarkerImage() {
         if (this.markerImage == null) {
-            this.markerImage = new NonCachingImage("markerImage", new ResourceStreamResource(new R(this.arContent.getMarker()))); //$NON-NLS-1$
+            try (final LargeDataResourceStream stream = new LargeDataResourceStream()) {
+                final ResourceStreamResource resource = new ResourceStreamResource(stream);
+                this.markerImage = new NonCachingImage("markerImage", resource); //$NON-NLS-1$
+            }
         }
         return this.markerImage;
     }
@@ -257,9 +239,31 @@ public class ArContentEditPage extends RestrictedPageBase {
         return ret;
     }
 
+    private class ContentLabelModel extends AbstractReadOnlyModel<String> {
+        @SuppressWarnings("nls")
+        @Override
+        public String getObject() {
+            try (LargeDataOperation op = getContentUpload().getOperation()) {
+                switch (op.getMode()) {
+                case DELETE:
+                    return "コンテンツなし";
+                case NOOP:
+                    return ArContentEditPage.this.arContent.getContent().hasData() ? "コンテンツあり" : "コンテンツなし";
+                case UPDATE:
+                    return op.getData() == null ? "コンテンツなし" : "コンテンツあり";
+                default:
+                    throw new IllegalStateException();
+                }
+            } catch (final IOException e) {
+                throw ExceptionUtil.rethrow(e);
+            }
+        }
+
+    }
+
     private class Handler implements Serializable {
 
-        void persist() {
+        private void save() {
             try (LargeDataOperation markerDataOperation = getMarkerUpload().getOperation(); //
                     LargeDataOperation contentDataOperation = getContentUpload().getOperation()) {
                 ArContentEditPage.this.arContentService.insertOrUpdate( //
@@ -267,21 +271,18 @@ public class ArContentEditPage extends RestrictedPageBase {
                         , ArContentEditPage.this.arContent //
                         , markerDataOperation //
                         , contentDataOperation);
+                getMarkerUpload().clear();
+                setResponsePage(ArContentListPage.class);
+
             } catch (final IOException e) {
                 throw ExceptionUtil.rethrow(e);
             }
         }
     }
 
-    private class R extends AbstractResourceStream {
+    private class LargeDataResourceStream extends AbstractResourceStream {
 
-        private final ELargeData      data;
         private transient InputStream in;
-
-        R(final ELargeData pData) {
-            ArgUtil.checkNull(pData, "pData"); //$NON-NLS-1$
-            this.data = pData;
-        }
 
         @Override
         public void close() {
@@ -295,19 +296,23 @@ public class ArContentEditPage extends RestrictedPageBase {
             return this.in;
         }
 
+        @SuppressWarnings("resource")
         private InputStream getInputStreamCore() throws ResourceStreamNotFoundException {
-            try {
-                return getMarkerUpload().getInputStream();
-            } catch (final NotFound e) {
-                // 次の処理へ.
-            }
-
-            try {
-                return ArContentEditPage.this.arContentService.getDataInputStream(this.data);
-            } catch (final NotFound e) {
+            final LargeDataOperation operation = getMarkerUpload().getOperation();
+            switch (operation.getMode()) {
+            case DELETE:
                 throw new ResourceStreamNotFoundException();
+            case UPDATE:
+                return operation.getData();
+            case NOOP:
+                try {
+                    return ArContentEditPage.this.arContentService.getDataInputStream(ArContentEditPage.this.arContent.getMarker());
+                } catch (final NotFound e1) {
+                    throw new ResourceStreamNotFoundException();
+                }
+            default:
+                throw new IllegalStateException();
             }
         }
-
     }
 }
