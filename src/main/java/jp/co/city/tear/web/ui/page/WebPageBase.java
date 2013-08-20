@@ -4,6 +4,7 @@ import jabara.general.ArgUtil;
 import jabara.wicket.JavaScriptUtil;
 import jabara.wicket.Models;
 import jp.co.city.tear.Environment;
+import jp.co.city.tear.web.ui.AppSession;
 
 import org.apache.wicket.Page;
 import org.apache.wicket.markup.head.CssHeaderItem;
@@ -42,6 +43,14 @@ public abstract class WebPageBase extends WebPage {
         this.add(getApplicationNameInHeader());
         this.add(getTitleLabel());
         this.add(getHeaderPanel());
+    }
+
+    /**
+     * @see org.apache.wicket.Component#getSession()
+     */
+    @Override
+    public AppSession getSession() {
+        return (AppSession) super.getSession();
     }
 
     /**

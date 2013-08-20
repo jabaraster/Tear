@@ -109,6 +109,7 @@ public class WebInitializer extends GuiceServletContextListener {
             private void initializeJersey() {
                 final Map<String, String> params = new HashMap<>();
                 params.put(ServletContainer.APPLICATION_CONFIG_CLASS, RestApplication.class.getName());
+                params.put("com.sun.jersey.config.property.JSPTemplatesBasePath", "/WEB-INF/jsp"); //$NON-NLS-1$//$NON-NLS-2$
                 serve(PATH_REST + WILD_CARD).with(GuiceContainer.class, params);
             }
 

@@ -10,6 +10,7 @@ import jabara.general.NotFound;
 import jabara.general.Sort;
 import jabara.jpa.JpaDaoBase;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
@@ -26,9 +27,11 @@ import jp.co.city.tear.entity.EArContent_;
 import jp.co.city.tear.entity.EUser;
 import jp.co.city.tear.entity.EUser_;
 import jp.co.city.tear.model.Duplicate;
+import jp.co.city.tear.model.LargeDataOperation;
 import jp.co.city.tear.model.LoginUser;
 import jp.co.city.tear.service.IUserService;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -81,11 +84,35 @@ public class ArContentServiceImplTest {
         }
     }
 
-    private static InputStream getContentData() {
+    @SuppressWarnings("resource")
+    private static LargeDataOperation getContentData() {
+        final InputStream in = getContentDataStream();
+        return new LargeDataOperation().update(in);
+    }
+
+    private static int getContentDataLength() throws IOException {
+        try (final InputStream in = getContentDataStream()) {
+            return IOUtils.toByteArray(in).length;
+        }
+    }
+
+    private static InputStream getContentDataStream() {
         return getResourceAsStream("AR01_content.jpg"); //$NON-NLS-1$
     }
 
-    private static InputStream getMarkerData() {
+    @SuppressWarnings("resource")
+    private static LargeDataOperation getMarkerData() {
+        final InputStream in = getMarkerDataStream();
+        return new LargeDataOperation().update(in);
+    }
+
+    private static int getMarkerDataLength() throws IOException {
+        try (final InputStream in = getMarkerDataStream()) {
+            return IOUtils.toByteArray(in).length;
+        }
+    }
+
+    private static InputStream getMarkerDataStream() {
         return getResourceAsStream("AR01_marker.jpg"); //$NON-NLS-1$
     }
 
@@ -114,63 +141,185 @@ public class ArContentServiceImplTest {
 
         /**
          * @throws NotFound -
+         * @throws IOException -
          */
-        @SuppressWarnings("boxing")
         @Test
-        public void _insert_makerの中のInputStreamがnullの場合はELargeDataはinsertされない() throws NotFound {
+        public void _insert_データあり() throws NotFound, IOException {
             final EntityManager em = this.rule.getEntityManager();
             final LoginUser loginUser = getAdministratorUser(em);
 
             final EArContent ac = new EArContent();
-            ac.setTitle("title"); //$NON-NLS-1$
-            this.rule.getSut().insertOrUpdate(loginUser, ac, null, null);
+            final String title = "title"; //$NON-NLS-1$
+            ac.setTitle(title);
+
+            try (LargeDataOperation md = getMarkerData(); LargeDataOperation cd = getContentData()) {
+                this.rule.getSut().insertOrUpdate(loginUser, ac, md, cd);
+            }
 
             em.flush();
             em.clear();
 
-            final EArContent inDb = this.rule.getSut().findById(loginUser, ac.getId().longValue());
-
-            assertThat(inDb.getMarker().hasData(), is(false));
-            assertThat(inDb.getContent().hasData(), is(false));
+            assertContent(loginUser, ac, title, true);
         }
-    }
-
-    /**
-     * @author jabaraster
-     */
-    public static class TableRowCount_is_0 {
-        /**
-         * 
-         */
-        @Rule
-        public final JpaDaoRule<ArContentServiceImpl> tool = new JpaDaoRule<ArContentServiceImpl>() {
-                                                               @Override
-                                                               protected ArContentServiceImpl createService(
-                                                                       final EntityManagerFactory pEntityManagerFactory) {
-                                                                   return createServiceCore(pEntityManagerFactory);
-                                                               }
-                                                           };
 
         /**
-         * 
+         * @throws NotFound -
+         * @throws IOException -
          */
         @Test
-        public void _update() {
-            final EntityManager em = this.tool.getEntityManager();
+        public void _insert_データなし_cancel() throws NotFound, IOException {
+            final EntityManager em = this.rule.getEntityManager();
             final LoginUser loginUser = getAdministratorUser(em);
 
             final EArContent ac = new EArContent();
-            ac.setTitle("title"); //$NON-NLS-1$
+            final String title = "title"; //$NON-NLS-1$
+            ac.setTitle(title);
 
-            this.tool.getSut().insertOrUpdate(loginUser, ac, getMarkerData(), null);
-            em.detach(ac);
-
-            ac.setTitle("title_"); //$NON-NLS-1$
-            this.tool.getSut().insertOrUpdate(loginUser, ac, null, getContentData());
+            try (LargeDataOperation md = getMarkerData(); LargeDataOperation cd = getContentData()) {
+                this.rule.getSut().insertOrUpdate(loginUser, ac, md.cancel(), cd.cancel());
+            }
 
             em.flush();
+            em.clear();
+
+            assertContent(loginUser, ac, title, false);
         }
 
+        /**
+         * @throws NotFound -
+         * @throws IOException -
+         */
+        @Test
+        public void _insert_データなし_delete() throws NotFound, IOException {
+            final EntityManager em = this.rule.getEntityManager();
+            final LoginUser loginUser = getAdministratorUser(em);
+
+            final EArContent ac = new EArContent();
+            final String title = "title"; //$NON-NLS-1$
+            ac.setTitle(title);
+
+            try (LargeDataOperation md = getMarkerData(); LargeDataOperation cd = getContentData()) {
+                this.rule.getSut().insertOrUpdate(loginUser, ac, md.delete(), cd.delete());
+            }
+
+            em.flush();
+            em.clear();
+
+            assertContent(loginUser, ac, title, false);
+        }
+
+        /**
+         * @throws NotFound -
+         * @throws IOException -
+         */
+        @SuppressWarnings("boxing")
+        @Test
+        public void _update_データに変更なし() throws NotFound, IOException {
+            final EntityManager em = this.rule.getEntityManager();
+            final LoginUser loginUser = getAdministratorUser(em);
+
+            final String newTitle = "new_title"; //$NON-NLS-1$
+            final EArContent update = insertAndUpdate(loginUser, newTitle);
+
+            try (LargeDataOperation md = getMarkerData(); //
+                    LargeDataOperation cd = getContentData(); //
+                    InputStream updateMarkerData = getContentDataStream(); //
+                    InputStream updateContentData = getMarkerDataStream(); //
+            ) {
+                md.update(updateMarkerData).cancel();
+                cd.update(updateContentData).cancel();
+                this.rule.getSut().insertOrUpdate(loginUser, update, md, cd);
+
+                em.flush();
+                em.clear();
+
+                assertContent(loginUser, update, newTitle, true);
+                final EArContent inDb = this.rule.getSut().findById(loginUser, update.getId().longValue());
+                assertThat(inDb.getMarker().getLength(), is(getMarkerDataLength()));
+                assertThat(inDb.getContent().getLength(), is(getContentDataLength()));
+            }
+        }
+
+        /**
+         * @throws NotFound -
+         * @throws IOException -
+         */
+        @SuppressWarnings("boxing")
+        @Test
+        public void _update_データ更新() throws NotFound, IOException {
+            final EntityManager em = this.rule.getEntityManager();
+            final LoginUser loginUser = getAdministratorUser(em);
+
+            final String newTitle = "new_title"; //$NON-NLS-1$
+            final EArContent update = insertAndUpdate(loginUser, newTitle);
+
+            try (LargeDataOperation md = getMarkerData(); //
+                    LargeDataOperation cd = getContentData(); //
+                    InputStream updateMarkerData = getContentDataStream(); //
+                    InputStream updateContentData = getMarkerDataStream(); //
+            ) {
+                this.rule.getSut().insertOrUpdate(loginUser, update, md.update(updateMarkerData), cd.update(updateContentData));
+
+                em.flush();
+                em.clear();
+
+                assertContent(loginUser, update, newTitle, true);
+                final EArContent inDb = this.rule.getSut().findById(loginUser, update.getId().longValue());
+                assertThat(inDb.getMarker().getLength(), is(getContentDataLength()));
+                assertThat(inDb.getContent().getLength(), is(getMarkerDataLength()));
+            }
+        }
+
+        /**
+         * @throws NotFound -
+         * @throws IOException -
+         */
+        @Test
+        public void _update_データ削除() throws NotFound, IOException {
+            final EntityManager em = this.rule.getEntityManager();
+            final LoginUser loginUser = getAdministratorUser(em);
+
+            final String newTitle = "new_title"; //$NON-NLS-1$
+            final EArContent update = insertAndUpdate(loginUser, newTitle);
+
+            try (LargeDataOperation md = getMarkerData(); LargeDataOperation cd = getContentData()) {
+                this.rule.getSut().insertOrUpdate(loginUser, update, md.delete(), cd.delete());
+            }
+
+            em.flush();
+            em.clear();
+
+            assertContent(loginUser, update, newTitle, false);
+        }
+
+        @SuppressWarnings("boxing")
+        private void assertContent( //
+                final LoginUser pLoginUser //
+                , final EArContent pArContent //
+                , final String pTitle //
+                , final boolean pHasData) throws NotFound {
+            final EArContent inDb = this.rule.getSut().findById(pLoginUser, pArContent.getId().longValue());
+            assertThat(inDb.getTitle(), is(pTitle));
+            assertThat(inDb.getMarker().hasData(), is(pHasData));
+            assertThat(inDb.getContent().hasData(), is(pHasData));
+        }
+
+        private EArContent insertAndUpdate(final LoginUser loginUser, final String pNewTitle) throws IOException, NotFound {
+            final EntityManager em = this.rule.getEntityManager();
+            final EArContent ac = new EArContent();
+            ac.setTitle("title"); //$NON-NLS-1$
+
+            try (LargeDataOperation md = getMarkerData(); LargeDataOperation cd = getContentData()) {
+                this.rule.getSut().insertOrUpdate(loginUser, ac, md, cd);
+            }
+
+            em.flush();
+            em.clear();
+
+            final EArContent update = this.rule.getSut().findById(loginUser, ac.getId().longValue());
+            update.setTitle(pNewTitle);
+            return update;
+        }
     }
 
     /**
@@ -287,7 +436,7 @@ public class ArContentServiceImplTest {
                 for (int i = 0; i < pInsertRowCount; i++) {
                     final EArContent ac = new EArContent();
                     ac.setTitle(i + "'th AR Contents."); //$NON-NLS-1$
-                    this.rule.getSut().insertOrUpdate(o, ac, getMarkerData(), null);
+                    this.rule.getSut().insertOrUpdate(o, ac, getMarkerData(), getContentData());
                 }
                 this.rule.getEntityManager().flush();
 
