@@ -23,7 +23,7 @@ public class WebStarter {
     /**
      * @param pMode -
      */
-    @SuppressWarnings({ "unused", "nls" })
+    @SuppressWarnings({ "nls", "unused" })
     public static void initializeDataSource(final Mode pMode) {
         ArgUtil.checkNull(pMode, "pMode"); //$NON-NLS-1$
 
