@@ -4,11 +4,9 @@
 package jp.co.city.tear.web.rest;
 
 import java.io.InputStream;
-import java.util.HashMap;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -17,7 +15,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import com.sun.jersey.api.view.Viewable;
 import com.sun.jersey.multipart.FormDataParam;
 
 /**
@@ -25,15 +22,6 @@ import com.sun.jersey.multipart.FormDataParam;
  */
 @Path("arContent")
 public class ArContentResource {
-
-    /**
-     * @return -
-     */
-    @Path("hoge")
-    @GET
-    public Viewable get() {
-        return new Viewable("/plist.jsp", new HashMap<>()); //$NON-NLS-1$
-    }
 
     /**
      * @param pArContentId -

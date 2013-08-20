@@ -18,8 +18,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
 
+import javax.inject.Inject;
+
 import jp.co.city.tear.model.LargeDataOperation;
 import jp.co.city.tear.model.LargeDataOperation.Mode;
+import jp.co.city.tear.service.ITempFileService;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.wicket.markup.html.form.Button;
@@ -33,6 +36,9 @@ import org.apache.wicket.markup.html.panel.Panel;
 @SuppressWarnings("synthetic-access")
 public class FileUploadPanel extends Panel {
     private static final long       serialVersionUID = -2121159238236955334L;
+
+    @Inject
+    ITempFileService                tempFileService;
 
     private final Handler           handler          = new Handler();
 
@@ -169,21 +175,6 @@ public class FileUploadPanel extends Panel {
         }
     }
 
-    private static File save(final InputStream pData) {
-        try {
-            final File file = File.createTempFile(FileUploadPanel.class.getName(), ".dat"); //$NON-NLS-1$
-            try (final OutputStream out = new FileOutputStream(file); //
-                    final BufferedOutputStream bufOut = new BufferedOutputStream(out)) {
-                IOUtils.copy(IoUtil.toBuffered(pData), bufOut);
-                bufOut.flush();
-            }
-            return file;
-
-        } catch (final IOException e) {
-            throw ExceptionUtil.rethrow(e);
-        }
-    }
-
     private class Handler implements Serializable {
         private static final long serialVersionUID = -2699703816024152769L;
 
@@ -195,6 +186,21 @@ public class FileUploadPanel extends Panel {
         private void restore() {
             deleteTemporaryFile();
             FileUploadPanel.this.dataOperation = Mode.NOOP;
+        }
+
+        private File save(final InputStream pData) {
+            try {
+                final File file = FileUploadPanel.this.tempFileService.create(FileUploadPanel.class, "dat"); //$NON-NLS-1$
+                try (final OutputStream out = new FileOutputStream(file); //
+                        final BufferedOutputStream bufOut = new BufferedOutputStream(out)) {
+                    IOUtils.copy(IoUtil.toBuffered(pData), bufOut);
+                    bufOut.flush();
+                }
+                return file;
+
+            } catch (final IOException e) {
+                throw ExceptionUtil.rethrow(e);
+            }
         }
 
         private void upload() {
