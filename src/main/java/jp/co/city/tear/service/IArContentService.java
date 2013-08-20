@@ -11,6 +11,7 @@ import java.util.List;
 
 import jp.co.city.tear.entity.EArContent;
 import jp.co.city.tear.entity.ELargeData;
+import jp.co.city.tear.model.LargeDataOperation;
 import jp.co.city.tear.model.LoginUser;
 import jp.co.city.tear.service.impl.ArContentServiceImpl;
 
@@ -60,8 +61,12 @@ public interface IArContentService {
     /**
      * @param pLoginUser -
      * @param pArContent -
-     * @param pMarkerData -
-     * @param pContentData -
+     * @param pMarkerDataOperation -
+     * @param pContentDataOperation -
      */
-    void insertOrUpdate(LoginUser pLoginUser, EArContent pArContent, InputStream pMarkerData, InputStream pContentData);
+    void insertOrUpdate( //
+            LoginUser pLoginUser //
+            , EArContent pArContent //
+            , LargeDataOperation pMarkerDataOperation //
+            , LargeDataOperation pContentDataOperation);
 }

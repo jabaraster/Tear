@@ -25,6 +25,7 @@ import jp.co.city.tear.entity.EArContent;
 import jp.co.city.tear.entity.EArContent_;
 import jp.co.city.tear.entity.ELargeData;
 import jp.co.city.tear.entity.EUser;
+import jp.co.city.tear.model.LargeDataOperation;
 import jp.co.city.tear.model.LoginUser;
 import jp.co.city.tear.service.IArContentService;
 import jp.co.city.tear.service.ILargeDataService;
@@ -153,43 +154,73 @@ public class ArContentServiceImpl extends JpaDaoBase implements IArContentServic
 
     /**
      * @see jp.co.city.tear.service.IArContentService#insertOrUpdate(jp.co.city.tear.model.LoginUser, jp.co.city.tear.entity.EArContent,
-     *      java.io.InputStream, java.io.InputStream)
+     *      jp.co.city.tear.model.LargeDataOperation, jp.co.city.tear.model.LargeDataOperation)
      */
     @Override
     public void insertOrUpdate( //
             final LoginUser pLoginUser //
             , final EArContent pArContent //
-            , final InputStream pMarkerData //
-            , final InputStream pContentData //
-    ) {
+            , final LargeDataOperation pMarkerDataOperation //
+            , final LargeDataOperation pContentDataOperation) {
+
         ArgUtil.checkNull(pLoginUser, "pLoginUser"); //$NON-NLS-1$
         ArgUtil.checkNull(pArContent, "pArContent"); //$NON-NLS-1$
+        ArgUtil.checkNull(pMarkerDataOperation, "pMarkerDataOperation"); //$NON-NLS-1$
+        ArgUtil.checkNull(pContentDataOperation, "pContentDataOperation"); //$NON-NLS-1$
 
         try {
             final EUser loginUser = this.userService.findById(pLoginUser.getId());
             pArContent.setOwner(loginUser);
 
             if (pArContent.isPersisted()) {
-                updateCore(pArContent, pMarkerData, pContentData);
+                updateCore(pArContent, pMarkerDataOperation, pContentDataOperation);
             } else {
-                insertCore(pArContent, pMarkerData, pContentData);
+                insertCore(pArContent, pMarkerDataOperation, pContentDataOperation);
             }
-
         } catch (final NotFound e) {
             throw ExceptionUtil.rethrow(e);
         }
     }
 
-    private void insertCore(final EArContent pArContent, final InputStream pMarkerData, final InputStream pContentData) {
-        this.largeDataService.insertOrUpdate(pArContent.getMarker(), pMarkerData);
-        this.largeDataService.insertOrUpdate(pArContent.getContent(), pContentData);
+    private void insertCore( //
+            final EArContent pArContent //
+            , final LargeDataOperation pMarkerDataOperation //
+            , final LargeDataOperation pContentDataOperation) {
+
+        insertDataIfDataExists(pArContent.getMarker(), pMarkerDataOperation);
+        insertDataIfDataExists(pArContent.getContent(), pContentDataOperation);
         getEntityManager().persist(pArContent);
     }
 
-    private void updateCore(final EArContent pArContent, final InputStream pMarkerData, final InputStream pContentData) {
-        this.largeDataService.insertOrUpdate(pArContent.getMarker(), pMarkerData);
-        this.largeDataService.insertOrUpdate(pArContent.getContent(), pContentData);
+    private void insertDataIfDataExists(final ELargeData pData, final LargeDataOperation pDataOperation) {
+        if (pDataOperation.getMode() == LargeDataOperation.Mode.UPDATE) {
+            this.largeDataService.insertOrUpdate(pData, pDataOperation.getData());
+        }
+    }
+
+    private void updateCore( //
+            final EArContent pArContent //
+            , final LargeDataOperation pMarkerDataOperation //
+            , final LargeDataOperation pContentDataOperation) {
+
+        updateData(pArContent.getMarker(), pMarkerDataOperation);
+        updateData(pArContent.getContent(), pContentDataOperation);
+
         final EArContent inDb = getEntityManager().merge(pArContent);
         inDb.setTitle(pArContent.getTitle());
+    }
+
+    private void updateData(final ELargeData pData, final LargeDataOperation pDataOperation) {
+        switch (pDataOperation.getMode()) {
+        case DELETE:
+            this.largeDataService.delete(pData);
+            break;
+        case NOOP:
+            // 処理なし
+            break;
+        case UPDATE:
+            this.largeDataService.insertOrUpdate(pData, pDataOperation.getData());
+            break;
+        }
     }
 }

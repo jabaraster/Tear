@@ -18,6 +18,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
 
+import jp.co.city.tear.model.LargeDataOperation;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.upload.FileUpload;
@@ -29,27 +31,23 @@ import org.apache.wicket.markup.html.panel.Panel;
  */
 @SuppressWarnings("synthetic-access")
 public class FileUploadPanel extends Panel {
-    private static final long serialVersionUID = -2121159238236955334L;
+    private static final long             serialVersionUID = -2121159238236955334L;
 
-    private final IOperation  onRemove;
+    private final Handler                 handler          = new Handler();
 
-    private final Handler     handler          = new Handler();
+    private final LargeDataOperation.Mode dataOperation    = LargeDataOperation.Mode.NOOP;
+    private File                          temporary;
 
-    private File              temporary;
-
-    private FileUploadField   fileUpload;
-    private Button            uploader;
-    private Button            remover;
-    private Button            restorer;
+    private FileUploadField               fileUpload;
+    private Button                        uploader;
+    private Button                        remover;
+    private Button                        restorer;
 
     /**
      * @param pId -
-     * @param pOnRemove -
      */
-    public FileUploadPanel(final String pId, final IOperation pOnRemove) {
+    public FileUploadPanel(final String pId) {
         super(pId);
-
-        this.onRemove = pOnRemove;
 
         this.add(getFileUpload());
         this.add(getUploader());
@@ -67,6 +65,30 @@ public class FileUploadPanel extends Panel {
         }
         try {
             return new BufferedInputStream(new FileInputStream(this.temporary));
+
+        } catch (final FileNotFoundException e) {
+            throw NotFound.GLOBAL;
+        }
+    }
+
+    /**
+     * @return -
+     */
+    public LargeDataOperation getOperation() {
+        try {
+            final LargeDataOperation ret = new LargeDataOperation();
+            switch (this.dataOperation) {
+            case DELETE:
+                ret.delete();
+                break;
+            case NOOP:
+                ret.cancel();
+                break;
+            case UPDATE:
+                ret.update(new BufferedInputStream(new FileInputStream(this.temporary)));
+                break;
+            }
+            return ret;
 
         } catch (final FileNotFoundException e) {
             throw ExceptionUtil.rethrow(e);
@@ -93,9 +115,6 @@ public class FileUploadPanel extends Panel {
                 @Override
                 public void onSubmit() {
                     deleteTemporaryFile();
-                    if (FileUploadPanel.this.onRemove != null) {
-                        FileUploadPanel.this.onRemove.run();
-                    }
                 }
             };
         }
@@ -153,13 +172,6 @@ public class FileUploadPanel extends Panel {
         } catch (final IOException e) {
             throw ExceptionUtil.rethrow(e);
         }
-    }
-
-    /**
-     * @author jabaraster
-     */
-    public interface IOperation extends Runnable, Serializable {
-        //
     }
 
     private class Handler implements Serializable {

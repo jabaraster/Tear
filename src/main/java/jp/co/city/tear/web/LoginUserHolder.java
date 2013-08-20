@@ -32,6 +32,15 @@ public class LoginUserHolder {
 
     /**
      * @param pSession -
+     * @return -
+     */
+    public static boolean isLoggedin(final HttpSession pSession) {
+        ArgUtil.checkNull(pSession, "pSession"); //$NON-NLS-1$
+        return pSession.getAttribute(KEY) != null;
+    }
+
+    /**
+     * @param pSession -
      * @param pLoginUser -
      */
     public static void set(final HttpSession pSession, final LoginUser pLoginUser) {
