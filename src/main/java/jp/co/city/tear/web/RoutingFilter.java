@@ -35,7 +35,6 @@ public class RoutingFilter extends RoutingFilterBase {
         @Override
         protected void routingCore() throws Exception {
             redirectIfMatch("/", WebInitializer.PATH_UI);
-            forwardIfMatch("/plist", "/WEB-INF/jsp/plist.jsp");
         }
     }
 }
