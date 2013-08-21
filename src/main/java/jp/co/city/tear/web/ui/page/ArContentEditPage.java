@@ -26,6 +26,8 @@ import jp.co.city.tear.web.ui.component.FileUploadPanel;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.wicket.RestartResponseException;
+import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.form.OnChangeAjaxBehavior;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
@@ -213,6 +215,15 @@ public class ArContentEditPage extends RestrictedPageBase {
         if (this.title == null) {
             this.title = new TextField<>(EArContent_.title.getName(), new PropertyModel<String>(this.arContent, EArContent_.title.getName()));
             ValidatorUtil.setSimpleStringValidator(this.title, EArContent.class, EArContent_.title);
+
+            // タイトルを入力した後に「保存」を押さずにファイルをアップロードすると入力内容が消えてしまう.
+            // この現象に対処するため、タイトルテキストの変更内容を随時Ajaxで送ってもらうようにする.
+            this.title.add(new OnChangeAjaxBehavior() {
+                @Override
+                protected void onUpdate(@SuppressWarnings("unused") final AjaxRequestTarget pTarget) {
+                    // 画面更新の必要はないので、ここで行う処理はない.
+                }
+            });
         }
         return this.title;
     }
@@ -272,7 +283,6 @@ public class ArContentEditPage extends RestrictedPageBase {
                         , markerDataOperation //
                         , contentDataOperation);
                 getMarkerUpload().clear();
-                setResponsePage(ArContentListPage.class);
 
             } catch (final IOException e) {
                 throw ExceptionUtil.rethrow(e);
@@ -296,7 +306,6 @@ public class ArContentEditPage extends RestrictedPageBase {
             return this.in;
         }
 
-        @SuppressWarnings("resource")
         private InputStream getInputStreamCore() throws ResourceStreamNotFoundException {
             final LargeDataOperation operation = getMarkerUpload().getOperation();
             switch (operation.getMode()) {

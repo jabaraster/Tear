@@ -144,6 +144,32 @@ public class ArContentServiceImpl extends JpaDaoBase implements IArContentServic
     }
 
     /**
+     * @see jp.co.city.tear.service.IArContentService#findById(long)
+     */
+    @Override
+    public EArContent findById(final long pId) throws NotFound {
+        return this.findByIdCore(EArContent.class, pId);
+    }
+
+    /**
+     * @see jp.co.city.tear.service.IArContentService#getAll()
+     */
+    @Override
+    public List<EArContent> getAll() {
+        final EntityManager em = getEntityManager();
+        final CriteriaBuilder builder = em.getCriteriaBuilder();
+        final CriteriaQuery<EArContent> query = builder.createQuery(EArContent.class);
+        final Root<EArContent> root = query.from(EArContent.class);
+
+        query.distinct(true);
+
+        root.fetch(EArContent_.marker, JoinType.LEFT);
+        root.fetch(EArContent_.content, JoinType.LEFT);
+
+        return em.createQuery(query).getResultList();
+    }
+
+    /**
      * @see jp.co.city.tear.service.IArContentService#getDataInputStream(jp.co.city.tear.entity.ELargeData)
      */
     @Override

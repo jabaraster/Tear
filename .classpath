@@ -181,7 +181,7 @@
 			<attribute name="javadoc_location" value="jar:file:/Users/jabaraster/.m2/repository/org/codehaus/jettison/jettison/1.1/jettison-1.1-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/jetty-annotations/8.1.5.v20120716/jetty-annotations-8.1.5.v20120716.jar">
+	<classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/jetty-annotations/8.1.5.v20120716/jetty-annotations-8.1.5.v20120716.jar" sourcepath="M2_REPO/org/eclipse/jetty/jetty-annotations/8.1.5.v20120716/jetty-annotations-8.1.5.v20120716-sources.jar">
 		<attributes>
 			<attribute name="javadoc_location" value="jar:file:/Users/jabaraster/.m2/repository/org/eclipse/jetty/jetty-annotations/8.1.5.v20120716/jetty-annotations-8.1.5.v20120716-javadoc.jar!/"/>
 		</attributes>
@@ -226,7 +226,7 @@
 			<attribute name="javadoc_location" value="jar:file:/Users/jabaraster/.m2/repository/com/geishatokyo/jetty/jetty-nosql-memcached/0.3.1/jetty-nosql-memcached-0.3.1-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/jetty-plus/8.1.5.v20120716/jetty-plus-8.1.5.v20120716.jar">
+	<classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/jetty-plus/8.1.5.v20120716/jetty-plus-8.1.5.v20120716.jar" sourcepath="M2_REPO/org/eclipse/jetty/jetty-plus/8.1.5.v20120716/jetty-plus-8.1.5.v20120716-sources.jar">
 		<attributes>
 			<attribute name="javadoc_location" value="jar:file:/Users/jabaraster/.m2/repository/org/eclipse/jetty/jetty-plus/8.1.5.v20120716/jetty-plus-8.1.5.v20120716-javadoc.jar!/"/>
 		</attributes>

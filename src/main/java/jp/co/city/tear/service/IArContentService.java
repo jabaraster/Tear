@@ -52,6 +52,18 @@ public interface IArContentService {
     EArContent findById(LoginUser pUser, long pId) throws NotFound;
 
     /**
+     * @param pId -
+     * @return -
+     * @throws NotFound -
+     */
+    EArContent findById(long pId) throws NotFound;
+
+    /**
+     * @return -
+     */
+    List<EArContent> getAll();
+
+    /**
      * @param pData -
      * @return -
      * @throws NotFound -
