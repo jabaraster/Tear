@@ -28,6 +28,10 @@ import jp.co.city.tear.Environment;
 import jp.co.city.tear.entity.EArContent;
 import jp.co.city.tear.service.IArContentService;
 import jp.co.city.tear.service.ILargeDataService;
+import jp.co.city.tear.web.rest.trackingData.Connection;
+import jp.co.city.tear.web.rest.trackingData.Sensor;
+import jp.co.city.tear.web.rest.trackingData.SensorCOS;
+import jp.co.city.tear.web.rest.trackingData.TrackingData;
 
 import org.apache.commons.io.IOUtils;
 
@@ -122,6 +126,29 @@ public class ArContentResource {
         } catch (final NotFound e) {
             return Response.status(Status.NOT_FOUND).build();
         }
+    }
+
+    /**
+     * @return -
+     */
+    @Path("trackingData")
+    @GET
+    @Produces({ MediaType.TEXT_XML })
+    public TrackingData getTrackingData() {
+        final TrackingData ret = new TrackingData();
+        final Sensor sensor = ret.sensors.get(0);
+        final List<EArContent> contents = this.arContentService.getAll();
+        for (int i = 0; i < contents.size(); i++) {
+            final SensorCOS cos = new SensorCOS();
+            cos.sensorCosID = "Patch" + (i + 1); //$NON-NLS-1$
+            sensor.sensorCOS.add(cos);
+
+            final Connection connection = new Connection();
+            connection.name = "MarkerlessCOS" + (i + 1); //$NON-NLS-1$
+            connection.sensorSource.sensorCosID = cos.sensorCosID;
+            ret.connections.add(connection);
+        }
+        return ret;
     }
 
     /**
