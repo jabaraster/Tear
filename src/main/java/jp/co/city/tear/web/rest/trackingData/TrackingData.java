@@ -12,15 +12,21 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement
 public class TrackingData {
+    /**
+     * 
+     */
     @XmlElement(name = "Sensor")
     @XmlElementWrapper(name = "Sensors")
-    List<Sensor>     sensors     = new ArrayList<>();
+    public final List<Sensor>     sensors     = new ArrayList<>();
     {
         final Sensor sensor = new Sensor();
         this.sensors.add(sensor);
     }
 
+    /**
+     * 
+     */
     @XmlElement(name = "COS")
     @XmlElementWrapper(name = "Connections")
-    List<Connection> connections = new ArrayList<>();
+    public final List<Connection> connections = new ArrayList<>();
 }

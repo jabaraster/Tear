@@ -30,6 +30,11 @@ public interface IArContentService {
     long count(LoginUser pLoginUser);
 
     /**
+     * @return -
+     */
+    long countAll();
+
+    /**
      * @param pArContent -
      */
     void delete(EArContent pArContent);

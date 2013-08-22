@@ -6,12 +6,24 @@ import javax.xml.bind.annotation.XmlElement;
  * @author jabaraster
  */
 public class SensorSource {
+    /**
+     * 
+     */
     @XmlElement(name = "SensorID")
-    String  sensorID           = "FeatureTracking1"; //$NON-NLS-1$
+    public String        sensorID           = "FeatureTracking1"; //$NON-NLS-1$
+    /**
+     * 
+     */
     @XmlElement(name = "SensorCosID")
-    String  sensorCosID        = "Patch";           //$NON-NLS-1$
+    public String        sensorCosID        = "Patch";           //$NON-NLS-1$
+    /**
+     * 
+     */
     @XmlElement(name = "HandEyeCalibration")
-    Offsets handEyeCalibration = new Offsets();
+    public final Offsets handEyeCalibration = new Offsets();
+    /**
+     * 
+     */
     @XmlElement(name = "COSOffset")
-    Offsets cosOffset          = new Offsets();
+    public final Offsets cosOffset          = new Offsets();
 }

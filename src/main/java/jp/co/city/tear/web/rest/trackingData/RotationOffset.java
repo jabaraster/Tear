@@ -6,12 +6,24 @@ import javax.xml.bind.annotation.XmlElement;
  * @author jabaraster
  */
 public class RotationOffset {
+    /**
+     * 
+     */
     @XmlElement(name = "X")
-    int x = 0;
+    public int x = 0;
+    /**
+     * 
+     */
     @XmlElement(name = "Y")
-    int y = 0;
+    public int y = 0;
+    /**
+     * 
+     */
     @XmlElement(name = "Z")
-    int z = 0;
+    public int z = 0;
+    /**
+     * 
+     */
     @XmlElement(name = "W")
-    int w = 1;
+    public int w = 1;
 }

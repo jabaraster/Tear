@@ -7,10 +7,16 @@ import javax.xml.bind.annotation.XmlElement;
  * @author jabaraster
  */
 public class Fuser {
+    /**
+     * 
+     */
     @XmlAttribute(name = "Type")
-    Type            type       = Type.SmoothingFuser;
+    public Type                  type       = Type.SmoothingFuser;
+    /**
+     * 
+     */
     @XmlElement(name = "Parameters")
-    FuserParameters parameters = new FuserParameters();
+    public final FuserParameters parameters = new FuserParameters();
 
     /**
      * @author jabaraster

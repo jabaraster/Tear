@@ -7,10 +7,19 @@ import javax.xml.bind.annotation.XmlValue;
  * @author jabaraster
  */
 public class ReferenceImage {
+    /**
+     * 
+     */
     @XmlAttribute(name = "WidthMM")
-    int    widthMM  = 80;
+    public int    widthMM  = 80;
+    /**
+     * 
+     */
     @XmlAttribute(name = "HeightMM")
-    int    heightMM = 80;
+    public int    heightMM = 80;
+    /**
+     * 
+     */
     @XmlValue
-    String name     = "image"; //$NON-NLS-1$
+    public String name     = "image"; //$NON-NLS-1$
 }

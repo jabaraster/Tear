@@ -8,18 +8,39 @@ import javax.xml.bind.annotation.XmlElement;
  * @author jabaraster
  */
 public class FuserParameters {
+    /**
+     * 
+     */
     @XmlElement(name = "KeepPoseForNumberOfFrames")
-    int     keepPoseForNumberOfFrames                 = 2;
+    public int     keepPoseForNumberOfFrames                 = 2;
+    /**
+     * 
+     */
     @XmlElement(name = "GravityAssistance")
-    String  gravityAssistance                         = Empty.STRING;
+    public String  gravityAssistance                         = Empty.STRING;
+    /**
+     * 
+     */
     @XmlElement(name = "AlphaTranslation")
-    float   alphaTranslation                          = 0.8f;
+    public float   alphaTranslation                          = 0.8f;
+    /**
+     * 
+     */
     @XmlElement(name = "GammaTranslation")
-    float   gammaTranslation                          = 0.8f;
+    public float   gammaTranslation                          = 0.8f;
+    /**
+     * 
+     */
     @XmlElement(name = "AlphaRotation")
-    float   alphaRotation                             = 0.5f;
+    public float   alphaRotation                             = 0.5f;
+    /**
+     * 
+     */
     @XmlElement(name = "GammaRotation")
-    float   gammaRotation                             = 0.5f;
+    public float   gammaRotation                             = 0.5f;
+    /**
+     * 
+     */
     @XmlElement(name = "ContinueLostTrackingWithOrientationSensor")
-    boolean continueLostTrackingWithOrientationSensor = false;
+    public boolean continueLostTrackingWithOrientationSensor = false;
 }

@@ -84,6 +84,25 @@ public class ArContentServiceImpl extends JpaDaoBase implements IArContentServic
     }
 
     /**
+     * @see jp.co.city.tear.service.IArContentService#countAll()
+     */
+    @Override
+    public long countAll() {
+        final EntityManager em = getEntityManager();
+        final CriteriaBuilder builder = em.getCriteriaBuilder();
+        final CriteriaQuery<Long> query = builder.createQuery(Long.class);
+        final Root<EArContent> root = query.from(EArContent.class);
+
+        query.select(builder.count(root.get(EntityBase_.id)));
+
+        try {
+            return getSingleResult(em.createQuery(query)).longValue();
+        } catch (final NotFound e) {
+            throw ExceptionUtil.rethrow(e);
+        }
+    }
+
+    /**
      * @see jp.co.city.tear.service.IArContentService#delete(jp.co.city.tear.entity.EArContent)
      */
     @Override
@@ -162,7 +181,6 @@ public class ArContentServiceImpl extends JpaDaoBase implements IArContentServic
         final Root<EArContent> root = query.from(EArContent.class);
 
         query.distinct(true);
-
         root.fetch(EArContent_.marker, JoinType.LEFT);
         root.fetch(EArContent_.content, JoinType.LEFT);
 
