@@ -306,6 +306,7 @@ public class ArContentEditPage extends RestrictedPageBase {
             return this.in;
         }
 
+        @SuppressWarnings("resource")
         private InputStream getInputStreamCore() throws ResourceStreamNotFoundException {
             final LargeDataOperation operation = getMarkerUpload().getOperation();
             switch (operation.getMode()) {

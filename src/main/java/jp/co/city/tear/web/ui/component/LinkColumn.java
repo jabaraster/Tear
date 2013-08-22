@@ -4,6 +4,11 @@ import jabara.general.ArgUtil;
 import jabara.general.IProducer2;
 import jabara.wicket.Models;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Page;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.AbstractColumn;
@@ -23,21 +28,27 @@ public class LinkColumn<E> extends AbstractColumn<E, String> {
     private final IModel<String>                linkLabelModel;
     private final Class<? extends Page>         destination;
     private final IProducer2<E, PageParameters> parametersProducer;
+    private final List<AttributeModifier>       linkLabelAttributeModifiers;
 
     /**
      * @param pLinkLabelModel -
      * @param pDestination -
      * @param pParametersProducer -
+     * @param pLinkLabelAttributeModifiers -
      */
     public LinkColumn( //
             final IModel<String> pLinkLabelModel //
             , final Class<? extends Page> pDestination //
             , final IProducer2<E, PageParameters> pParametersProducer //
+            , final AttributeModifier... pLinkLabelAttributeModifiers //
     ) {
         super(EMPTY_LABEL_MODEL);
         this.linkLabelModel = ArgUtil.checkNull(pLinkLabelModel, "pLinkLabelModel"); //$NON-NLS-1$
         this.destination = ArgUtil.checkNull(pDestination, "pDestination"); //$NON-NLS-1$
         this.parametersProducer = ArgUtil.checkNull(pParametersProducer, "pParametersProducer"); //$NON-NLS-1$
+        this.linkLabelAttributeModifiers = pLinkLabelAttributeModifiers == null //
+        ? Collections.<AttributeModifier> emptyList() //
+                : Arrays.asList(pLinkLabelAttributeModifiers);
     }
 
     /**
@@ -47,6 +58,10 @@ public class LinkColumn<E> extends AbstractColumn<E, String> {
     @Override
     public void populateItem(final Item<ICellPopulator<E>> pCellItem, final String pComponentId, final IModel<E> pRowModel) {
         final PageParameters params = this.parametersProducer.produce(pRowModel.getObject());
-        pCellItem.add(new LinkPanel(pComponentId, this.linkLabelModel, params, this.destination));
+        final LinkPanel link = new LinkPanel(pComponentId, this.linkLabelModel, params, this.destination);
+        for (final AttributeModifier am : this.linkLabelAttributeModifiers) {
+            link.getLinkLabel().add(am);
+        }
+        pCellItem.add(link);
     }
 }

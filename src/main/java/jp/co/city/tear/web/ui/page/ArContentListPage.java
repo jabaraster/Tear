@@ -22,7 +22,8 @@ import jp.co.city.tear.entity.EUser_;
 import jp.co.city.tear.service.IArContentService;
 import jp.co.city.tear.web.ui.AppSession;
 import jp.co.city.tear.web.ui.component.AttributeColumn;
-import jp.co.city.tear.web.ui.component.LinkColumn;
+import jp.co.city.tear.web.ui.component.DeleteLinkColumn;
+import jp.co.city.tear.web.ui.component.EditLinkColumn;
 
 import org.apache.wicket.extensions.ajax.markup.html.repeater.data.table.AjaxFallbackDefaultDataTable;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
@@ -105,8 +106,8 @@ public class ArContentListPage extends RestrictedPageBase {
                     return ArContentEditPage.createParameters(pArgument);
                 }
             };
-            columns.add(new LinkColumn<>(Models.readOnly("編集"), ArContentUpdatePage.class, p)); //$NON-NLS-1$
-            columns.add(new LinkColumn<>(Models.readOnly("削除"), ArContentDeletePage.class, p)); //$NON-NLS-1$
+            columns.add(new EditLinkColumn<>(Models.readOnly("編集"), ArContentUpdatePage.class, p)); //$NON-NLS-1$
+            columns.add(new DeleteLinkColumn<>(Models.readOnly("削除"), ArContentDeletePage.class, p)); //$NON-NLS-1$
 
             this.arContents = new AjaxFallbackDefaultDataTable<>("arContents", columns, new ArContentsProvider(), DEFAULT_ROWS_PER_PAGE); //$NON-NLS-1$
         }

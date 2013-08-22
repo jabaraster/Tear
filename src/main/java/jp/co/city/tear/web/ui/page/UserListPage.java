@@ -19,7 +19,8 @@ import jp.co.city.tear.entity.EUser;
 import jp.co.city.tear.entity.EUser_;
 import jp.co.city.tear.service.IUserService;
 import jp.co.city.tear.web.ui.component.AttributeColumn;
-import jp.co.city.tear.web.ui.component.LinkColumn;
+import jp.co.city.tear.web.ui.component.DeleteLinkColumn;
+import jp.co.city.tear.web.ui.component.EditLinkColumn;
 
 import org.apache.wicket.extensions.ajax.markup.html.repeater.data.table.AjaxFallbackDefaultDataTable;
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
@@ -84,8 +85,8 @@ public class UserListPage extends AdministrationPageBase {
                     return UserEditPage.createParameters(pArgument);
                 }
             };
-            columns.add(new LinkColumn<>(Models.readOnly("編集"), UserUpdatePage.class, p)); //$NON-NLS-1$
-            columns.add(new LinkColumn<>(Models.readOnly("削除"), UserDeletePage.class, p)); //$NON-NLS-1$
+            columns.add(new EditLinkColumn<>(Models.readOnly("編集"), ArContentUpdatePage.class, p)); //$NON-NLS-1$
+            columns.add(new DeleteLinkColumn<>(Models.readOnly("削除"), ArContentDeletePage.class, p)); //$NON-NLS-1$
 
             this.users = new AjaxFallbackDefaultDataTable<>( //
                     "users" // //$NON-NLS-1$

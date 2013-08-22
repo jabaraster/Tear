@@ -40,7 +40,10 @@ public class LinkPanel extends Panel {
         this.add(getLink());
     }
 
-    private Link<?> getLink() {
+    /**
+     * @return -
+     */
+    public Link<?> getLink() {
         if (this.link == null) {
             this.link = new BookmarkablePageLink<>("go", this.destination, this.destinationParameter); //$NON-NLS-1$
             this.link.add(getLinkLabel());
@@ -48,7 +51,10 @@ public class LinkPanel extends Panel {
         return this.link;
     }
 
-    private Label getLinkLabel() {
+    /**
+     * @return -
+     */
+    public Label getLinkLabel() {
         if (this.linkLabel == null) {
             this.linkLabel = new Label("linkLabel", this.linkLabelModel); //$NON-NLS-1$
         }
