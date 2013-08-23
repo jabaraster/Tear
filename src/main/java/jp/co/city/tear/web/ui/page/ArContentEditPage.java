@@ -174,6 +174,7 @@ public class ArContentEditPage extends RestrictedPageBase {
     private FileUploadPanel getContentUpload() {
         if (this.contentUpload == null) {
             this.contentUpload = new FileUploadPanel("contentUpload"); //$NON-NLS-1$
+            this.contentUpload.getRestorer().setVisible(this.arContent.getContent().hasData());
         }
         return this.contentUpload;
     }
@@ -207,6 +208,7 @@ public class ArContentEditPage extends RestrictedPageBase {
     private FileUploadPanel getMarkerUpload() {
         if (this.markerUpload == null) {
             this.markerUpload = new FileUploadPanel("markerUpload"); //$NON-NLS-1$
+            this.markerUpload.getRestorer().setVisible(this.arContent.getMarker().hasData());
         }
         return this.markerUpload;
     }
@@ -282,7 +284,7 @@ public class ArContentEditPage extends RestrictedPageBase {
                         , ArContentEditPage.this.arContent //
                         , markerDataOperation //
                         , contentDataOperation);
-                getMarkerUpload().clear();
+                setResponsePage(ArContentEditPage.class, ArContentEditPage.createParameters(ArContentEditPage.this.arContent));
 
             } catch (final IOException e) {
                 throw ExceptionUtil.rethrow(e);

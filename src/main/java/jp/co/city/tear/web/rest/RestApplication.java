@@ -4,6 +4,7 @@ import jabara.jax_rs.JsonMessageBodyReaderWriter;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import javax.ws.rs.core.Application;
@@ -23,5 +24,14 @@ public class RestApplication extends Application {
                         , UserResource.class //
                         , ArContentResource.class //
                 }));
+    }
+
+    /**
+     * @param pArgs 起動引数.
+     */
+    public static void main(final String[] pArgs) {
+        for (final Map.Entry<String, String> entry : System.getenv().entrySet()) {
+            System.out.println(entry);
+        }
     }
 }

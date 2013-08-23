@@ -12,17 +12,17 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 
 /**
- * @param <E>
+ * @param <E> -
  * @author jabaraster
  */
 public class BootstrapLinkColumn<E> extends LinkColumn<E> {
     private static final long serialVersionUID = 1392006843959295743L;
 
     /**
-     * @param pLinkLabelModel
-     * @param pDestination
-     * @param pParametersProducer
-     * @param type
+     * @param pLinkLabelModel -
+     * @param pDestination -
+     * @param pParametersProducer -
+     * @param type -
      */
     public BootstrapLinkColumn( //
             final IModel<String> pLinkLabelModel //

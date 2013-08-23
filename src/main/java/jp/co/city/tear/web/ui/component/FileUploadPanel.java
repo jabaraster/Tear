@@ -111,6 +111,22 @@ public class FileUploadPanel extends Panel {
         }
     }
 
+    /**
+     * @return -
+     */
+    @SuppressWarnings("serial")
+    public Button getRestorer() {
+        if (this.restorer == null) {
+            this.restorer = new Button("restorer") { //$NON-NLS-1$
+                @Override
+                public void onSubmit() {
+                    FileUploadPanel.this.handler.restore();
+                }
+            };
+        }
+        return this.restorer;
+    }
+
     private void deleteTemporaryFile() {
         if (this.temporary != null) {
             this.temporary.delete();
@@ -135,19 +151,6 @@ public class FileUploadPanel extends Panel {
             this.fileUpload = new FileUploadField("fileUpload"); //$NON-NLS-1$
         }
         return this.fileUpload;
-    }
-
-    @SuppressWarnings("serial")
-    private Button getRestorer() {
-        if (this.restorer == null) {
-            this.restorer = new Button("restorer") { //$NON-NLS-1$
-                @Override
-                public void onSubmit() {
-                    FileUploadPanel.this.handler.restore();
-                }
-            };
-        }
-        return this.restorer;
     }
 
     @SuppressWarnings("serial")

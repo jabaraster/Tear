@@ -3,8 +3,6 @@
  */
 package jp.co.city.tear.service.impl;
 
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 import jabara.general.ExceptionUtil;
 import jabara.general.NotFound;
 import jabara.general.Sort;
@@ -37,6 +35,10 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
+
+import static org.junit.Assert.assertThat;
+
+import static org.hamcrest.core.Is.is;
 
 /**
  * @author jabaraster
@@ -319,6 +321,15 @@ public class ArContentServiceImplTest {
             final EArContent update = this.rule.getSut().findById(loginUser, ac.getId().longValue());
             update.setTitle(pNewTitle);
             return update;
+        }
+    }
+
+    public static class TableRowCount_is_0 {
+        /**
+         * 
+         */
+        @Test
+        public void _delete() {
         }
     }
 
