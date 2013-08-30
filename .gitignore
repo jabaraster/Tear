@@ -9,3 +9,4 @@ src/main/webapp/WEB-INF/test-classes
 *.war
 *.ear
 ~
+.DS_Store

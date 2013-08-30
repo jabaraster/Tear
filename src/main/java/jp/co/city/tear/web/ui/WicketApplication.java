@@ -15,7 +15,6 @@ import jp.co.city.tear.web.ui.page.ArContentDeletePage;
 import jp.co.city.tear.web.ui.page.ArContentInsertPage;
 import jp.co.city.tear.web.ui.page.ArContentListPage;
 import jp.co.city.tear.web.ui.page.ArContentUpdatePage;
-import jp.co.city.tear.web.ui.page.BootPage;
 import jp.co.city.tear.web.ui.page.LoginPage;
 import jp.co.city.tear.web.ui.page.LogoutPage;
 import jp.co.city.tear.web.ui.page.RestrictedPageBase;
@@ -164,8 +163,6 @@ public class WicketApplication extends WebApplication {
         this.mountPage("mainte/content/new", ArContentInsertPage.class);
         this.mountPage("mainte/content/edit", ArContentUpdatePage.class);
         this.mountPage("mainte/content/delete", ArContentDeletePage.class);
-
-        this.mountPage("boot", BootPage.class);
     }
 
     /**
