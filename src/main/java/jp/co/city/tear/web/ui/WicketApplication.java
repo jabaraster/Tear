@@ -45,10 +45,10 @@ public class WicketApplication extends WebApplication {
     @SuppressWarnings("nls")
     private static final List<MenuInfo> _menuInfoList = Arrays.asList( //
                                                               new MenuInfo(Models.readOnly("ユーザ一覧"), UserListPage.class) //
-                                                              , new MenuInfo(Models.readOnly("ユーザ新規登録"), UserInsertPage.class) //
+                                                              // , new MenuInfo(Models.readOnly("ユーザ新規登録"), UserInsertPage.class) //
                                                               , new MenuInfo(Models.readOnly("ARコンテンツ一覧"), ArContentListPage.class) //
-                                                              , new MenuInfo(Models.readOnly("ARコンテンツ新規登録"), ArContentInsertPage.class) //
-                                                              , new MenuInfo(Models.readOnly("ログアウト"), LogoutPage.class) //
+                                                      // , new MenuInfo(Models.readOnly("ARコンテンツ新規登録"), ArContentInsertPage.class) //
+                                                      // , new MenuInfo(Models.readOnly("ログアウト"), LogoutPage.class) //
                                                       );
 
     private static final String         ENC           = "UTF-8"; //$NON-NLS-1$

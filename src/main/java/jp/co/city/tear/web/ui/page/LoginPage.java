@@ -11,16 +11,15 @@ import java.io.Serializable;
 import jp.co.city.tear.model.FailAuthentication;
 import jp.co.city.tear.web.ui.AppSession;
 
+import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.markup.html.form.AjaxButton;
+import org.apache.wicket.extensions.ajax.markup.html.IndicatingAjaxButton;
 import org.apache.wicket.markup.head.IHeaderResponse;
-import org.apache.wicket.markup.html.form.Button;
+import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.PasswordTextField;
 import org.apache.wicket.markup.html.form.StatelessForm;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.pages.RedirectPage;
-import org.apache.wicket.markup.html.panel.ComponentFeedbackPanel;
-import org.apache.wicket.markup.html.panel.EmptyPanel;
-import org.apache.wicket.markup.html.panel.FeedbackPanel;
-import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.util.string.StringValue;
 
@@ -33,19 +32,15 @@ public class LoginPage extends WebPageBase {
 
     private final Handler     handler          = new Handler();
 
-    private FeedbackPanel     feedback;
     private StatelessForm<?>  form;
     private TextField<String> userId;
-    private FeedbackPanel     userIdFeedback;
     private PasswordTextField password;
-    private FeedbackPanel     passwordFeedback;
-    private Button            submitter;
+    private AjaxButton        submitter;
 
     /**
      * 
      */
     public LoginPage() {
-        this.add(getFeedback());
         this.add(getForm());
     }
 
@@ -60,14 +55,6 @@ public class LoginPage extends WebPageBase {
     }
 
     /**
-     * @see jp.co.city.tear.web.ui.page.WebPageBase#createHeaderPanel(java.lang.String)
-     */
-    @Override
-    protected Panel createHeaderPanel(final String pId) {
-        return new EmptyPanel(pId);
-    }
-
-    /**
      * @see jp.co.city.tear.web.ui.page.WebPageBase#getTitleLabelModel()
      */
     @Override
@@ -79,9 +66,7 @@ public class LoginPage extends WebPageBase {
         if (this.form == null) {
             this.form = new StatelessForm<>("form"); //$NON-NLS-1$
             this.form.add(getUserId());
-            this.form.add(getUserIdFeedback());
             this.form.add(getPassword());
-            this.form.add(getPasswordFeedback());
             this.form.add(getSubmitter());
         }
         return this.form;
@@ -95,17 +80,17 @@ public class LoginPage extends WebPageBase {
     }
 
     @SuppressWarnings("serial")
-    Button getSubmitter() {
+    AjaxButton getSubmitter() {
         if (this.submitter == null) {
-            this.submitter = new Button("submitter") { //$NON-NLS-1$
+            this.submitter = new IndicatingAjaxButton("submitter") { //$NON-NLS-1$
                 @Override
-                public void onError() {
-                    LoginPage.this.handler.onSubmitterError();
+                protected void onError(final AjaxRequestTarget pTarget, @SuppressWarnings("unused") final Form<?> pForm) {
+                    LoginPage.this.handler.onSubmitterError(pTarget);
                 }
 
                 @Override
-                public void onSubmit() {
-                    LoginPage.this.handler.tryLogin();
+                protected void onSubmit(final AjaxRequestTarget pTarget, @SuppressWarnings("unused") final Form<?> pForm) {
+                    LoginPage.this.handler.tryLogin(pTarget);
                 }
             };
         }
@@ -120,37 +105,18 @@ public class LoginPage extends WebPageBase {
         return this.userId;
     }
 
-    private FeedbackPanel getFeedback() {
-        if (this.feedback == null) {
-            this.feedback = new ComponentFeedbackPanel("feedback", this); //$NON-NLS-1$
-        }
-        return this.feedback;
-    }
-
-    private FeedbackPanel getPasswordFeedback() {
-        if (this.passwordFeedback == null) {
-            this.passwordFeedback = new ComponentFeedbackPanel("passwordFeedback", getPassword()); //$NON-NLS-1$
-        }
-        return this.passwordFeedback;
-    }
-
-    private FeedbackPanel getUserIdFeedback() {
-        if (this.userIdFeedback == null) {
-            this.userIdFeedback = new ComponentFeedbackPanel("userIdFeedback", getUserId()); //$NON-NLS-1$
-        }
-        return this.userIdFeedback;
-    }
-
     private class Handler implements Serializable {
         private static final long        serialVersionUID   = 6317461189636878176L;
 
         private final ErrorClassAppender errorClassAppender = new ErrorClassAppender();
 
-        private void onSubmitterError() {
+        private void onSubmitterError(final AjaxRequestTarget pTarget) {
             this.errorClassAppender.addErrorClass(getForm());
+            pTarget.add(getUserId());
+            pTarget.add(getPassword());
         }
 
-        private void tryLogin() {
+        private void tryLogin(final AjaxRequestTarget pTarget) {
             try {
                 AppSession.get().login(getUserId().getModelObject(), getPassword().getModelObject());
                 final StringValue url = getPageParameters().get("u"); //$NON-NLS-1$
@@ -162,6 +128,8 @@ public class LoginPage extends WebPageBase {
             } catch (final FailAuthentication e) {
                 error(getString("message.failLogin")); //$NON-NLS-1$
                 this.errorClassAppender.addErrorClass(getForm());
+                pTarget.add(getUserId());
+                pTarget.add(getPassword());
             }
         }
     }

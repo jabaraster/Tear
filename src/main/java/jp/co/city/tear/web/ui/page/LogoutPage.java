@@ -1,13 +1,12 @@
 package jp.co.city.tear.web.ui.page;
 
+import jabara.wicket.CssUtil;
 import jabara.wicket.Models;
 
 import org.apache.wicket.Session;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.head.OnDomReadyHeaderItem;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
-import org.apache.wicket.markup.html.panel.EmptyPanel;
-import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
 
 /**
@@ -31,16 +30,8 @@ public class LogoutPage extends WebPageBase {
     @Override
     public void renderHead(final IHeaderResponse pResponse) {
         super.renderHead(pResponse);
-        addPageCssReference(pResponse, this.getClass());
+        CssUtil.addComponentCssReference(pResponse, LogoutPage.class);
         pResponse.render(OnDomReadyHeaderItem.forScript("countDown(" + REFRESH_INTERVAL_MINUTES + ")")); //$NON-NLS-1$ //$NON-NLS-2$
-    }
-
-    /**
-     * @see jp.co.city.tear.web.ui.page.WebPageBase#createHeaderPanel(java.lang.String)
-     */
-    @Override
-    protected Panel createHeaderPanel(final String pId) {
-        return new EmptyPanel(pId);
     }
 
     /**

@@ -1,7 +1,42 @@
 <wicket:extend>
-  <h4>
-    ログイン中のユーザ：<span wicket:id="loginUserId"></span>
-  </h4>
-  <wicket:child>
-  </wicket:child>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#"><span wicket:id="applicationNameInNavbar"></span></a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul wicket:id="menus" class="nav navbar-nav">
+            <li wicket:id="list">
+              <a wicket:id="goPage" href="#">
+                <span wicket:id="label"></span>
+              </a>
+            </li>
+          </ul>
+          <div class="navbar-collapse navbar-right">
+            <ul class="nav navbar-nav">
+              <li><a href="#"><span wicket:id="loginUserId"></span>としてログイン</a></li>
+              <li><a href="#"><span wicket:id="goLogout">ログアウト</span></a></li>
+            </ul>
+          </div>
+        </div><!--/.navbar-collapse -->
+      </div>
+    </div>
+
+    <div class="container">
+
+      <wicket:child>
+      </wicket:child>
+
+      <hr>
+
+      <footer>
+        <p>&copy; Company 2013</p>
+      </footer>
+    </div> <!-- /container -->
+
 </wicket:extend>
