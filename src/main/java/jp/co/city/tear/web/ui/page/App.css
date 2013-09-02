@@ -1,1 +1,1 @@
-@charset "UTF-8";body.body{background-image:url('${bodyBackground}')}input.error{color:#9b1e1e;background:#ffb4b4}
+@charset "UTF-8";body{background-image:url('${bodyBackground}')}li{list-style:none}input.error{color:#9b1e1e;background:#ffb4b4}

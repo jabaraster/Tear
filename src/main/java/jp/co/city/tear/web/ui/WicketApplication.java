@@ -53,18 +53,8 @@ import com.google.inject.Injector;
 public class WicketApplication extends WebApplication {
 
     @SuppressWarnings("nls")
-    private static final List<MenuInfo> _menuInfoList  = Arrays.asList(
-                                                       //
-                                                               new MenuInfo(Models.readOnly("ユーザ一覧"), UserListPage.class) //
-                                                               // , new
-                                                               // MenuInfo(Models.readOnly("ユーザ新規登録"),
-                                                               // UserInsertPage.class) //
+    private static final List<MenuInfo> _menuInfoList  = Arrays.asList(new MenuInfo(Models.readOnly("ユーザ一覧"), UserListPage.class) //
                                                                , new MenuInfo(Models.readOnly("ARコンテンツ一覧"), ArContentListPage.class) //
-                                                       // , new
-                                                       // MenuInfo(Models.readOnly("ARコンテンツ新規登録"),
-                                                       // ArContentInsertPage.class) //
-                                                       // , new MenuInfo(Models.readOnly("ログアウト"),
-                                                       // LogoutPage.class) //
                                                        );
 
     private static final String         ENC            = "UTF-8";              //$NON-NLS-1$
@@ -94,6 +84,24 @@ public class WicketApplication extends WebApplication {
      */
     public Injector getInjector() {
         return this.injectorProvider.get();
+    }
+
+    /**
+     * @return -
+     */
+    @SuppressWarnings("static-method")
+    public List<MenuInfo> getMenuInfo() {
+        if (AppSession.get().currentUserIsAdministrator()) {
+            return new ArrayList<>(_menuInfoList);
+        }
+
+        final List<MenuInfo> ret = new ArrayList<>();
+        for (final MenuInfo mi : _menuInfoList) {
+            if (!AdministrationPageBase.class.isAssignableFrom(mi.getPage())) {
+                ret.add(mi);
+            }
+        }
+        return ret;
     }
 
     /**
@@ -206,6 +214,7 @@ public class WicketApplication extends WebApplication {
     @SuppressWarnings({ "nls", "serial" })
     private void mountResources() {
         mountResource("back", new ResourceReference("back") {
+            @SuppressWarnings("resource")
             @Override
             public IResource getResource() {
                 return new ResourceStreamResource(new UrlResourceStream(WicketApplication.class.getResource("brickwall.png"))) //
@@ -220,23 +229,6 @@ public class WicketApplication extends WebApplication {
      */
     public static WicketApplication get() {
         return (WicketApplication) WebApplication.get();
-    }
-
-    /**
-     * @return -
-     */
-    public static List<MenuInfo> getMenuInfo() {
-        if (AppSession.get().currentUserIsAdministrator()) {
-            return new ArrayList<>(_menuInfoList);
-        }
-
-        final List<MenuInfo> ret = new ArrayList<>();
-        for (final MenuInfo mi : _menuInfoList) {
-            if (!AdministrationPageBase.class.isAssignableFrom(mi.getPage())) {
-                ret.add(mi);
-            }
-        }
-        return ret;
     }
 
     @SuppressWarnings({ "synthetic-access", "unchecked" })

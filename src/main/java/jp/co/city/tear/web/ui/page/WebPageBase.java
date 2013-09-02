@@ -92,7 +92,7 @@ public abstract class WebPageBase extends WebPage {
     }
 
     private static TextTemplateResourceReference buildAppCssReference() {
-        final Map<String, Object> params = new HashMap<String, Object>();
+        final Map<String, Object> params = new HashMap<>();
         final Request request = RequestCycle.get().getRequest();
         params.put("bodyBackground", request.getContextPath() + request.getFilterPath() + "/back"); //$NON-NLS-1$ //$NON-NLS-2$
         return new TextTemplateResourceReference(WebPageBase.class, "App.css", "text/css", Models.readOnly(params)); //$NON-NLS-1$ //$NON-NLS-2$

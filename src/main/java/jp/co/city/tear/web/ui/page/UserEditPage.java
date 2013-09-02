@@ -4,11 +4,13 @@
 package jp.co.city.tear.web.ui.page;
 
 import jabara.general.ArgUtil;
+import jabara.general.ExceptionUtil;
 import jabara.general.NotFound;
 import jabara.wicket.CssUtil;
 import jabara.wicket.ErrorClassAppender;
 import jabara.wicket.JavaScriptUtil;
 import jabara.wicket.beaneditor.BeanEditor;
+import jabara.wicket.beaneditor.PropertyEditor;
 
 import java.io.Serializable;
 
@@ -19,6 +21,7 @@ import jp.co.city.tear.entity.EUserPassword_;
 import jp.co.city.tear.entity.EUser_;
 import jp.co.city.tear.model.Duplicate;
 import jp.co.city.tear.service.IUserService;
+import jp.co.city.tear.web.ui.AppSession;
 
 import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -26,6 +29,7 @@ import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.extensions.ajax.markup.html.IndicatingAjaxButton;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.PasswordTextField;
 import org.apache.wicket.markup.html.form.validation.EqualPasswordInputValidator;
 import org.apache.wicket.markup.html.panel.ComponentFeedbackPanel;
@@ -34,12 +38,15 @@ import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.util.string.StringValueConversionException;
+import org.apache.wicket.validation.IValidatable;
+import org.apache.wicket.validation.IValidator;
+import org.apache.wicket.validation.ValidationError;
 
 /**
  * @author jabaraster
  */
 @SuppressWarnings("synthetic-access")
-public abstract class UserEditPage extends AdministrationPageBase {
+public abstract class UserEditPage extends RestrictedPageBase {
     private static final long   serialVersionUID = 7454930682959012116L;
 
     /**
@@ -102,6 +109,35 @@ public abstract class UserEditPage extends AdministrationPageBase {
             JavaScriptUtil.addFocusScript(pResponse, getEditor().findInputComponent(EUser_.userId.getName()).getFirstFormComponent());
         } catch (final NotFound e) {
             // 処理なし
+        }
+    }
+
+    /**
+     * @see org.apache.wicket.Page#onBeforeRender()
+     */
+    @Override
+    protected void onBeforeRender() {
+        super.onBeforeRender();
+        addAdministratorValidator();
+        setAdministratorEditorVisibility();
+    }
+
+    @SuppressWarnings("serial")
+    private void addAdministratorValidator() {
+        final FormComponent<?> cp = getAdministratorEditor().getFirstFormComponent();
+        cp.add(new IValidator<Object>() {
+            @Override
+            public void validate(final IValidatable<Object> pValidatable) {
+                UserEditPage.this.handler.checkAdministration(pValidatable);
+            }
+        });
+    }
+
+    private PropertyEditor getAdministratorEditor() {
+        try {
+            return getEditor().findInputComponent(EUser_.administrator.getName());
+        } catch (final NotFound e) {
+            throw ExceptionUtil.rethrow(e);
         }
     }
 
@@ -186,6 +222,13 @@ public abstract class UserEditPage extends AdministrationPageBase {
         this.add(getForm());
     }
 
+    private void setAdministratorEditorVisibility() {
+        if (getSession().currentUserIsAdministrator()) {
+            return;
+        }
+        getAdministratorEditor().setVisible(false);
+    }
+
     /**
      * @param pUser -
      * @return -
@@ -195,9 +238,16 @@ public abstract class UserEditPage extends AdministrationPageBase {
         if (!pUser.isPersisted()) {
             throw new IllegalArgumentException("永続化されていないエンティティは処理出来ません."); //$NON-NLS-1$
         }
+        return createParameters(pUser.getId().longValue());
+    }
 
+    /**
+     * @param pEUserId -
+     * @return -
+     */
+    public static PageParameters createParameters(final long pEUserId) {
         final PageParameters ret = new PageParameters();
-        ret.set(0, pUser.getId());
+        ret.set(0, Long.valueOf(pEUserId));
         return ret;
     }
 
@@ -206,12 +256,31 @@ public abstract class UserEditPage extends AdministrationPageBase {
 
         private final ErrorClassAppender errorClassAppender = new ErrorClassAppender();
 
-        void onError(final AjaxRequestTarget pTarget) {
+        private void checkAdministration(final IValidatable<Object> pValidatable) {
+            if (!UserEditPage.this.userValue.isPersisted()) {
+                return;
+            }
+
+            // ログインユーザが管理者ユーザの場合、自身を管理者でなくする操作は禁止する.
+            final AppSession session = getSession();
+            if (!session.currentUserIsAdministrator()) {
+                return;
+            }
+            if (session.getLoginUser().getId() != UserEditPage.this.userValue.getId().longValue()) {
+                return;
+            }
+            final Boolean admin = (Boolean) pValidatable.getValue();
+            if (Boolean.FALSE.equals(admin)) {
+                pValidatable.error(new ValidationError("自身を管理者でなくすることはできません.")); //$NON-NLS-1$
+            }
+        }
+
+        private void onError(final AjaxRequestTarget pTarget) {
             this.errorClassAppender.addErrorClass(getForm());
             pTarget.add(getForm());
         }
 
-        void onSubmit(final AjaxRequestTarget pTarget) {
+        private void onSubmit(final AjaxRequestTarget pTarget) {
             try {
                 UserEditPage.this.userService.insertOrUpdate(UserEditPage.this.userValue, getPassword().getModelObject());
                 setResponsePage(UserListPage.class);

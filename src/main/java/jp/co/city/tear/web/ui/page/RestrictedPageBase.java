@@ -27,6 +27,7 @@ public abstract class RestrictedPageBase extends WebPageBase {
     private Label                   loginUserId;
     private ListView<MenuInfo>      menus;
     private MenuLinkList            goTop;
+    private Link<?>                 goUserEdit;
     private BookmarkablePageLink<?> goLogout;
     private CopyrightPanel          copyright;
 
@@ -44,7 +45,7 @@ public abstract class RestrictedPageBase extends WebPageBase {
         super(pParameters);
         this.add(getGoTop());
         this.add(getMenus());
-        this.add(getLoginUserId());
+        this.add(getGoUserEdit());
         this.add(getGoLogout());
         this.add(getCopyright());
     }
@@ -81,6 +82,15 @@ public abstract class RestrictedPageBase extends WebPageBase {
         return this.goTop;
     }
 
+    private Link<?> getGoUserEdit() {
+        if (this.goUserEdit == null) {
+            this.goUserEdit = new BookmarkablePageLink<>("goUserEdit", UserUpdatePage.class // //$NON-NLS-1$
+                    , UserEditPage.createParameters(getSession().getLoginUser().getId()));
+            this.goUserEdit.add(getLoginUserId());
+        }
+        return this.goUserEdit;
+    }
+
     private Label getLoginUserId() {
         if (this.loginUserId == null) {
             this.loginUserId = new Label("loginUserId", AppSession.get().getLoginUser().getUserId()); //$NON-NLS-1$
@@ -91,7 +101,7 @@ public abstract class RestrictedPageBase extends WebPageBase {
     @SuppressWarnings("serial")
     private ListView<MenuInfo> getMenus() {
         if (this.menus == null) {
-            this.menus = new ListView<MenuInfo>("menus", WicketApplication.getMenuInfo()) { //$NON-NLS-1$
+            this.menus = new ListView<MenuInfo>("menus", WicketApplication.get().getMenuInfo()) { //$NON-NLS-1$
                 @Override
                 protected void populateItem(final ListItem<MenuInfo> pItem) {
                     final MenuInfo menu = pItem.getModelObject();
