@@ -85,8 +85,8 @@ public class UserListPage extends AdministrationPageBase {
                     return UserEditPage.createParameters(pArgument);
                 }
             };
-            columns.add(new EditLinkColumn<>(Models.readOnly("編集"), ArContentUpdatePage.class, p)); //$NON-NLS-1$
-            columns.add(new DeleteLinkColumn<>(Models.readOnly("削除"), ArContentDeletePage.class, p)); //$NON-NLS-1$
+            columns.add(new EditLinkColumn<>(Models.readOnly("編集"), UserUpdatePage.class, p)); //$NON-NLS-1$
+            columns.add(new DeleteLinkColumn<>(Models.readOnly("削除"), UserDeletePage.class, p)); //$NON-NLS-1$
 
             this.users = new AjaxFallbackDefaultDataTable<>( //
                     "users" // //$NON-NLS-1$

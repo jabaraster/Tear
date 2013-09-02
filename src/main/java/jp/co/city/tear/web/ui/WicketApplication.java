@@ -8,10 +8,15 @@ import jabara.wicket.Models;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import jp.co.city.tear.web.ui.page.AdministrationPageBase;
 import jp.co.city.tear.web.ui.page.ArContentDeletePage;
+import jp.co.city.tear.web.ui.page.ArContentEditPage;
 import jp.co.city.tear.web.ui.page.ArContentInsertPage;
 import jp.co.city.tear.web.ui.page.ArContentListPage;
 import jp.co.city.tear.web.ui.page.ArContentUpdatePage;
@@ -20,6 +25,7 @@ import jp.co.city.tear.web.ui.page.LogoutPage;
 import jp.co.city.tear.web.ui.page.RestrictedPageBase;
 import jp.co.city.tear.web.ui.page.TopPage;
 import jp.co.city.tear.web.ui.page.UserDeletePage;
+import jp.co.city.tear.web.ui.page.UserEditPage;
 import jp.co.city.tear.web.ui.page.UserInsertPage;
 import jp.co.city.tear.web.ui.page.UserListPage;
 import jp.co.city.tear.web.ui.page.UserUpdatePage;
@@ -43,17 +49,29 @@ import com.google.inject.Injector;
 public class WicketApplication extends WebApplication {
 
     @SuppressWarnings("nls")
-    private static final List<MenuInfo> _menuInfoList = Arrays.asList( //
-                                                              new MenuInfo(Models.readOnly("ユーザ一覧"), UserListPage.class) //
-                                                              // , new MenuInfo(Models.readOnly("ユーザ新規登録"), UserInsertPage.class) //
-                                                              , new MenuInfo(Models.readOnly("ARコンテンツ一覧"), ArContentListPage.class) //
-                                                      // , new MenuInfo(Models.readOnly("ARコンテンツ新規登録"), ArContentInsertPage.class) //
-                                                      // , new MenuInfo(Models.readOnly("ログアウト"), LogoutPage.class) //
-                                                      );
+    private static final List<MenuInfo>                                                _menuInfoList  = Arrays.asList(
+                                                                                                              //
+                                                                                                              new MenuInfo(Models.readOnly("ユーザ一覧"),
+                                                                                                                      UserListPage.class) //
+                                                                                                              // , new
+                                                                                                              // MenuInfo(Models.readOnly("ユーザ新規登録"),
+                                                                                                              // UserInsertPage.class) //
+                                                                                                              ,
+                                                                                                              new MenuInfo(Models
+                                                                                                                      .readOnly("ARコンテンツ一覧"),
+                                                                                                                      ArContentListPage.class) //
+                                                                                                      // , new
+                                                                                                      // MenuInfo(Models.readOnly("ARコンテンツ新規登録"),
+                                                                                                      // ArContentInsertPage.class) //
+                                                                                                      // , new MenuInfo(Models.readOnly("ログアウト"),
+                                                                                                      // LogoutPage.class) //
+                                                                                                      );
 
-    private static final String         ENC           = "UTF-8"; //$NON-NLS-1$
+    private static final String                                                        ENC            = "UTF-8";              //$NON-NLS-1$
 
-    private final IProvider<Injector>   injectorProvider;
+    private final IProvider<Injector>                                                  injectorProvider;
+
+    private final Map<Class<? extends WebPageBase>, Set<Class<? extends WebPageBase>>> menuCategories = buildMenuCategories();
 
     /**
      * @param pInjectorProvider Guiceの{@link Injector}を供給するオブジェクト. DI設定に使用します.
@@ -68,7 +86,7 @@ public class WicketApplication extends WebApplication {
      */
     @Override
     public Class<? extends Page> getHomePage() {
-        return ArContentListPage.class;
+        return TopPage.class;
     }
 
     /**
@@ -76,6 +94,24 @@ public class WicketApplication extends WebApplication {
      */
     public Injector getInjector() {
         return this.injectorProvider.get();
+    }
+
+    /**
+     * @param pLinkTargetPage -
+     * @param pViewPage -
+     * @return -
+     */
+    public boolean isSelected(final Class<? extends WebPageBase> pLinkTargetPage, final Page pViewPage) {
+        final Set<Class<? extends WebPageBase>> pages = this.menuCategories.get(pLinkTargetPage);
+        if (pages == null) {
+            return false;
+        }
+        for (final Class<? extends WebPageBase> page : pages) {
+            if (page.isInstance(pViewPage)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -151,6 +187,7 @@ public class WicketApplication extends WebApplication {
     private void mountPages() {
         this.mountPage("login", LoginPage.class);
         this.mountPage("logout", LogoutPage.class);
+        this.mountPage("top", TopPage.class);
 
         this.mountPage("mainte/user/", UserListPage.class);
         this.mountPage("mainte/user/index", UserListPage.class);
@@ -186,6 +223,14 @@ public class WicketApplication extends WebApplication {
                 ret.add(mi);
             }
         }
+        return ret;
+    }
+
+    private static Map<Class<? extends WebPageBase>, Set<Class<? extends WebPageBase>>> buildMenuCategories() {
+        final Map<Class<? extends WebPageBase>, Set<Class<? extends WebPageBase>>> ret = new HashMap<Class<? extends WebPageBase>, Set<Class<? extends WebPageBase>>>();
+        ret.put(TopPage.class, new HashSet<Class<? extends WebPageBase>>(Arrays.asList(TopPage.class)));
+        ret.put(UserListPage.class, new HashSet<Class<? extends WebPageBase>>(Arrays.asList(UserListPage.class, UserEditPage.class)));
+        ret.put(ArContentListPage.class, new HashSet<Class<? extends WebPageBase>>(Arrays.asList(ArContentListPage.class, ArContentEditPage.class)));
         return ret;
     }
 

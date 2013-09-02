@@ -8,13 +8,16 @@ import jabara.wicket.Models;
 
 import java.io.Serializable;
 
+import jp.co.city.tear.Environment;
 import jp.co.city.tear.model.FailAuthentication;
 import jp.co.city.tear.web.ui.AppSession;
+import jp.co.city.tear.web.ui.component.CopyrightPanel;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.extensions.ajax.markup.html.IndicatingAjaxButton;
 import org.apache.wicket.markup.head.IHeaderResponse;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.PasswordTextField;
 import org.apache.wicket.markup.html.form.StatelessForm;
@@ -32,16 +35,20 @@ public class LoginPage extends WebPageBase {
 
     private final Handler     handler          = new Handler();
 
+    private Label             applicationName;
     private StatelessForm<?>  form;
     private TextField<String> userId;
     private PasswordTextField password;
     private AjaxButton        submitter;
+    private CopyrightPanel    copyright;
 
     /**
      * 
      */
     public LoginPage() {
+        this.add(getApplicationName());
         this.add(getForm());
+        this.add(getCopyright());
     }
 
     /**
@@ -103,6 +110,20 @@ public class LoginPage extends WebPageBase {
             this.userId.setRequired(true);
         }
         return this.userId;
+    }
+
+    private Label getApplicationName() {
+        if (this.applicationName == null) {
+            this.applicationName = new Label("applicationName", Environment.getApplicationName()); //$NON-NLS-1$
+        }
+        return this.applicationName;
+    }
+
+    private CopyrightPanel getCopyright() {
+        if (this.copyright == null) {
+            this.copyright = new CopyrightPanel("copyright"); //$NON-NLS-1$
+        }
+        return this.copyright;
     }
 
     private class Handler implements Serializable {

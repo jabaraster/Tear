@@ -42,6 +42,11 @@ public final class Environment {
      */
     public static final String         PARAM_ABSOLUTE_REST_URL_ROOT = PARAM_PREFIX + "absoluteRestUrlRoot";
 
+    /**
+     * 
+     */
+    public static final String         PARAM_COPYRIGHT              = PARAM_PREFIX + "copyright";
+
     private static final AtomicBoolean _dataStoreDirectoryCreated   = new AtomicBoolean(false);
 
     /**
@@ -77,6 +82,13 @@ public final class Environment {
      */
     public static String getAwsSecretKey() {
         return getString(PARAM_AWS_SECRET_KEY, null);
+    }
+
+    /**
+     * @return -
+     */
+    public static String getCopyright() {
+        return getString(PARAM_COPYRIGHT, "@ CITY ASCOM 2013");
     }
 
     /**
