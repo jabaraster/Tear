@@ -11,7 +11,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import jp.co.city.tear.web.ui.page.AdministrationPageBase;
@@ -33,13 +32,18 @@ import jp.co.city.tear.web.ui.page.WebPageBase;
 
 import org.apache.wicket.Page;
 import org.apache.wicket.Session;
+import org.apache.wicket.core.util.resource.UrlResourceStream;
 import org.apache.wicket.guice.GuiceComponentInjector;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.request.Request;
 import org.apache.wicket.request.Response;
+import org.apache.wicket.request.resource.IResource;
+import org.apache.wicket.request.resource.ResourceReference;
+import org.apache.wicket.request.resource.ResourceStreamResource;
 import org.apache.wicket.util.IProvider;
+import org.apache.wicket.util.time.Duration;
 
 import com.google.inject.Injector;
 
@@ -49,29 +53,25 @@ import com.google.inject.Injector;
 public class WicketApplication extends WebApplication {
 
     @SuppressWarnings("nls")
-    private static final List<MenuInfo>                                                _menuInfoList  = Arrays.asList(
-                                                                                                              //
-                                                                                                              new MenuInfo(Models.readOnly("ユーザ一覧"),
-                                                                                                                      UserListPage.class) //
-                                                                                                              // , new
-                                                                                                              // MenuInfo(Models.readOnly("ユーザ新規登録"),
-                                                                                                              // UserInsertPage.class) //
-                                                                                                              ,
-                                                                                                              new MenuInfo(Models
-                                                                                                                      .readOnly("ARコンテンツ一覧"),
-                                                                                                                      ArContentListPage.class) //
-                                                                                                      // , new
-                                                                                                      // MenuInfo(Models.readOnly("ARコンテンツ新規登録"),
-                                                                                                      // ArContentInsertPage.class) //
-                                                                                                      // , new MenuInfo(Models.readOnly("ログアウト"),
-                                                                                                      // LogoutPage.class) //
-                                                                                                      );
+    private static final List<MenuInfo> _menuInfoList  = Arrays.asList(
+                                                       //
+                                                               new MenuInfo(Models.readOnly("ユーザ一覧"), UserListPage.class) //
+                                                               // , new
+                                                               // MenuInfo(Models.readOnly("ユーザ新規登録"),
+                                                               // UserInsertPage.class) //
+                                                               , new MenuInfo(Models.readOnly("ARコンテンツ一覧"), ArContentListPage.class) //
+                                                       // , new
+                                                       // MenuInfo(Models.readOnly("ARコンテンツ新規登録"),
+                                                       // ArContentInsertPage.class) //
+                                                       // , new MenuInfo(Models.readOnly("ログアウト"),
+                                                       // LogoutPage.class) //
+                                                       );
 
-    private static final String                                                        ENC            = "UTF-8";              //$NON-NLS-1$
+    private static final String         ENC            = "UTF-8";              //$NON-NLS-1$
 
-    private final IProvider<Injector>                                                  injectorProvider;
+    private final IProvider<Injector>   injectorProvider;
 
-    private final Map<Class<? extends WebPageBase>, Set<Class<? extends WebPageBase>>> menuCategories = buildMenuCategories();
+    private final MenuCategories        menuCategories = buildMenuCategories();
 
     /**
      * @param pInjectorProvider Guiceの{@link Injector}を供給するオブジェクト. DI設定に使用します.
@@ -129,6 +129,7 @@ public class WicketApplication extends WebApplication {
     protected void init() {
         super.init();
 
+        mountResources();
         mountPages();
         initializeEncoding();
         initializeInjection();
@@ -202,6 +203,18 @@ public class WicketApplication extends WebApplication {
         this.mountPage("mainte/content/delete", ArContentDeletePage.class);
     }
 
+    @SuppressWarnings({ "nls", "serial" })
+    private void mountResources() {
+        mountResource("back", new ResourceReference("back") {
+            @Override
+            public IResource getResource() {
+                return new ResourceStreamResource(new UrlResourceStream(WicketApplication.class.getResource("brickwall.png"))) //
+                        .setCacheDuration(Duration.days(10)) //
+                ;
+            }
+        });
+    }
+
     /**
      * @return -
      */
@@ -226,11 +239,14 @@ public class WicketApplication extends WebApplication {
         return ret;
     }
 
-    private static Map<Class<? extends WebPageBase>, Set<Class<? extends WebPageBase>>> buildMenuCategories() {
-        final Map<Class<? extends WebPageBase>, Set<Class<? extends WebPageBase>>> ret = new HashMap<Class<? extends WebPageBase>, Set<Class<? extends WebPageBase>>>();
-        ret.put(TopPage.class, new HashSet<Class<? extends WebPageBase>>(Arrays.asList(TopPage.class)));
-        ret.put(UserListPage.class, new HashSet<Class<? extends WebPageBase>>(Arrays.asList(UserListPage.class, UserEditPage.class)));
-        ret.put(ArContentListPage.class, new HashSet<Class<? extends WebPageBase>>(Arrays.asList(ArContentListPage.class, ArContentEditPage.class)));
+    @SuppressWarnings({ "synthetic-access", "unchecked" })
+    private static MenuCategories buildMenuCategories() {
+        final MenuCategories ret = new MenuCategories();
+
+        ret.append(TopPage.class, TopPage.class);
+        ret.append(UserListPage.class, UserListPage.class, UserEditPage.class);
+        ret.append(ArContentListPage.class, ArContentListPage.class, ArContentEditPage.class);
+
         return ret;
     }
 
@@ -266,6 +282,27 @@ public class WicketApplication extends WebApplication {
          */
         public Class<? extends WebPageBase> getPage() {
             return this.page;
+        }
+    }
+
+    private static class MenuCategories extends HashMap<Class<? extends WebPageBase>, Set<Class<? extends WebPageBase>>> {
+        private static final long serialVersionUID = 2226176315425317930L;
+
+        void append(final Class<? extends WebPageBase> pLinkTarget, @SuppressWarnings("unchecked") final Class<? extends WebPageBase>... pViewPages) {
+            ArgUtil.checkNull(pLinkTarget, "pLinkTarget"); //$NON-NLS-1$
+            ArgUtil.checkNull(pViewPages, "pViewPages"); //$NON-NLS-1$
+            for (final Class<? extends WebPageBase> page : pViewPages) {
+                if (page == null) {
+                    throw new IllegalArgumentException("pViewPages contain null element."); //$NON-NLS-1$
+                }
+            }
+
+            Set<Class<? extends WebPageBase>> pages = this.get(pLinkTarget);
+            if (pages == null) {
+                pages = new HashSet<>();
+                put(pLinkTarget, pages);
+            }
+            pages.addAll(Arrays.asList(pViewPages));
         }
     }
 }

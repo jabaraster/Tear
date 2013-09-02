@@ -28,6 +28,8 @@ import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.extensions.markup.html.repeater.util.SortParam;
 import org.apache.wicket.extensions.markup.html.repeater.util.SortableDataProvider;
 import org.apache.wicket.markup.head.IHeaderResponse;
+import org.apache.wicket.markup.html.link.BookmarkablePageLink;
+import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
@@ -44,11 +46,13 @@ public class UserListPage extends AdministrationPageBase {
     IUserService                                        userService;
 
     private AjaxFallbackDefaultDataTable<EUser, String> users;
+    private Link<?>                                     adder;
 
     /**
      * 
      */
     public UserListPage() {
+        this.add(getAdder());
         this.add(getUsers());
     }
 
@@ -67,6 +71,13 @@ public class UserListPage extends AdministrationPageBase {
     @Override
     protected IModel<String> getTitleLabelModel() {
         return Models.of("ユーザ一覧"); //$NON-NLS-1$
+    }
+
+    private Link<?> getAdder() {
+        if (this.adder == null) {
+            this.adder = new BookmarkablePageLink<>("adder", UserInsertPage.class); //$NON-NLS-1$
+        }
+        return this.adder;
     }
 
     @SuppressWarnings("serial")

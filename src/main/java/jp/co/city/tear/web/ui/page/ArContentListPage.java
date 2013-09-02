@@ -34,6 +34,8 @@ import org.apache.wicket.extensions.markup.html.repeater.util.SortParam;
 import org.apache.wicket.extensions.markup.html.repeater.util.SortableDataProvider;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.link.BookmarkablePageLink;
+import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.LoadableDetachableModel;
@@ -51,11 +53,13 @@ public class ArContentListPage extends RestrictedPageBase {
     IArContentService                                        arContentService;
 
     private AjaxFallbackDefaultDataTable<EArContent, String> arContents;
+    private Link<?>                                          adder;
 
     /**
      * 
      */
     public ArContentListPage() {
+        this.add(getAdder());
         this.add(getArContents());
     }
 
@@ -74,6 +78,13 @@ public class ArContentListPage extends RestrictedPageBase {
     @Override
     protected IModel<String> getTitleLabelModel() {
         return Models.readOnly("ARコンテンツ一覧"); //$NON-NLS-1$
+    }
+
+    private Link<?> getAdder() {
+        if (this.adder == null) {
+            this.adder = new BookmarkablePageLink<>("adder", ArContentInsertPage.class); //$NON-NLS-1$
+        }
+        return this.adder;
     }
 
     @SuppressWarnings({ "nls", "serial" })

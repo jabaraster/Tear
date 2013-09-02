@@ -26,6 +26,6 @@ public class EditLinkColumn<E> extends BootstrapLinkColumn<E> {
             , final Class<? extends Page> pDestination //
             , final IProducer2<E, PageParameters> pParametersProducer //
     ) {
-        super(pLinkLabelModel, pDestination, pParametersProducer, Type.INFO);
+        super(pLinkLabelModel, pDestination, pParametersProducer, IconType.EDIT, ButtonType.INFO);
     }
 }

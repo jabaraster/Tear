@@ -2,6 +2,10 @@ package jp.co.city.tear.web.ui.page;
 
 import jabara.general.ArgUtil;
 import jabara.wicket.Models;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import jp.co.city.tear.Environment;
 import jp.co.city.tear.web.ui.AppSession;
 
@@ -11,9 +15,12 @@ import org.apache.wicket.markup.head.JavaScriptHeaderItem;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.request.Request;
+import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.request.resource.CssResourceReference;
 import org.apache.wicket.request.resource.JavaScriptResourceReference;
+import org.apache.wicket.resource.TextTemplateResourceReference;
 
 /**
  *
@@ -80,7 +87,14 @@ public abstract class WebPageBase extends WebPage {
     public static void renderCommonHead(final IHeaderResponse pResponse) {
         ArgUtil.checkNull(pResponse, "pResponse"); //$NON-NLS-1$
         pResponse.render(CssHeaderItem.forReference(new CssResourceReference(WebPageBase.class, "bootstrap/css/bootstrap.min.css"))); //$NON-NLS-1$
-        pResponse.render(CssHeaderItem.forReference(new CssResourceReference(WebPageBase.class, "App.css"))); //$NON-NLS-1$
+        pResponse.render(CssHeaderItem.forReference(buildAppCssReference()));
         pResponse.render(JavaScriptHeaderItem.forReference(new JavaScriptResourceReference(WebPageBase.class, "bootstrap/js/bootstrap.min.js"))); //$NON-NLS-1$
+    }
+
+    private static TextTemplateResourceReference buildAppCssReference() {
+        final Map<String, Object> params = new HashMap<String, Object>();
+        final Request request = RequestCycle.get().getRequest();
+        params.put("bodyBackground", request.getContextPath() + request.getFilterPath() + "/back"); //$NON-NLS-1$ //$NON-NLS-2$
+        return new TextTemplateResourceReference(WebPageBase.class, "App.css", "text/css", Models.readOnly(params)); //$NON-NLS-1$ //$NON-NLS-2$
     }
 }

@@ -26,6 +26,6 @@ public class DeleteLinkColumn<E> extends BootstrapLinkColumn<E> {
             , final Class<? extends Page> pDestination //
             , final IProducer2<E, PageParameters> pParametersProducer //
     ) {
-        super(pLinkLabelModel, pDestination, pParametersProducer, Type.WARNING);
+        super(pLinkLabelModel, pDestination, pParametersProducer, IconType.TRASH, ButtonType.WARNING);
     }
 }

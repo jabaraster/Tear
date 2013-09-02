@@ -22,58 +22,91 @@ public class BootstrapLinkColumn<E> extends LinkColumn<E> {
      * @param pLinkLabelModel -
      * @param pDestination -
      * @param pParametersProducer -
-     * @param type -
+     * @param pIconType -
+     * @param pButtonType -
      */
     public BootstrapLinkColumn( //
             final IModel<String> pLinkLabelModel //
             , final Class<? extends Page> pDestination //
             , final IProducer2<E, PageParameters> pParametersProducer //
-            , final Type type //
+            , final IconType pIconType //
+            , final ButtonType pButtonType //
     ) {
-        super(pLinkLabelModel, pDestination, pParametersProducer, AttributeModifier.append("class", getClassValue(type))); //$NON-NLS-1$
+        super( //
+                pLinkLabelModel //
+                , pDestination //
+                , pParametersProducer //
+                , AttributeModifier.append("class", getClassValue(pIconType)) // //$NON-NLS-1$
+                , AttributeModifier.append("class", getClassValue(pButtonType)) // //$NON-NLS-1$
+        );
     }
 
-    private static String getClassValue(final Type type) {
+    private static String getClassValue(final ButtonType type) {
         if (type == null) {
             throw new IllegalArgumentException("null not allowed."); //$NON-NLS-1$
         }
-        if (type == Type.DEFAULT) {
+        if (type == ButtonType.DEFAULT) {
             return Empty.STRING;
         }
         return "btn-" + type.name().toLowerCase(); //$NON-NLS-1$
     }
 
+    private static String getClassValue(final IconType pType) {
+        if (pType == null) {
+            throw new IllegalArgumentException("null not allowed."); //$NON-NLS-1$
+        }
+        return "glyphicon-" + pType.name().toLowerCase(); //$NON-NLS-1$
+    }
+
     /**
      * @author jabaraster
      */
-    public enum Type {
+    public enum ButtonType {
         /**
-             * 
-             */
+         * 
+         */
         DEFAULT,
         /**
-             * 
-             */
+         * 
+         */
         PRIMARY,
         /**
-             * 
-             */
+         * 
+         */
         INFO,
         /**
-             * 
-             */
+         * 
+         */
         SUCCESS,
         /**
-             * 
-             */
+         * 
+         */
         WARNING,
         /**
-             * 
-             */
+         * 
+         */
         DANGER,
         /**
-             * 
-             */
+         * 
+         */
         INVERSE, ;
+    }
+
+    /**
+     * @author jabaraster
+     */
+    public enum IconType {
+        /**
+         * 
+         */
+        PLUS,
+        /**
+         * 
+         */
+        EDIT,
+        /**
+         * 
+         */
+        TRASH, ;
     }
 }

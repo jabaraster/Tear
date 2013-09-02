@@ -1,6 +1,7 @@
 package jp.co.city.tear.web.ui.component;
 
 import org.apache.wicket.Page;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.link.Link;
@@ -19,6 +20,7 @@ public class LinkPanel extends Panel {
     private final Class<? extends Page> destination;
 
     private Link<?>                     link;
+    private WebMarkupContainer          icon;
     private Label                       linkLabel;
 
     /**
@@ -43,18 +45,26 @@ public class LinkPanel extends Panel {
     /**
      * @return -
      */
-    public Link<?> getLink() {
-        if (this.link == null) {
-            this.link = new BookmarkablePageLink<>("go", this.destination, this.destinationParameter); //$NON-NLS-1$
-            this.link.add(getLinkLabel());
+    public WebMarkupContainer getIcon() {
+        if (this.icon == null) {
+            this.icon = new WebMarkupContainer("icon"); //$NON-NLS-1$
         }
-        return this.link;
+        return this.icon;
     }
 
     /**
      * @return -
      */
-    public Label getLinkLabel() {
+    public Link<?> getLink() {
+        if (this.link == null) {
+            this.link = new BookmarkablePageLink<>("go", this.destination, this.destinationParameter); //$NON-NLS-1$
+            this.link.add(getIcon());
+            this.link.add(getLinkLabel());
+        }
+        return this.link;
+    }
+
+    private Label getLinkLabel() {
         if (this.linkLabel == null) {
             this.linkLabel = new Label("linkLabel", this.linkLabelModel); //$NON-NLS-1$
         }

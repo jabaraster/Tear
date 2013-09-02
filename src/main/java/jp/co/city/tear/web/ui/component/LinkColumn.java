@@ -28,24 +28,28 @@ public class LinkColumn<E> extends AbstractColumn<E, String> {
     private final IModel<String>                linkLabelModel;
     private final Class<? extends Page>         destination;
     private final IProducer2<E, PageParameters> parametersProducer;
+    private final AttributeModifier             iconClassModifier;
     private final List<AttributeModifier>       linkLabelAttributeModifiers;
 
     /**
      * @param pLinkLabelModel -
      * @param pDestination -
      * @param pParametersProducer -
+     * @param pIconClassModifier -
      * @param pLinkLabelAttributeModifiers -
      */
     public LinkColumn( //
             final IModel<String> pLinkLabelModel //
             , final Class<? extends Page> pDestination //
             , final IProducer2<E, PageParameters> pParametersProducer //
+            , final AttributeModifier pIconClassModifier //
             , final AttributeModifier... pLinkLabelAttributeModifiers //
     ) {
         super(EMPTY_LABEL_MODEL);
         this.linkLabelModel = ArgUtil.checkNull(pLinkLabelModel, "pLinkLabelModel"); //$NON-NLS-1$
         this.destination = ArgUtil.checkNull(pDestination, "pDestination"); //$NON-NLS-1$
         this.parametersProducer = ArgUtil.checkNull(pParametersProducer, "pParametersProducer"); //$NON-NLS-1$
+        this.iconClassModifier = pIconClassModifier;
         this.linkLabelAttributeModifiers = pLinkLabelAttributeModifiers == null //
         ? Collections.<AttributeModifier> emptyList() //
                 : Arrays.asList(pLinkLabelAttributeModifiers);
@@ -59,8 +63,11 @@ public class LinkColumn<E> extends AbstractColumn<E, String> {
     public void populateItem(final Item<ICellPopulator<E>> pCellItem, final String pComponentId, final IModel<E> pRowModel) {
         final PageParameters params = this.parametersProducer.produce(pRowModel.getObject());
         final LinkPanel link = new LinkPanel(pComponentId, this.linkLabelModel, params, this.destination);
+
+        link.getIcon().add(this.iconClassModifier);
+
         for (final AttributeModifier am : this.linkLabelAttributeModifiers) {
-            link.getLinkLabel().add(am);
+            link.getLink().add(am);
         }
         pCellItem.add(link);
     }

@@ -10,7 +10,7 @@ public class Fuser {
     /**
      * 
      */
-    @XmlAttribute(name = "Type")
+    @XmlAttribute(name = "ButtonType")
     public Type                  type       = Type.SmoothingFuser;
     /**
      * 
