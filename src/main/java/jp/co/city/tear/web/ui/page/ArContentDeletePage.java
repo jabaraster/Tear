@@ -28,7 +28,7 @@ import org.apache.wicket.util.string.StringValueConversionException;
  * @author jabaraster
  */
 @SuppressWarnings("synthetic-access")
-public class ArContentDeletePage extends AdministrationPageBase {
+public class ArContentDeletePage extends RestrictedPageBase {
     private static final long serialVersionUID = 4077550347681798839L;
 
     private final Handler     handler          = new Handler();

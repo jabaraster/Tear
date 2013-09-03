@@ -10,6 +10,7 @@ import jabara.jpa.JpaDaoBase;
 import java.io.InputStream;
 
 import javax.inject.Inject;
+import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
 import jp.co.city.tear.entity.ELargeData;
@@ -46,7 +47,9 @@ public class LargeDataServiceImpl extends JpaDaoBase implements ILargeDataServic
         if (pData == null) {
             return;
         }
-        getEntityManager().remove(pData);
+        final EntityManager em = getEntityManager();
+        em.remove(em.merge(pData));
+        em.flush();
         this.dataStore.delete(pData.getId().longValue());
     }
 

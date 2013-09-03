@@ -33,7 +33,7 @@ public class UserDeletePage extends AdministrationPageBase {
     private final Handler     handler          = new Handler();
 
     @Inject
-    IUserService              shopService;
+    IUserService              userService;
 
     private EUser             user;
 
@@ -47,7 +47,7 @@ public class UserDeletePage extends AdministrationPageBase {
     public UserDeletePage(final PageParameters pParameters) {
         super(pParameters);
         try {
-            this.user = this.shopService.findById(Long.parseLong(pParameters.get(0).toString(Empty.STRING)));
+            this.user = this.userService.findById(Long.parseLong(pParameters.get(0).toString(Empty.STRING)));
 
             this.add(getUserId());
             this.add(getForm());
@@ -96,11 +96,9 @@ public class UserDeletePage extends AdministrationPageBase {
     private class Handler implements Serializable {
         private static final long serialVersionUID = 1602048681286165479L;
 
-        public void onSubmit() {
-            UserDeletePage.this.shopService.delete(UserDeletePage.this.user);
+        private void onSubmit() {
+            UserDeletePage.this.userService.delete(UserDeletePage.this.user);
             setResponsePage(UserListPage.class);
         }
-
     }
-
 }

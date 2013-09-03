@@ -236,8 +236,8 @@ public class WicketApplication extends WebApplication {
         final MenuCategories ret = new MenuCategories();
 
         ret.append(TopPage.class, TopPage.class);
-        ret.append(UserListPage.class, UserListPage.class, UserEditPage.class);
-        ret.append(ArContentListPage.class, ArContentListPage.class, ArContentEditPage.class);
+        ret.append(UserListPage.class, UserListPage.class, UserEditPage.class, UserDeletePage.class);
+        ret.append(ArContentListPage.class, ArContentListPage.class, ArContentEditPage.class, ArContentDeletePage.class);
 
         return ret;
     }

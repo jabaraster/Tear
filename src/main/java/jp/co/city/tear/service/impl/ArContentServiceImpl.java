@@ -108,12 +108,18 @@ public class ArContentServiceImpl extends JpaDaoBase implements IArContentServic
     @Override
     public void delete(final EArContent pArContent) {
         ArgUtil.checkNull(pArContent, "pArContent"); //$NON-NLS-1$
+        deleteCore(pArContent);
+    }
 
-        this.largeDataService.delete(pArContent.getMarker());
-        this.largeDataService.delete(pArContent.getContent());
-
-        final EntityManager em = getEntityManager();
-        em.remove(em.merge(pArContent));
+    /**
+     * @param pUser -
+     */
+    @Override
+    public void deleteUserContents(final EUser pUser) {
+        ArgUtil.checkNull(pUser, "pUser"); //$NON-NLS-1$
+        for (final EArContent content : getAllByUser(pUser)) {
+            deleteCore(content);
+        }
     }
 
     /**
@@ -224,6 +230,27 @@ public class ArContentServiceImpl extends JpaDaoBase implements IArContentServic
         } catch (final NotFound e) {
             throw ExceptionUtil.rethrow(e);
         }
+    }
+
+    private void deleteCore(final EArContent pArContent) {
+        final EntityManager em = getEntityManager();
+        em.remove(em.merge(pArContent));
+
+        this.largeDataService.delete(pArContent.getMarker());
+        this.largeDataService.delete(pArContent.getContent());
+
+        em.flush();
+    }
+
+    private List<EArContent> getAllByUser(final EUser pUser) {
+        final EntityManager em = getEntityManager();
+        final CriteriaBuilder builder = em.getCriteriaBuilder();
+        final CriteriaQuery<EArContent> query = builder.createQuery(EArContent.class);
+        final Root<EArContent> root = query.from(EArContent.class);
+
+        query.where(builder.equal(root.get(EArContent_.owner), pUser));
+
+        return em.createQuery(query).getResultList();
     }
 
     private void insertCore( //

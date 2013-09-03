@@ -3,6 +3,8 @@
  */
 package jp.co.city.tear.service.impl;
 
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
 import jabara.general.Sort;
 import jabara.jpa.entity.EntityBase_;
 
@@ -16,10 +18,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
-
-import static org.junit.Assert.assertThat;
-
-import static org.hamcrest.core.Is.is;
 
 /**
  * @author jabaraster
@@ -46,7 +44,7 @@ public class UserServiceImplTest {
         public final JpaDaoRule<UserServiceImpl> tool = new JpaDaoRule<UserServiceImpl>() {
                                                           @Override
                                                           protected UserServiceImpl createService(final EntityManagerFactory pEntityManagerFactory) {
-                                                              return new UserServiceImpl(pEntityManagerFactory);
+                                                              return new UserServiceImpl(pEntityManagerFactory, null);
                                                           }
                                                       };
 

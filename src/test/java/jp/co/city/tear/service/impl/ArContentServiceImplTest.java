@@ -3,6 +3,9 @@
  */
 package jp.co.city.tear.service.impl;
 
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 import jabara.general.ExceptionUtil;
 import jabara.general.NotFound;
 import jabara.general.Sort;
@@ -36,10 +39,6 @@ import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 
-import static org.junit.Assert.assertThat;
-
-import static org.hamcrest.core.Is.is;
-
 /**
  * @author jabaraster
  */
@@ -56,7 +55,7 @@ public class ArContentServiceImplTest {
     }
 
     private static ArContentServiceImpl createServiceCore(final EntityManagerFactory pEntityManagerFactory) {
-        final UserServiceImpl userService = new UserServiceImpl(pEntityManagerFactory);
+        final UserServiceImpl userService = new UserServiceImpl(pEntityManagerFactory, null);
         userService.insertAdministratorIfNotExists();
         return new ArContentServiceImpl( //
                 pEntityManagerFactory //
@@ -66,7 +65,7 @@ public class ArContentServiceImplTest {
     }
 
     private static IUserService createUserService(final EntityManagerFactory pEntityManagerFactory) {
-        return new UserServiceImpl(pEntityManagerFactory);
+        return new UserServiceImpl(pEntityManagerFactory, null);
     }
 
     private static LoginUser getAdministratorUser(final EntityManager em) {
@@ -324,12 +323,17 @@ public class ArContentServiceImplTest {
         }
     }
 
+    /**
+     * @author jabaraster
+     */
     public static class TableRowCount_is_0 {
         /**
          * 
          */
+        @SuppressWarnings("static-method")
         @Test
         public void _delete() {
+            fail();
         }
     }
 

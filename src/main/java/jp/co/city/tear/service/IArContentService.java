@@ -11,6 +11,7 @@ import java.util.List;
 
 import jp.co.city.tear.entity.EArContent;
 import jp.co.city.tear.entity.ELargeData;
+import jp.co.city.tear.entity.EUser;
 import jp.co.city.tear.model.LargeDataOperation;
 import jp.co.city.tear.model.LoginUser;
 import jp.co.city.tear.service.impl.ArContentServiceImpl;
@@ -38,6 +39,11 @@ public interface IArContentService {
      * @param pArContent -
      */
     void delete(EArContent pArContent);
+
+    /**
+     * @param pUser -
+     */
+    void deleteUserContents(EUser pUser);
 
     /**
      * @param pLoginUser -

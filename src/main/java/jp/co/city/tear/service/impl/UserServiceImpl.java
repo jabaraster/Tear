@@ -23,20 +23,25 @@ import jp.co.city.tear.entity.EUserPassword;
 import jp.co.city.tear.entity.EUserPassword_;
 import jp.co.city.tear.entity.EUser_;
 import jp.co.city.tear.model.Duplicate;
+import jp.co.city.tear.service.IArContentService;
 import jp.co.city.tear.service.IUserService;
 
 /**
  * 
  */
 public class UserServiceImpl extends JpaDaoBase implements IUserService {
-    private static final long serialVersionUID = 5771084556720067384L;
+    private static final long       serialVersionUID = 5771084556720067384L;
+
+    private final IArContentService arContentService;
 
     /**
      * @param pEntityManagerFactory DBアクセス用オブジェクト.
+     * @param pArContentService -
      */
     @Inject
-    public UserServiceImpl(final EntityManagerFactory pEntityManagerFactory) {
+    public UserServiceImpl(final EntityManagerFactory pEntityManagerFactory, final IArContentService pArContentService) {
         super(pEntityManagerFactory);
+        this.arContentService = pArContentService;
     }
 
     /**
@@ -65,10 +70,13 @@ public class UserServiceImpl extends JpaDaoBase implements IUserService {
     public void delete(final EUser pUser) {
         ArgUtil.checkNull(pUser, "pUser"); //$NON-NLS-1$
 
+        this.arContentService.deleteUserContents(pUser);
+
         final EntityManager em = getEntityManager();
         final EUser c = em.merge(pUser);
         em.remove(findPasswordByUser(pUser));
         em.remove(c);
+        em.flush();
     }
 
     /**
