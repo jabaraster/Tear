@@ -30,17 +30,18 @@
       > * {
         vertical-align: top;
       }
-      > span.label {
+      > span.label, > * > span.label {
         color: rgba(0,0,0,1);
+        text-shadow: rgba(0,0,0,.3) 1px 1px;
       }
-      > span:nth-child(1) {
+      > span:nth-child(1), > * > span:nth-child(1) { /* "> *"はwicket:enclosure対策  */
         font-size: large;
         text-align: right;
         width: @label-width;
         display: inline-block;
         line-height: inherit;
       }
-      > span:nth-child(1):after {
+      > span:nth-child(1):after, > * > span:nth-child(1):after {
         content: '：';
       }
       input {

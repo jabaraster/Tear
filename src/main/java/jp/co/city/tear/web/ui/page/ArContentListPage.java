@@ -69,6 +69,7 @@ public class ArContentListPage extends RestrictedPageBase {
     @Override
     public void renderHead(final IHeaderResponse pResponse) {
         super.renderHead(pResponse);
+        addBodyCssReference(pResponse);
         CssUtil.addComponentCssReference(pResponse, ArContentListPage.class);
     }
 

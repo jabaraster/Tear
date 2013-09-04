@@ -17,6 +17,7 @@ import jp.co.city.tear.service.IUserService;
 import jp.co.city.tear.web.ui.WicketApplication;
 
 import org.apache.wicket.RestartResponseAtInterceptPageException;
+import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.Form;
@@ -55,6 +56,15 @@ public class UserDeletePage extends AdministrationPageBase {
         } catch (NumberFormatException | NotFound e) {
             throw new RestartResponseAtInterceptPageException(WicketApplication.get().getHomePage());
         }
+    }
+
+    /**
+     * @see jp.co.city.tear.web.ui.page.RestrictedPageBase#renderHead(org.apache.wicket.markup.head.IHeaderResponse)
+     */
+    @Override
+    public void renderHead(final IHeaderResponse pResponse) {
+        super.renderHead(pResponse);
+        addBodyCssReference(pResponse);
     }
 
     /**

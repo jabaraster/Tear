@@ -31,6 +31,7 @@ public class LogoutPage extends WebPageBase {
     public void renderHead(final IHeaderResponse pResponse) {
         super.renderHead(pResponse);
         CssUtil.addComponentCssReference(pResponse, LogoutPage.class);
+        addBodyCssReference(pResponse);
         pResponse.render(OnDomReadyHeaderItem.forScript("countDown(" + REFRESH_INTERVAL_MINUTES + ")")); //$NON-NLS-1$ //$NON-NLS-2$
     }
 

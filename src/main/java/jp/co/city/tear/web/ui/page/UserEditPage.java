@@ -104,6 +104,7 @@ public abstract class UserEditPage extends RestrictedPageBase {
     @Override
     public void renderHead(final IHeaderResponse pResponse) {
         super.renderHead(pResponse);
+        addBodyCssReference(pResponse);
         CssUtil.addComponentCssReference(pResponse, UserEditPage.class);
         try {
             JavaScriptUtil.addFocusScript(pResponse, getEditor().findInputComponent(EUser_.userId.getName()).getFirstFormComponent());

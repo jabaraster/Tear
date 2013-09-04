@@ -112,7 +112,7 @@ public class ArContentEditPage extends RestrictedPageBase {
     public void renderHead(final IHeaderResponse pResponse) {
         super.renderHead(pResponse);
         CssUtil.addComponentCssReference(pResponse, ArContentEditPage.class);
-        JavaScriptUtil.addJQuery1_9_1Reference(pResponse);
+        addBodyCssReference(pResponse);
         JavaScriptUtil.addComponentJavaScriptReference(pResponse, ArContentEditPage.class);
         JavaScriptUtil.addFocusScript(pResponse, getTitle());
     }

@@ -1,6 +1,7 @@
 package jp.co.city.tear.web.ui.page;
 
 import jabara.general.ArgUtil;
+import jabara.wicket.JavaScriptUtil;
 import jabara.wicket.Models;
 
 import java.util.HashMap;
@@ -26,9 +27,15 @@ import org.apache.wicket.resource.TextTemplateResourceReference;
  *
  */
 public abstract class WebPageBase extends WebPage {
-    private static final long serialVersionUID = 9011478021815065944L;
+    private static final long                        serialVersionUID  = 9011478021815065944L;
 
-    private Label             titleLabel;
+    private static final CssResourceReference        REF_BOOTSTRAP_CSS = new CssResourceReference(WebPageBase.class,
+                                                                               "bootstrap/css/bootstrap.min.css");              //$NON-NLS-1$
+    private static final CssResourceReference        REF_APP_CSS       = new CssResourceReference(WebPageBase.class, "App.css"); //$NON-NLS-1$
+    private static final JavaScriptResourceReference REF_BOOTSTRAP_JS  = new JavaScriptResourceReference(WebPageBase.class,
+                                                                               "bootstrap/js/bootstrap.min.js");                //$NON-NLS-1$
+
+    private Label                                    titleLabel;
 
     /**
      * 
@@ -86,15 +93,26 @@ public abstract class WebPageBase extends WebPage {
      */
     public static void renderCommonHead(final IHeaderResponse pResponse) {
         ArgUtil.checkNull(pResponse, "pResponse"); //$NON-NLS-1$
-        pResponse.render(CssHeaderItem.forReference(new CssResourceReference(WebPageBase.class, "bootstrap/css/bootstrap.min.css"))); //$NON-NLS-1$
-        pResponse.render(CssHeaderItem.forReference(buildAppCssReference()));
-        pResponse.render(JavaScriptHeaderItem.forReference(new JavaScriptResourceReference(WebPageBase.class, "bootstrap/js/bootstrap.min.js"))); //$NON-NLS-1$
+
+        pResponse.render(CssHeaderItem.forReference(REF_BOOTSTRAP_CSS));
+        pResponse.render(CssHeaderItem.forReference(REF_APP_CSS));
+
+        pResponse.render(JavaScriptHeaderItem.forReference(JavaScriptUtil.JQUERY_1_9_1_REFERENCE));
+        pResponse.render(JavaScriptHeaderItem.forReference(REF_BOOTSTRAP_JS));
     }
 
-    private static TextTemplateResourceReference buildAppCssReference() {
+    /**
+     * @param pResponse -
+     */
+    protected static void addBodyCssReference(final IHeaderResponse pResponse) {
+        ArgUtil.checkNull(pResponse, "pResponse"); //$NON-NLS-1$
+        pResponse.render(CssHeaderItem.forReference(buildBodyCssReference()));
+    }
+
+    private static TextTemplateResourceReference buildBodyCssReference() {
         final Map<String, Object> params = new HashMap<>();
         final Request request = RequestCycle.get().getRequest();
         params.put("bodyBackground", request.getContextPath() + request.getFilterPath() + "/back"); //$NON-NLS-1$ //$NON-NLS-2$
-        return new TextTemplateResourceReference(WebPageBase.class, "App.css", "text/css", Models.readOnly(params)); //$NON-NLS-1$ //$NON-NLS-2$
+        return new TextTemplateResourceReference(WebPageBase.class, "Body.css", "text/css", Models.readOnly(params)); //$NON-NLS-1$ //$NON-NLS-2$
     }
 }

@@ -62,6 +62,7 @@ public class UserListPage extends AdministrationPageBase {
     @Override
     public void renderHead(final IHeaderResponse pResponse) {
         super.renderHead(pResponse);
+        addBodyCssReference(pResponse);
         CssUtil.addComponentCssReference(pResponse, UserListPage.class);
     }
 
