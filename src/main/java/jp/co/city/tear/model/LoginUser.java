@@ -30,6 +30,17 @@ public class LoginUser implements Serializable {
     }
 
     /**
+     * @param pUser
+     * @return pUserがこのオブジェクトと同じユーザ情報を示している場合はtrue.
+     */
+    public boolean equal(final EUser pUser) {
+        if (!pUser.isPersisted()) {
+            return false;
+        }
+        return pUser.getId().longValue() == this.id;
+    }
+
+    /**
      * @return idを返す.
      */
     public long getId() {

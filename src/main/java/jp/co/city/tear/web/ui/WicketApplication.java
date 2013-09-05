@@ -1,7 +1,6 @@
 package jp.co.city.tear.web.ui;
 
 import jabara.general.ArgUtil;
-import jabara.wicket.LoginPageInstantiationAuthorizer;
 import jabara.wicket.MarkupIdForceOutputer;
 import jabara.wicket.Models;
 
@@ -21,7 +20,6 @@ import jp.co.city.tear.web.ui.page.ArContentListPage;
 import jp.co.city.tear.web.ui.page.ArContentUpdatePage;
 import jp.co.city.tear.web.ui.page.LoginPage;
 import jp.co.city.tear.web.ui.page.LogoutPage;
-import jp.co.city.tear.web.ui.page.RestrictedPageBase;
 import jp.co.city.tear.web.ui.page.TopPage;
 import jp.co.city.tear.web.ui.page.UserDeletePage;
 import jp.co.city.tear.web.ui.page.UserEditPage;
@@ -34,7 +32,6 @@ import org.apache.wicket.Page;
 import org.apache.wicket.Session;
 import org.apache.wicket.core.util.resource.UrlResourceStream;
 import org.apache.wicket.guice.GuiceComponentInjector;
-import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.request.Request;
@@ -141,8 +138,12 @@ public class WicketApplication extends WebApplication {
         mountPages();
         initializeEncoding();
         initializeInjection();
-        initializeSecurity();
+        initializePageAccessSecurity();
         initializeOther();
+    }
+
+    private void initializePageAccessSecurity() {
+        getSecuritySettings().setAuthorizationStrategy(new PageAccessSecurity());
     }
 
     private void initializeEncoding() {
@@ -156,40 +157,6 @@ public class WicketApplication extends WebApplication {
 
     private void initializeOther() {
         getComponentInstantiationListeners().add(new MarkupIdForceOutputer());
-    }
-
-    private void initializeSecurity() {
-        getSecuritySettings().setAuthorizationStrategy(new LoginPageInstantiationAuthorizer() {
-
-            @Override
-            protected Class<? extends Page> getFirstPageType() {
-                return TopPage.class;
-            }
-
-            @Override
-            protected Class<? extends Page> getLoginPageType() {
-                return LoginPage.class;
-            }
-
-            @Override
-            protected Class<? extends Page> getRestictedPageType() {
-                return RestrictedPageBase.class;
-            }
-
-            @Override
-            protected boolean isAuthenticated() {
-                final AppSession session = AppSession.get();
-                return session.isAuthenticated();
-            }
-
-            @Override
-            protected boolean isPermittedPage(final Class<? extends WebPage> pPageType) {
-                if (!AppSession.get().currentUserIsAdministrator()) {
-                    return !AdministrationPageBase.class.isAssignableFrom(pPageType);
-                }
-                return true;
-            }
-        });
     }
 
     @SuppressWarnings("nls")

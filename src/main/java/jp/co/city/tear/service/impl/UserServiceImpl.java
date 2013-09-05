@@ -23,6 +23,8 @@ import jp.co.city.tear.entity.EUserPassword;
 import jp.co.city.tear.entity.EUserPassword_;
 import jp.co.city.tear.entity.EUser_;
 import jp.co.city.tear.model.Duplicate;
+import jp.co.city.tear.model.LoginUser;
+import jp.co.city.tear.model.UnmatchPassword;
 import jp.co.city.tear.service.IArContentService;
 import jp.co.city.tear.service.IUserService;
 
@@ -80,6 +82,27 @@ public class UserServiceImpl extends JpaDaoBase implements IUserService {
     }
 
     /**
+     * @see jp.co.city.tear.service.IUserService#enableDelete(jp.co.city.tear.model.LoginUser, jp.co.city.tear.entity.EUser)
+     */
+    @Override
+    public boolean enableDelete(final LoginUser pLoginUser, final EUser pDeleteTargetUser) {
+        ArgUtil.checkNull(pLoginUser, "pLoginUser"); //$NON-NLS-1$
+        ArgUtil.checkNull(pDeleteTargetUser, "pDeleteTargetUser"); //$NON-NLS-1$
+
+        // 自身は削除不可.
+        if (pLoginUser.equal(pDeleteTargetUser)) {
+            return false;
+        }
+
+        // 管理者でないユーザが管理者を削除することは出来ない.
+        if (!pLoginUser.isAdministrator() && pDeleteTargetUser.isAdministrator()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * @see jp.co.city.tear.service.IUserService#findById(long)
      */
     @Override
@@ -126,6 +149,18 @@ public class UserServiceImpl extends JpaDaoBase implements IUserService {
     }
 
     /**
+     * @see jp.co.city.tear.service.IUserService#insert(jp.co.city.tear.entity.EUser, java.lang.String)
+     */
+    @Override
+    public void insert(final EUser pUser, final String pPassword) throws Duplicate {
+        ArgUtil.checkNull(pUser, "pUser"); //$NON-NLS-1$
+        if (pUser.isPersisted()) {
+            throw new IllegalStateException("既に永続化されているエンティティは処理できません."); //$NON-NLS-1$
+        }
+        insertCore(pUser, pPassword);
+    }
+
+    /**
      * @see jp.co.city.tear.service.IUserService#insertAdministratorIfNotExists()
      */
     @Override
@@ -148,16 +183,29 @@ public class UserServiceImpl extends JpaDaoBase implements IUserService {
     }
 
     /**
-     * @see jp.co.city.tear.service.IUserService#insertOrUpdate(jp.co.city.tear.entity.EUser, java.lang.String)
+     * @see jp.co.city.tear.service.IUserService#update(jp.co.city.tear.entity.EUser)
      */
     @Override
-    public void insertOrUpdate(final EUser pUser, final String pPassword) throws Duplicate {
+    public void update(final EUser pUser) throws Duplicate {
         ArgUtil.checkNull(pUser, "pUser"); //$NON-NLS-1$
-        if (pUser.isPersisted()) {
-            updateCore(pUser, pPassword);
-        } else {
-            insertCore(pUser, pPassword);
+        if (!pUser.isPersisted()) {
+            throw new IllegalStateException("永続化していないエンティティは処理出来ません."); //$NON-NLS-1$
         }
+        updateCore(pUser);
+    }
+
+    /**
+     * @see jp.co.city.tear.service.IUserService#updatePassword(jp.co.city.tear.entity.EUser, java.lang.String, java.lang.String)
+     */
+    @Override
+    public void updatePassword(final EUser pUser, final String pCurrentPassword, final String pNewPassword) throws UnmatchPassword {
+        ArgUtil.checkNull(pUser, "pUser");
+
+        final EUserPassword password = findPasswordByUser(pUser);
+        if (!password.equal(pCurrentPassword)) {
+            throw UnmatchPassword.INSTANCE;
+        }
+        updatePasswordCore(pUser, pNewPassword);
     }
 
     private void checkCodeDuplicate(final EUser pUser, final DuplicateCheckMode pMode) throws Duplicate {
@@ -219,14 +267,16 @@ public class UserServiceImpl extends JpaDaoBase implements IUserService {
         em.persist(new EUserPassword(pUser, pPassword));
     }
 
-    private void updateCore(final EUser pUser, final String pPassword) throws Duplicate {
+    private void updateCore(final EUser pUser) throws Duplicate {
         checkCodeDuplicate(pUser, DuplicateCheckMode.UPDATE);
         final EntityManager em = getEntityManager();
         if (!em.contains(pUser)) {
             final EUser target = em.merge(pUser);
             target.setUserId(pUser.getUserId());
         }
+    }
 
+    private void updatePasswordCore(final EUser pUser, final String pPassword) {
         final EUserPassword password = findPasswordByUser(pUser);
         password.setPassword(pPassword);
     }

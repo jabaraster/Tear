@@ -7,6 +7,8 @@ import java.util.List;
 
 import jp.co.city.tear.entity.EUser;
 import jp.co.city.tear.model.Duplicate;
+import jp.co.city.tear.model.LoginUser;
+import jp.co.city.tear.model.UnmatchPassword;
 import jp.co.city.tear.service.impl.UserServiceImpl;
 
 import com.google.inject.ImplementedBy;
@@ -26,6 +28,13 @@ public interface IUserService {
      * @param pUser -
      */
     void delete(EUser pUser);
+
+    /**
+     * @param pLoginUser
+     * @param pDeleteTargetUser
+     * @return ログイン中ユーザが、pDeleteTargetUserを削除可能であればtrue.
+     */
+    boolean enableDelete(LoginUser pLoginUser, EUser pDeleteTargetUser);
 
     /**
      * @param pId -
@@ -49,14 +58,28 @@ public interface IUserService {
     List<EUser> getAll(Sort pSort);
 
     /**
+     * @param pUser -
+     * @param pPassword -
+     * @throws Duplicate -
+     */
+    void insert(EUser pUser, String pPassword) throws Duplicate;
+
+    /**
      * 
      */
     void insertAdministratorIfNotExists();
 
     /**
      * @param pUser -
-     * @param pPassword -
      * @throws Duplicate -
      */
-    void insertOrUpdate(EUser pUser, String pPassword) throws Duplicate;
+    void update(EUser pUser) throws Duplicate;
+
+    /**
+     * @param pUser -
+     * @param pCurrentPassword -
+     * @param pNewPassword -
+     * @throws UnmatchPassword -
+     */
+    void updatePassword(EUser pUser, String pCurrentPassword, String pNewPassword) throws UnmatchPassword;
 }

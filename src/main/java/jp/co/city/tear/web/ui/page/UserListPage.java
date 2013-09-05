@@ -17,10 +17,13 @@ import javax.inject.Inject;
 
 import jp.co.city.tear.entity.EUser;
 import jp.co.city.tear.entity.EUser_;
+import jp.co.city.tear.model.LoginUser;
 import jp.co.city.tear.service.IUserService;
+import jp.co.city.tear.web.ui.AppSession;
 import jp.co.city.tear.web.ui.component.AttributeColumn;
 import jp.co.city.tear.web.ui.component.DeleteLinkColumn;
 import jp.co.city.tear.web.ui.component.EditLinkColumn;
+import jp.co.city.tear.web.ui.component.LinkPanel;
 
 import org.apache.wicket.extensions.ajax.markup.html.repeater.data.table.AjaxFallbackDefaultDataTable;
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
@@ -98,7 +101,7 @@ public class UserListPage extends AdministrationPageBase {
                 }
             };
             columns.add(new EditLinkColumn<>(Models.readOnly("編集"), UserUpdatePage.class, p)); //$NON-NLS-1$
-            columns.add(new DeleteLinkColumn<>(Models.readOnly("削除"), UserDeletePage.class, p)); //$NON-NLS-1$
+            columns.add(new UserDeleteLinkColumn(Models.readOnly("削除"), p)); //$NON-NLS-1$
 
             this.users = new AjaxFallbackDefaultDataTable<>( //
                     "users" // //$NON-NLS-1$
@@ -141,6 +144,24 @@ public class UserListPage extends AdministrationPageBase {
         @Override
         public long size() {
             return this.userService.countAll();
+        }
+    }
+
+    private class UserDeleteLinkColumn extends DeleteLinkColumn<EUser> {
+        private static final long serialVersionUID = 1284065238740991987L;
+
+        UserDeleteLinkColumn(final IModel<String> pLinkLabelModel, final IProducer2<EUser, PageParameters> pParametersProducer) {
+            super(pLinkLabelModel, UserDeletePage.class, pParametersProducer);
+        }
+
+        @Override
+        protected void processLink(final LinkPanel pLink, final IModel<EUser> pRowModel) {
+            super.processLink(pLink, pRowModel);
+
+            final EUser rowUser = pRowModel.getObject();
+            final LoginUser loginUser = AppSession.get().getLoginUser();
+
+            pLink.setVisible(UserListPage.this.userService.enableDelete(loginUser, rowUser));
         }
     }
 }

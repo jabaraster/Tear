@@ -1,0 +1,46 @@
+<wicket:extend>
+
+  <h1>'<span wicket:id="userId"></span>'のプロフィールを編集</h1>
+
+  <wicket:enclosure child="authorityForm">
+    <h2>権限管理</h2>
+    <form wicket:id="authorityForm">
+      <ul>
+        <li class="input">
+          <span class="label">管理者</span>
+          <input wicket:id="administrator" type="checkbox" />
+        </li>
+      </ul>
+      <div class="button">
+        <button wicket:id="authoritySubmitter" class="btn btn-primary btn-large"><i class="icon-white icon-ok"></i>更新</button>
+      </div>
+    </form>
+  </wicket:enclosure>
+
+  <h4/>
+  <h2>パスワード変更</h2>
+  <form wicket:id="passwordForm">
+    <div wicket:id="feedback"></div>
+    <ul>
+      <li class="input">
+        <span class="label">今のパスワード</span>
+        <input type="password" wicket:id="currentPassword" autofocus />
+        <div wicket:id="currentPasswordFeedback"></div>
+      </li>
+      <li class="input">
+        <span class="label">新しいパスワード</span>
+        <input type="password" wicket:id="newPassword" />
+        <div wicket:id="newPasswordFeedback"></div>
+      </li>
+      <li class="input">
+        <span class="label">パスワード（確認）</span>
+        <input type="password" wicket:id="newPasswordConfirmation" />
+        <div wicket:id="newPasswordConfirmationFeedback"></div>
+      </li>
+    </ul>
+    <div class="button">
+      <button wicket:id="passwordSubmitter" class="btn btn-primary btn-large"><i class="icon-white icon-ok"></i>更新</button>
+    </div>
+  </form>
+
+</wicket:extend>

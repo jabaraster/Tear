@@ -14,6 +14,7 @@ import javax.inject.Inject;
 import jp.co.city.tear.entity.EUser;
 import jp.co.city.tear.entity.EUser_;
 import jp.co.city.tear.service.IUserService;
+import jp.co.city.tear.web.ui.AppSession;
 import jp.co.city.tear.web.ui.WicketApplication;
 
 import org.apache.wicket.RestartResponseAtInterceptPageException;
@@ -49,6 +50,10 @@ public class UserDeletePage extends AdministrationPageBase {
         super(pParameters);
         try {
             this.user = this.userService.findById(Long.parseLong(pParameters.get(0).toString(Empty.STRING)));
+
+            if (!this.userService.enableDelete(AppSession.get().getLoginUser(), this.user)) {
+                throw new RestartResponseAtInterceptPageException(WicketApplication.get().getHomePage());
+            }
 
             this.add(getUserId());
             this.add(getForm());

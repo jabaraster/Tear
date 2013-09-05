@@ -471,7 +471,7 @@ public class ArContentServiceImplTest {
                 final EUser user = new EUser();
                 user.setAdministrator(false);
                 user.setUserId(pUserId);
-                createUserService(this.rule.getEntityManagerFactory()).insertOrUpdate(user, "aaa"); //$NON-NLS-1$
+                createUserService(this.rule.getEntityManagerFactory()).insert(user, "aaa"); //$NON-NLS-1$
                 return new LoginUser(user);
 
             } catch (final Duplicate e) {

@@ -76,7 +76,7 @@ public abstract class RestrictedPageBase extends WebPageBase {
     private MenuLinkList getGoTop() {
         if (this.goTop == null) {
             this.goTop = new MenuLinkList("goTop" // //$NON-NLS-1$
-                    , new MenuInfo(Models.readOnly(Environment.getApplicationName() + "とは"), TopPage.class) // //$NON-NLS-1$
+                    , new MenuInfo(Models.readOnly(Environment.getApplicationName()), TopPage.class) //
             );
         }
         return this.goTop;

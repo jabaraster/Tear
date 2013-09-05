@@ -70,5 +70,18 @@ public class LinkColumn<E> extends AbstractColumn<E, String> {
             link.getLink().add(am);
         }
         pCellItem.add(link);
+
+        this.processLink(link, pRowModel);
+    }
+
+    /**
+     * リンクを加工する機会を与えるメソッドです.
+     * 
+     * @param pLink -
+     * @param pRowModel -
+     */
+    @SuppressWarnings("unused")
+    protected void processLink(final LinkPanel pLink, final IModel<E> pRowModel) {
+        // デフォルト処理なし
     }
 }
