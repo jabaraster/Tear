@@ -40,7 +40,7 @@ import org.apache.wicket.util.string.StringValueConversionException;
 /**
  * @author jabaraster
  */
-public class UserUpdatePage extends AdministrationPageBase {
+public class UserUpdatePage extends RestrictedPageBase {
     private static final long   serialVersionUID = -1979174828823637569L;
 
     /**
@@ -48,11 +48,13 @@ public class UserUpdatePage extends AdministrationPageBase {
      */
     protected final EUser       userValue;
 
+    @SuppressWarnings("synthetic-access")
     private final PasswordValue passwordValue    = new PasswordValue();
 
     @Inject
     IUserService                userService;
 
+    @SuppressWarnings("synthetic-access")
     private final Handler       handler          = new Handler();
 
     private Label               userId;
@@ -130,6 +132,7 @@ public class UserUpdatePage extends AdministrationPageBase {
     private AjaxButton getAuthoritySubmitter() {
         if (this.authoritySubmitter == null) {
             this.authoritySubmitter = new IndicatingAjaxButton("authoritySubmitter") { //$NON-NLS-1$
+                @SuppressWarnings("synthetic-access")
                 @Override
                 protected void onSubmit(final AjaxRequestTarget pTarget, @SuppressWarnings("unused") final Form<?> pForm) {
                     UserUpdatePage.this.handler.onAuthoritySubmit(pTarget);
@@ -212,11 +215,13 @@ public class UserUpdatePage extends AdministrationPageBase {
     private AjaxButton getPasswordSubmitter() {
         if (this.passwordSubmitter == null) {
             this.passwordSubmitter = new IndicatingAjaxButton("passwordSubmitter") { //$NON-NLS-1$
+                @SuppressWarnings("synthetic-access")
                 @Override
                 protected void onError(final AjaxRequestTarget pTarget, @SuppressWarnings("unused") final Form<?> pForm) {
                     UserUpdatePage.this.handler.onError(pTarget);
                 }
 
+                @SuppressWarnings("synthetic-access")
                 @Override
                 protected void onSubmit(final AjaxRequestTarget pTarget, @SuppressWarnings("unused") final Form<?> pForm) {
                     UserUpdatePage.this.handler.onPasswordSubmit(pTarget);
@@ -239,6 +244,7 @@ public class UserUpdatePage extends AdministrationPageBase {
         this.add(getPasswordForm());
     }
 
+    @SuppressWarnings("synthetic-access")
     private class Handler implements Serializable {
         private static final long        serialVersionUID   = 6149418547207914836L;
 

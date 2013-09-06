@@ -199,7 +199,7 @@ public class UserServiceImpl extends JpaDaoBase implements IUserService {
      */
     @Override
     public void updatePassword(final EUser pUser, final String pCurrentPassword, final String pNewPassword) throws UnmatchPassword {
-        ArgUtil.checkNull(pUser, "pUser");
+        ArgUtil.checkNull(pUser, "pUser"); //$NON-NLS-1$
 
         final EUserPassword password = findPasswordByUser(pUser);
         if (!password.equal(pCurrentPassword)) {
