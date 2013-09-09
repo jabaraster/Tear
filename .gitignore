@@ -10,3 +10,4 @@ src/main/webapp/WEB-INF/test-classes
 *.ear
 ~
 .DS_Store
+*.swp

@@ -67,8 +67,7 @@ public class EUser extends EntityBase<EUser> {
      * @see jabara.jpa.entity.EntityBase#getId()
      */
     @Override
-    @Order(0)
-    @Localized
+    @Hidden
     public Long getId() {
         return super.getId();
     }

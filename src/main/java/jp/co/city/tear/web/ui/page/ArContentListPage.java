@@ -22,6 +22,7 @@ import jp.co.city.tear.entity.EUser_;
 import jp.co.city.tear.service.IArContentService;
 import jp.co.city.tear.web.ui.AppSession;
 import jp.co.city.tear.web.ui.component.AttributeColumn;
+import jp.co.city.tear.web.ui.component.DateTimeColumn;
 import jp.co.city.tear.web.ui.component.DeleteLinkColumn;
 import jp.co.city.tear.web.ui.component.EditLinkColumn;
 
@@ -109,8 +110,8 @@ public class ArContentListPage extends RestrictedPageBase {
                 }
             }));
 
-            columns.add(new AttributeColumn<EArContent>(EArContent.getMeta(), EntityBase_.created));
-            columns.add(new AttributeColumn<EArContent>(EArContent.getMeta(), EntityBase_.updated));
+            columns.add(new DateTimeColumn<EArContent>(EArContent.getMeta(), EntityBase_.created));
+            columns.add(new DateTimeColumn<EArContent>(EArContent.getMeta(), EntityBase_.updated));
 
             final IProducer2<EArContent, PageParameters> p = new IProducer2<EArContent, PageParameters>() {
                 @Override

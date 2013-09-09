@@ -21,6 +21,7 @@ import jp.co.city.tear.model.LoginUser;
 import jp.co.city.tear.service.IUserService;
 import jp.co.city.tear.web.ui.AppSession;
 import jp.co.city.tear.web.ui.component.AttributeColumn;
+import jp.co.city.tear.web.ui.component.DateTimeColumn;
 import jp.co.city.tear.web.ui.component.DeleteLinkColumn;
 import jp.co.city.tear.web.ui.component.EditLinkColumn;
 import jp.co.city.tear.web.ui.component.LinkPanel;
@@ -91,8 +92,8 @@ public class UserListPage extends AdministrationPageBase {
             columns.add(new AttributeColumn<EUser>(EUser.getMeta(), EntityBase_.id));
             columns.add(new AttributeColumn<EUser>(EUser.getMeta(), EUser_.userId));
             columns.add(new AttributeColumn<EUser>(EUser.getMeta(), EUser_.administrator));
-            columns.add(new AttributeColumn<EUser>(EUser.getMeta(), EntityBase_.created));
-            columns.add(new AttributeColumn<EUser>(EUser.getMeta(), EntityBase_.updated));
+            columns.add(new DateTimeColumn<EUser>(EUser.getMeta(), EntityBase_.created));
+            columns.add(new DateTimeColumn<EUser>(EUser.getMeta(), EntityBase_.updated));
 
             final IProducer2<EUser, PageParameters> p = new IProducer2<EUser, PageParameters>() {
                 @Override

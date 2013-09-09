@@ -1,0 +1,25 @@
+<wicket:extend>
+
+  <h2><a wicket:id="reloader">リロード</a></h2>
+  <form id="fileForm" wicket:id="fileForm">
+    <h1 wicket:id="now"></h1>
+    <ul style="display: block;">
+      <li class="input progressable">
+        <span class="label">コンテンツ</span>
+        <input wicket:id="text" type="text" autofocus />
+        <input wicket:id="upload" type="file" />
+        <div class="progressArea">
+          <ul>
+            <li><button wicket:id="ajaxUploader">ajaxUploader</button></li>
+            <li><button wicket:id="customAjaxUploader">customAjaxUploader</button></li>
+            <li><button wicket:id="submitUploader">submitUploader</button></li>
+          </ul>
+          <div class="progressBar" wicket:id="progress">
+            <div>　0/0(0%)</div>
+          </div>
+        </div>
+      </li>
+    </ul>
+  </form>
+
+</wicket:extend>
