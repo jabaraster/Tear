@@ -17,7 +17,6 @@ import org.apache.wicket.ajax.AbstractDefaultAjaxBehavior;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.extensions.ajax.markup.html.IndicatingAjaxButton;
-import org.apache.wicket.extensions.ajax.markup.html.form.upload.UploadProgressBar;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.head.JavaScriptHeaderItem;
 import org.apache.wicket.markup.html.WebMarkupContainer;
@@ -51,7 +50,6 @@ public class AjaxPage extends WebPageBase {
     private AjaxButton         ajaxUploader;
     private WebMarkupContainer customAjaxUploader;
     private Button             submitUploader;
-    private UploadProgressBar  progress;
 
     /**
      * 
@@ -108,7 +106,6 @@ public class AjaxPage extends WebPageBase {
             this.fileForm.add(getSubmitUploader());
             this.fileForm.add(getNow());
             this.fileForm.add(getUpload());
-            this.fileForm.add(getProgress());
             this.fileForm.add(getText());
         }
         return this.fileForm;
@@ -125,13 +122,6 @@ public class AjaxPage extends WebPageBase {
             });
         }
         return this.now;
-    }
-
-    private UploadProgressBar getProgress() {
-        if (this.progress == null) {
-            this.progress = new UploadProgressBar("progress", getFileForm()); //$NON-NLS-1$
-        }
-        return this.progress;
     }
 
     private Link<?> getReloader() {

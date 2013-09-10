@@ -2,6 +2,7 @@ package jp.co.city.tear.web;
 
 import jabara.jpa.util.SystemPropertyToPostgreJpaPropertiesParser;
 import jabara.jpa_guice.SinglePersistenceUnitJpaModule;
+import jabara.servlet.RequestDumpFilter;
 
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -80,8 +81,8 @@ public class WebInitializer extends GuiceServletContextListener {
         addFilter(servletContext, RoutingFilter.class) //
                 .addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), false, PATH_ROOT + WILD_CARD);
 
-        // addFilter(servletContext, RequestDumpFilter.class) //
-        // .addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), false, PATH_ROOT + WILD_CARD);
+        addFilter(servletContext, RequestDumpFilter.class) //
+                .addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), false, PATH_ROOT + WILD_CARD);
         // addFilter(servletContext, ResponseDumpFilter.class) //
         // .addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), false, PATH_ROOT + WILD_CARD);
     }
@@ -102,10 +103,17 @@ public class WebInitializer extends GuiceServletContextListener {
         return Guice.createInjector(new JerseyServletModule() {
             @Override
             protected void configureServlets() {
-                install(new SinglePersistenceUnitJpaModule( //
-                        Environment.getApplicationName() //
-                        , new SystemPropertyToPostgreJpaPropertiesParser() //
-                ));
+                if (isDatabaseUrlSet()) {
+                    install(new SinglePersistenceUnitJpaModule( //
+                            Environment.getApplicationName() //
+                            , new SystemPropertyToPostgreJpaPropertiesParser() //
+                    ));
+                } else {
+                    install(new SinglePersistenceUnitJpaModule( //
+                            Environment.getApplicationName() + "_Local" // //$NON-NLS-1$
+                    ));
+                }
+
                 initializeJersey();
                 initializeWicket();
                 initializeServices();
@@ -170,6 +178,11 @@ public class WebInitializer extends GuiceServletContextListener {
                         + ",application/x-javascript" //
                         + ",image/svg+xml" //
         );
+    }
+
+    private static boolean isDatabaseUrlSet() {
+        final String p = System.getProperty(SystemPropertyToPostgreJpaPropertiesParser.KEY_DATABASE_URL);
+        return p != null && p.length() > 0;
     }
 
     /**

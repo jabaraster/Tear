@@ -10,14 +10,15 @@ function prepareFileUpload(pButtonId, pFormId, pCallbackUrl) {
 
 function send(pButtonId, pFormId, pCallbackUrl) {
     var fd = new FormData(document.getElementById(pFormId));
+    fd.append("customAjaxUploader", "");
     $.ajax({
         async: true,
-        url: pCallbackUrl,
+        url: /*$('#' + pFormId).attr('action'),*/  pCallbackUrl + "&wicket-ajax=true&wicket-ajax-baseurl=ajax%3F28",
         type: 'post',
         data: fd,
         contentType: false,
         processData: false,
-        dataType: "text", // これがないと、jQueryがレスポンスをパースしてしまうのでWicket.Ajax.process(pData)でエラーが起きてしまう.
+//        dataType: "text", // これがないと、jQueryがレスポンスをパースしてしまうのでWicket.Ajax.process(pData)でエラーが起きてしまう.
         success: function(pData) {
 //            Wicket.Ajax.process(pData); // TODO このコードで１回目はうまく動くのだが・・・
 //            window.location.reload(); // TODO リロードでお茶を濁した方が安全か・・・

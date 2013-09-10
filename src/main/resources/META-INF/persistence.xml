@@ -6,6 +6,28 @@
     <persistence-unit name="Tear" transaction-type="RESOURCE_LOCAL">
 
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
+        <class>jabara.jpa.entity.EntityBase</class>
+        <validation-mode>CALLBACK</validation-mode>
+
+        <properties>
+            <!-- この記述はなくても動作・・・してほしい.
+                 少なくともH2DatabaseとPostgresSQLではなくても動作した.
+            <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect" />
+            -->
+            <property name="hibernate.show_sql" value="false" />
+            <property name="hibernate.use_sql_comments" value="true" />
+            <property name="hibernate.format_sql" value="true" />
+
+            <!-- JPA起動時にテーブルを再作成する設定. 以下の環境変数によって設定を上書きできます.. HIBERNATE_HBM2DDL_AUTO -->
+            <property name="hibernate.hbm2ddl.auto" value="create-drop" />
+
+        </properties>
+
+    </persistence-unit>
+
+    <persistence-unit name="Tear_Local" transaction-type="RESOURCE_LOCAL">
+
+        <provider>org.hibernate.ejb.HibernatePersistence</provider>
         <non-jta-data-source>jdbc/Tear</non-jta-data-source>
         <class>jabara.jpa.entity.EntityBase</class>
         <validation-mode>CALLBACK</validation-mode>
