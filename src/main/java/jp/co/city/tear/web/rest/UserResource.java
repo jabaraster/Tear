@@ -8,6 +8,7 @@ import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import jp.co.city.tear.entity.EUser;
@@ -41,12 +42,14 @@ public class UserResource {
     }
 
     /**
+     * @param pCallback -
      * @return -
      */
     @SuppressWarnings("static-method")
     @Path("s")
+    @Produces("text/javascript")
     @GET
-    public String s() {
-        return "<div><h1>from Tear</h1></div>"; //$NON-NLS-1$
+    public String s(@QueryParam("callback") final String pCallback) {
+        return pCallback + "('<div><h1>from Tear</h1></div>');"; //$NON-NLS-1$
     }
 }
