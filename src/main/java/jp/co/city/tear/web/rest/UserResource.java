@@ -39,4 +39,14 @@ public class UserResource {
     public List<EUser> getAll() {
         return this.userService.getAll(Sort.asc(EUser_.userId.getName()));
     }
+
+    /**
+     * @return -
+     */
+    @SuppressWarnings("static-method")
+    @Path("s")
+    @GET
+    public String s() {
+        return "<div><h1>from Tear</h1></div>"; //$NON-NLS-1$
+    }
 }
