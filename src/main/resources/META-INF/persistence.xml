@@ -17,15 +17,13 @@
             <property name="hibernate.show_sql" value="false" />
             <property name="hibernate.use_sql_comments" value="true" />
             <property name="hibernate.format_sql" value="true" />
-
-            <!-- JPA起動時にテーブルを再作成する設定. 以下の環境変数によって設定を上書きできます.. HIBERNATE_HBM2DDL_AUTO -->
             <property name="hibernate.hbm2ddl.auto" value="create-drop" />
 
         </properties>
 
     </persistence-unit>
 
-    <persistence-unit name="Tear_Local" transaction-type="RESOURCE_LOCAL">
+    <persistence-unit name="Tear_WithDataSource" transaction-type="RESOURCE_LOCAL">
 
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
         <non-jta-data-source>jdbc/Tear</non-jta-data-source>
@@ -40,9 +38,7 @@
             <property name="hibernate.show_sql" value="false" />
             <property name="hibernate.use_sql_comments" value="true" />
             <property name="hibernate.format_sql" value="true" />
-
-            <!-- JPA起動時にテーブルを再作成する設定. 以下の環境変数によって設定を上書きできます.. HIBERNATE_HBM2DDL_AUTO -->
-            <property name="hibernate.hbm2ddl.auto" value="update" />
+            <property name="hibernate.hbm2ddl.auto" value="create-drop" />
 
         </properties>
 

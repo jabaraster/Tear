@@ -7,43 +7,27 @@
     #container {
       border: solid 1px rgba(0,0,0,.3);
     }
+    #container > div {
+      background: rgba(255, 255, 230, 1);
+      box-shadow: rgba(0,0,0,.3) 0px 1px;
+    }
   </style>
 </head>
 <body>
 
   <div id="container">
+    <img src="/ui/wicket/resource/org.apache.wicket.ajax.AbstractDefaultAjaxBehavior/indicator-ver-1378255270000.gif" />
+    Now loading ...
   </div>
 
   <button id="bt">Ajax</button>
 
 
-  <div id="scripts">
+  <div id="scripts" style="display: none;">
   </div>
 
   <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
-  <script>
-    <!--
-    function callback(pHtml) {
-      $('#container').html(pHtml);
-    }
-    /*
-    $.ajax({
-      type: 'get',
-      url: 'http://tear.herokuapp.com/rest/user/s',
-      success: function(d) {
-        console.log(arguments);
-        $('#container').html(d);
-      },
-      error: function() {
-        console.log(arguments);
-      }
-    });
-    */
-    $('#bt').click(function() {
-      $('#scripts').html('<script src="http://tear.herokuapp.com/rest/user/s?callback=callback"></script>');
-    });
-    -->
-  </script>
+  <script src="a.js"></script>
 
 </body>
 </html>

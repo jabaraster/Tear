@@ -41,7 +41,9 @@ public class UserServiceImpl extends JpaDaoBase implements IUserService {
      * @param pArContentService -
      */
     @Inject
-    public UserServiceImpl(final EntityManagerFactory pEntityManagerFactory, final IArContentService pArContentService) {
+    public UserServiceImpl( //
+            final EntityManagerFactory pEntityManagerFactory //
+            , final IArContentService pArContentService /* TODO 循環参照してしまう・・・ */) {
         super(pEntityManagerFactory);
         this.arContentService = pArContentService;
     }

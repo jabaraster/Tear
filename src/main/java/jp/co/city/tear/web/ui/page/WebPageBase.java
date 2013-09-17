@@ -29,11 +29,10 @@ import org.apache.wicket.resource.TextTemplateResourceReference;
 public abstract class WebPageBase extends WebPage {
     private static final long                        serialVersionUID  = 9011478021815065944L;
 
-    private static final CssResourceReference        REF_BOOTSTRAP_CSS = new CssResourceReference(WebPageBase.class,
-                                                                               "bootstrap/css/bootstrap.min.css");              //$NON-NLS-1$
-    private static final CssResourceReference        REF_APP_CSS       = new CssResourceReference(WebPageBase.class, "App.css"); //$NON-NLS-1$
+    private static final CssResourceReference        REF_BOOTSTRAP_CSS = new CssResourceReference(WebPageBase.class, "bootstrap/css/bootstrap.css"); //$NON-NLS-1$
+    private static final CssResourceReference        REF_APP_CSS       = new CssResourceReference(WebPageBase.class, "App.css");                    //$NON-NLS-1$
     private static final JavaScriptResourceReference REF_BOOTSTRAP_JS  = new JavaScriptResourceReference(WebPageBase.class,
-                                                                               "bootstrap/js/bootstrap.min.js");                //$NON-NLS-1$
+                                                                               "bootstrap/js/bootstrap.js");                                        //$NON-NLS-1$
 
     private Label                                    titleLabel;
 
