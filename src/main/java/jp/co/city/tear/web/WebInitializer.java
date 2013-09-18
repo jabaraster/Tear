@@ -105,17 +105,10 @@ public class WebInitializer extends GuiceServletContextListener {
             @SuppressWarnings("synthetic-access")
             @Override
             protected void configureServlets() {
-                if (isDatabaseUrlSet()) {
-                    install(new SinglePersistenceUnitJpaModule( //
-                            Environment.getApplicationName() //
-                            , new SystemPropertyToPostgreJpaPropertiesParser() //
-                    ));
-                } else {
-                    install(new SinglePersistenceUnitJpaModule( //
-                            Environment.getApplicationName() + "_WithDataSource" // //$NON-NLS-1$
-                    ));
-                }
-
+                install(new SinglePersistenceUnitJpaModule( //
+                        getPersistenceUnitName() //
+                        , new SystemPropertyToPostgreJpaPropertiesParser() //
+                ));
                 initializeJersey();
                 initializeWicket();
                 initializeServices();
@@ -180,6 +173,10 @@ public class WebInitializer extends GuiceServletContextListener {
                         + ",application/x-javascript" //
                         + ",image/svg+xml" //
         );
+    }
+
+    private static String getPersistenceUnitName() {
+        return isDatabaseUrlSet() ? Environment.getApplicationName() : Environment.getApplicationName() + "_WithDataSource"; //$NON-NLS-1$
     }
 
     private static boolean isDatabaseUrlSet() {
