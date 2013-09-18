@@ -9,6 +9,9 @@ import java.util.Map;
 
 import jp.co.city.tear.Environment;
 import jp.co.city.tear.web.ui.AppSession;
+import jp.co.city.tear.web.ui.WicketApplication;
+import jp.co.city.tear.web.ui.WicketApplication.Resource;
+import jp.co.city.tear.web.ui.component.IconHeaderItem;
 
 import org.apache.wicket.markup.head.CssHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
@@ -92,6 +95,8 @@ public abstract class WebPageBase extends WebPage {
      */
     public static void renderCommonHead(final IHeaderResponse pResponse) {
         ArgUtil.checkNull(pResponse, "pResponse"); //$NON-NLS-1$
+
+        pResponse.render(IconHeaderItem.forReference(WicketApplication.get().getSharedResourceReference(Resource.FAVICON)));
 
         pResponse.render(CssHeaderItem.forReference(REF_BOOTSTRAP_CSS));
         pResponse.render(CssHeaderItem.forReference(REF_APP_CSS));

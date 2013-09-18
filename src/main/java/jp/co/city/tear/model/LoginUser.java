@@ -30,7 +30,7 @@ public class LoginUser implements Serializable {
     }
 
     /**
-     * @param pUser
+     * @param pUser -
      * @return pUserがこのオブジェクトと同じユーザ情報を示している場合はtrue.
      */
     public boolean equal(final EUser pUser) {

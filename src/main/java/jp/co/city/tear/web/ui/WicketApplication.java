@@ -40,6 +40,7 @@ import org.apache.wicket.request.Response;
 import org.apache.wicket.request.resource.IResource;
 import org.apache.wicket.request.resource.ResourceReference;
 import org.apache.wicket.request.resource.ResourceStreamResource;
+import org.apache.wicket.request.resource.SharedResourceReference;
 import org.apache.wicket.util.IProvider;
 import org.apache.wicket.util.time.Duration;
 
@@ -100,6 +101,16 @@ public class WicketApplication extends WebApplication {
             }
         }
         return ret;
+    }
+
+    /**
+     * @param pResource -
+     * @return -
+     */
+    @SuppressWarnings("static-method")
+    public ResourceReference getSharedResourceReference(final Resource pResource) {
+        ArgUtil.checkNull(pResource, "pResource"); //$NON-NLS-1$
+        return new SharedResourceReference(pResource.getName());
     }
 
     /**
@@ -183,17 +194,23 @@ public class WicketApplication extends WebApplication {
         this.mountPage("ajax", AjaxPage.class);
     }
 
-    @SuppressWarnings({ "nls", "serial" })
-    private void mountResources() {
-        mountResource("back", new ResourceReference("back") {
-            @SuppressWarnings("resource")
+    private void mountResource(final Resource pResource, final String pFilePath, final Duration pCacheDuration) {
+        mountResource(pResource.getName(), new ResourceReference(pResource.getName()) {
+            private static final long serialVersionUID = -8982729375012083247L;
+
             @Override
             public IResource getResource() {
-                return new ResourceStreamResource(new UrlResourceStream(WicketApplication.class.getResource("brickwall.png"))) //
-                        .setCacheDuration(Duration.days(10)) //
+                return new ResourceStreamResource(new UrlResourceStream(WicketApplication.class.getResource(pFilePath))) //
+                        .setCacheDuration(pCacheDuration) //
                 ;
             }
         });
+    }
+
+    @SuppressWarnings({ "nls" })
+    private void mountResources() {
+        mountResource(Resource.BACK, "brickwall.png", Duration.days(10));
+        mountResource(Resource.FAVICON, "favicon.png", Duration.days(10));
     }
 
     /**
@@ -246,6 +263,36 @@ public class WicketApplication extends WebApplication {
          */
         public Class<? extends WebPageBase> getPage() {
             return this.page;
+        }
+    }
+
+    /**
+     * @author jabaraster
+     */
+    public enum Resource {
+        /**
+         * 
+         */
+        BACK("back"), //$NON-NLS-1$
+
+        /**
+         * 
+         */
+        FAVICON("favicon"), //$NON-NLS-1$
+
+        ;
+
+        private final String name;
+
+        Resource(final String pName) {
+            this.name = pName;
+        }
+
+        /**
+         * @return -
+         */
+        public String getName() {
+            return this.name;
         }
     }
 

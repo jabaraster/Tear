@@ -59,7 +59,6 @@ public class MultipartFilter implements Filter {
         try {
             final ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-            @SuppressWarnings("resource")
             final InputStream in = pRequest.getInputStream();
             final byte[] buf = new byte[4096];
             for (int d = in.read(buf); d != -1; d = in.read(buf)) {

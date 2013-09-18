@@ -66,15 +66,8 @@ public class WebInitializer extends GuiceServletContextListener {
     /**
      * @see com.google.inject.servlet.GuiceServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)
      */
-    @SuppressWarnings("nls")
     @Override
     public void contextInitialized(final ServletContextEvent pServletContextEvent) {
-        jabara.Debug.write("★★★★★★★★");
-        jabara.Debug.write("★★★★★★★★");
-        jabara.Debug.write("★★★★★★★★");
-        jabara.Debug.write("★★★★★★★★");
-        jabara.Debug.write("★★★★★★★★");
-
         super.contextInitialized(pServletContextEvent);
 
         final ServletContext servletContext = pServletContextEvent.getServletContext();
@@ -109,6 +102,7 @@ public class WebInitializer extends GuiceServletContextListener {
 
     private Injector createInjector() {
         return Guice.createInjector(new JerseyServletModule() {
+            @SuppressWarnings("synthetic-access")
             @Override
             protected void configureServlets() {
                 if (isDatabaseUrlSet()) {
