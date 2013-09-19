@@ -9,6 +9,7 @@ import jabara.general.ExceptionUtil;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.nio.file.Files;
 
 import jp.co.city.tear.Environment;
 import jp.co.city.tear.service.ITempFileService;
@@ -51,7 +52,7 @@ public class TempFileServiceImpl implements ITempFileService, Serializable {
     @Override
     public File create(final String pPrefix, final String pSuffix) {
         try {
-            return File.createTempFile(pPrefix, n(pSuffix), BASE_DIR);
+            return Files.createTempFile(pPrefix, pSuffix).toFile();
         } catch (final IOException e) {
             throw ExceptionUtil.rethrow(e);
         }

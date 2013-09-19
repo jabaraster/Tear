@@ -25,7 +25,6 @@ public class RestApplication extends Application {
                         , VelocityMessageBodyWriter.class //
                         , UserResource.class //
                         , ArContentResource.class //
-                        , JsonpResource.class //
                 }));
     }
 
