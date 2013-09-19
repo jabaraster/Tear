@@ -80,8 +80,8 @@ public class WebInitializer extends GuiceServletContextListener {
         addFilter(servletContext, RoutingFilter.class) //
                 .addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), false, PATH_ROOT + WILD_CARD);
 
-        addFilter(servletContext, MultipartFilter.class) //
-                .addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), false, PATH_ROOT + WILD_CARD);
+        // addFilter(servletContext, MultipartFilter.class) //
+        // .addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), false, PATH_ROOT + WILD_CARD);
         // addFilter(servletContext, RequestDumpFilter.class) //
         // .addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), false, PATH_ROOT + WILD_CARD);
         // addFilter(servletContext, ResponseDumpFilter.class) //

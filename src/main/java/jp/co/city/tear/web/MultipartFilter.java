@@ -5,10 +5,10 @@ package jp.co.city.tear.web;
 
 import jabara.servlet.ServletUtil;
 
-import java.io.BufferedOutputStream;
-import java.io.FileOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -51,19 +51,21 @@ public class MultipartFilter implements Filter {
 
     private static void core(final HttpServletRequest pRequest) {
         if (ServletUtil.isMultipartRequest(pRequest)) {
-            // s(pRequest);
+            s(pRequest);
         }
     }
 
     private static void s(final HttpServletRequest pRequest) {
-        try (FileOutputStream fileOut = new FileOutputStream("files/mr.txt"); // //$NON-NLS-1$
-                BufferedOutputStream out = new BufferedOutputStream(fileOut); //
-                final InputStream in = pRequest.getInputStream();) {
+        try {
+            final ByteArrayOutputStream out = new ByteArrayOutputStream();
 
+            final InputStream in = pRequest.getInputStream();
             final byte[] buf = new byte[4096];
             for (int d = in.read(buf); d != -1; d = in.read(buf)) {
                 out.write(buf, 0, d);
             }
+            System.out.println(new String(out.toByteArray(), Charset.forName("ascii"))); //$NON-NLS-1$
+
         } catch (final IOException e) {
             e.printStackTrace();
         }

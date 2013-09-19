@@ -194,6 +194,7 @@ public class WicketApplication extends WebApplication {
         mountResource(pResource.getName(), new ResourceReference(pResource.getName()) {
             private static final long serialVersionUID = -8982729375012083247L;
 
+            @SuppressWarnings("resource")
             @Override
             public IResource getResource() {
                 return new ResourceStreamResource(new UrlResourceStream(WicketApplication.class.getResource(pFilePath))) //

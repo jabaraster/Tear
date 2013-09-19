@@ -1,4 +1,0 @@
-https://dl.dropboxusercontent.com/u/88219936/otyatest/TrackingData_MarkerlessFast.xml
-https://dl.dropboxusercontent.com/u/88219936/otyatest/loading.3gp
-1,https://dl.dropboxusercontent.com/u/88219936/otyatest/marker01.png,https://dl.dropboxusercontent.com/u/88219936/otyatest/movie01.3gp
-2,https://dl.dropboxusercontent.com/u/88219936/otyatest/marker02.png,https://dl.dropboxusercontent.com/u/88219936/otyatest/movie03.3g2

@@ -18,7 +18,7 @@ public class Sensor {
     /**
      * 
      */
-    @XmlAttribute(name = "Type")
+    @XmlAttribute(name = "ButtonType")
     public String                 type      = "FeatureBasedSensorSource"; //$NON-NLS-1$
     /**
      * 

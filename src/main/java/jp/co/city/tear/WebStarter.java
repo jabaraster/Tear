@@ -56,7 +56,7 @@ public class WebStarter {
         // MemcachedをHttpSessionのストアとして使う場合.
         // 主にHerokuでの運用を意識.
         final MemcachedSessionServerStarter server = new MemcachedSessionServerStarter();
-        // server.setWebPort(8082);
+        server.setWebPort(8082);
         server.start();
     }
 
