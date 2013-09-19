@@ -168,7 +168,7 @@ public class ArContentResource {
         for (long i = 0, len = this.arContentService.countAll(); i < len; i++) {
             final SensorCOS cos = new SensorCOS();
             cos.sensorCosID = "Patch" + (i + 1); //$NON-NLS-1$
-            cos.parameters.referenceImage.name = "marker_" + (i + 1); //$NON-NLS-1$
+            cos.parameters.referenceImage.name = "marker_" + (i + 1) + ".png"; //$NON-NLS-1$ //$NON-NLS-2$
             sensor.sensorCOS.add(cos);
 
             final Connection connection = new Connection();
