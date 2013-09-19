@@ -33,6 +33,18 @@ public class ELargeDataTest {
     }
 
     /**
+     * 
+     */
+    @SuppressWarnings({ "static-method", "nls" })
+    @Test
+    public void _getLastToken() {
+        assertThat(create("hoge.png").getType(), is("png"));
+        assertThat(create(".png").getType(), is("png"));
+        assertThat(create("png").getType(), is(""));
+        assertThat(create("png.").getType(), is(""));
+    }
+
+    /**
      * Test method for {@link jp.co.city.tear.entity.ELargeData#setDataLength(int)}.
      */
     @SuppressWarnings({ "boxing", "static-method" })
@@ -44,5 +56,11 @@ public class ELargeDataTest {
 
         assertThat(true, is(d.hasData()));
         assertThat(LENGTH, is(d.getLength()));
+    }
+
+    private static ELargeData create(final String pName) {
+        final ELargeData ret = new ELargeData();
+        ret.setDataName(pName);
+        return ret;
     }
 }

@@ -30,6 +30,7 @@ import jp.co.city.tear.entity.EUser_;
 import jp.co.city.tear.model.Duplicate;
 import jp.co.city.tear.model.LargeDataOperation;
 import jp.co.city.tear.model.LoginUser;
+import jp.co.city.tear.model.NamedInputStream;
 import jp.co.city.tear.service.IUserService;
 
 import org.apache.commons.io.IOUtils;
@@ -45,6 +46,8 @@ import org.junit.runner.RunWith;
 @RunWith(Enclosed.class)
 @SuppressWarnings("synthetic-access")
 public class ArContentServiceImplTest {
+
+    private static final String DATA_NAME = "DataName"; //$NON-NLS-1$
 
     /**
      * 
@@ -88,7 +91,7 @@ public class ArContentServiceImplTest {
     @SuppressWarnings("resource")
     private static LargeDataOperation getContentData() {
         final InputStream in = getContentDataStream();
-        return new LargeDataOperation().update(in);
+        return new LargeDataOperation().update(new NamedInputStream(DATA_NAME, in));
     }
 
     private static int getContentDataLength() throws IOException {
@@ -104,7 +107,7 @@ public class ArContentServiceImplTest {
     @SuppressWarnings("resource")
     private static LargeDataOperation getMarkerData() {
         final InputStream in = getMarkerDataStream();
-        return new LargeDataOperation().update(in);
+        return new LargeDataOperation().update(new NamedInputStream(DATA_NAME, in));
     }
 
     private static int getMarkerDataLength() throws IOException {
@@ -213,7 +216,7 @@ public class ArContentServiceImplTest {
          * @throws NotFound -
          * @throws IOException -
          */
-        @SuppressWarnings("boxing")
+        @SuppressWarnings({ "boxing", "resource" })
         @Test
         public void _update_データに変更なし() throws NotFound, IOException {
             final EntityManager em = this.rule.getEntityManager();
@@ -227,8 +230,8 @@ public class ArContentServiceImplTest {
                     InputStream updateMarkerData = getContentDataStream(); //
                     InputStream updateContentData = getMarkerDataStream(); //
             ) {
-                md.update(updateMarkerData).cancel();
-                cd.update(updateContentData).cancel();
+                md.update(new NamedInputStream(DATA_NAME, updateMarkerData)).cancel();
+                cd.update(new NamedInputStream(DATA_NAME, updateContentData)).cancel();
                 this.rule.getSut().insertOrUpdate(loginUser, update, md, cd);
 
                 em.flush();
@@ -245,7 +248,7 @@ public class ArContentServiceImplTest {
          * @throws NotFound -
          * @throws IOException -
          */
-        @SuppressWarnings("boxing")
+        @SuppressWarnings({ "boxing", "resource" })
         @Test
         public void _update_データ更新() throws NotFound, IOException {
             final EntityManager em = this.rule.getEntityManager();
@@ -259,7 +262,8 @@ public class ArContentServiceImplTest {
                     InputStream updateMarkerData = getContentDataStream(); //
                     InputStream updateContentData = getMarkerDataStream(); //
             ) {
-                this.rule.getSut().insertOrUpdate(loginUser, update, md.update(updateMarkerData), cd.update(updateContentData));
+                this.rule.getSut().insertOrUpdate(loginUser, update, md.update(new NamedInputStream(DATA_NAME, updateMarkerData)),
+                        cd.update(new NamedInputStream(DATA_NAME, updateContentData)));
 
                 em.flush();
                 em.clear();

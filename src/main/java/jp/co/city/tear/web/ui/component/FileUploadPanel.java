@@ -14,7 +14,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
 
@@ -22,6 +21,7 @@ import javax.inject.Inject;
 
 import jp.co.city.tear.model.LargeDataOperation;
 import jp.co.city.tear.model.LargeDataOperation.Mode;
+import jp.co.city.tear.model.NamedInputStream;
 import jp.co.city.tear.service.ITempFileService;
 
 import org.apache.commons.io.IOUtils;
@@ -36,6 +36,8 @@ import org.apache.wicket.markup.html.panel.Panel;
 @SuppressWarnings("synthetic-access")
 public class FileUploadPanel extends Panel {
     private static final long       serialVersionUID = -2121159238236955334L;
+
+    private String                  fileName;
 
     @Inject
     ITempFileService                tempFileService;
@@ -73,12 +75,12 @@ public class FileUploadPanel extends Panel {
      * @return -
      * @throws NotFound -
      */
-    public InputStream getInputStream() throws NotFound {
+    public NamedInputStream getInputStream() throws NotFound {
         if (this.temporary == null) {
             throw NotFound.GLOBAL;
         }
         try {
-            return new BufferedInputStream(new FileInputStream(this.temporary));
+            return new NamedInputStream(this.fileName, new BufferedInputStream(new FileInputStream(this.temporary)));
 
         } catch (final FileNotFoundException e) {
             throw NotFound.GLOBAL;
@@ -99,7 +101,8 @@ public class FileUploadPanel extends Panel {
                 ret.cancel();
                 break;
             case UPDATE:
-                ret.update(new BufferedInputStream(new FileInputStream(this.temporary)));
+                final BufferedInputStream in = new BufferedInputStream(new FileInputStream(this.temporary));
+                ret.update(new NamedInputStream(this.fileName, in));
                 break;
             default:
                 throw new IllegalStateException();
@@ -166,13 +169,14 @@ public class FileUploadPanel extends Panel {
         return this.uploader;
     }
 
-    private static InputStream getDataFromFileUpload(final FileUploadField pField) {
+    private static NamedInputStream getDataFromFileUpload(final FileUploadField pField) {
         try {
             final FileUpload upload = pField.getFileUpload();
             if (upload == null) {
                 return null;
             }
-            return upload.getInputStream();
+            return new NamedInputStream(upload.getClientFileName(), upload.getInputStream());
+
         } catch (final IOException e) {
             throw ExceptionUtil.rethrow(e);
         }
@@ -191,13 +195,15 @@ public class FileUploadPanel extends Panel {
             FileUploadPanel.this.dataOperation = Mode.NOOP;
         }
 
-        private File save(final InputStream pData) {
+        private File save(final NamedInputStream pData) {
             try {
                 final File file = FileUploadPanel.this.tempFileService.create(FileUploadPanel.class, "dat"); //$NON-NLS-1$
                 try (final OutputStream out = new FileOutputStream(file); //
                         final BufferedOutputStream bufOut = new BufferedOutputStream(out)) {
-                    IOUtils.copy(IoUtil.toBuffered(pData), bufOut);
+                    IOUtils.copy(IoUtil.toBuffered(pData.getInputStream()), bufOut);
                     bufOut.flush();
+
+                    FileUploadPanel.this.fileName = pData.getName();
                 }
                 return file;
 
@@ -207,7 +213,7 @@ public class FileUploadPanel extends Panel {
         }
 
         private void upload() {
-            try (InputStream data = getDataFromFileUpload(getFileUpload())) {
+            try (NamedInputStream data = getDataFromFileUpload(getFileUpload())) {
                 if (data == null) {
                     return;
                 }

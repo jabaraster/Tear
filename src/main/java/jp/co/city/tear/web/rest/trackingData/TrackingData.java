@@ -10,7 +10,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 /**
  * @author jabaraster
  */
-@XmlRootElement
+@XmlRootElement(name = "TrackingData")
 public class TrackingData {
     /**
      * 

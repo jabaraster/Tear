@@ -21,6 +21,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -45,9 +46,12 @@ import org.apache.commons.io.IOUtils;
 @Path("arContent")
 public class ArContentResource {
 
-    private static final Method[]   METHODS              = ArContentResource.class.getMethods();
-    private static final Method     METHOD_LOADING_MOVIE = findMethod("getLoadingMovie", METHODS); //$NON-NLS-1$
-    private static final Method     METHOD_TRACKING_DATA = findMethod("getTrackingData", METHODS); //$NON-NLS-1$
+    private static final Method[]   METHODS                    = ArContentResource.class.getMethods();
+    private static final Method     METHOD_LOADING_MOVIE       = findMethod("getLoadingMovie", METHODS); //$NON-NLS-1$
+    private static final Method     METHOD_TRACKING_DATA       = findMethod("getTrackingData", METHODS); //$NON-NLS-1$
+
+    private static final String     HEADER_CONTENT_DISPOSITION = "Content-Disposition";                 //$NON-NLS-1$
+    private static final String     LOADING_MOVIE_NAME         = "loading.3gp";                         //$NON-NLS-1$
 
     private final IArContentService arContentService;
     private final ILargeDataService largeDataServicde;
@@ -84,12 +88,13 @@ public class ArContentResource {
 
     /**
      * @param pId -
+     * @param pDisposition -
      * @return -
      */
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
     @Path("{id}/content")
     @GET
-    public Response getContentData(@PathParam("id") final long pId) {
+    public Response getContentData(@PathParam("id") final long pId, @QueryParam("disposition") final String pDisposition) {
         try {
             final EArContent content = this.arContentService.findById(pId);
             return Response.ok(new StreamingOutput() {
@@ -102,21 +107,24 @@ public class ArContentResource {
                         throw new WebApplicationException(Status.NOT_FOUND);
                     }
                 }
-            }).build();
+            }) //
+                    .header(HEADER_CONTENT_DISPOSITION, buildContentDisposition(pDisposition, content.getContent().getDataName())) //
+                    .build();
         } catch (final NotFound e) {
             return Response.status(Status.NOT_FOUND).build();
         }
     }
 
     /**
+     * @param pDisposition -
      * @return -
      */
     @SuppressWarnings("static-method")
-    @Path("loading.3gp")
+    @Path(LOADING_MOVIE_NAME)
     @GET
     @Produces({ MediaType.APPLICATION_OCTET_STREAM })
-    public Response getLoadingMovie() {
-        final URL url = ArContentResource.class.getResource("/loading.3gp"); //$NON-NLS-1$
+    public Response getLoadingMovie(@QueryParam("disposition") final String pDisposition) {
+        final URL url = ArContentResource.class.getResource("/" + LOADING_MOVIE_NAME); //$NON-NLS-1$
         if (url == null) {
             return Response.status(Status.NOT_FOUND).build();
         }
@@ -127,17 +135,20 @@ public class ArContentResource {
                     IOUtils.copy(IoUtil.toBuffered(in), pOutput);
                 }
             }
-        }).build();
+        }) //
+                .header(HEADER_CONTENT_DISPOSITION, buildContentDisposition(pDisposition, LOADING_MOVIE_NAME)) //
+                .build();
     }
 
     /**
      * @param pId -
+     * @param pDisposition -
      * @return -
      */
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
     @Path("{id}/marker")
     @GET
-    public Response getMarkerData(@PathParam("id") final long pId) {
+    public Response getMarkerData(@PathParam("id") final long pId, @QueryParam("disposition") final String pDisposition) {
         try {
             final EArContent content = this.arContentService.findById(pId);
             return Response.ok(new StreamingOutput() {
@@ -150,24 +161,32 @@ public class ArContentResource {
                         throw new WebApplicationException(Status.NOT_FOUND);
                     }
                 }
-            }).build();
+            }) //
+                    .header(HEADER_CONTENT_DISPOSITION, buildContentDisposition(pDisposition, content.getMarker().getDataName())) //
+                    .build();
         } catch (final NotFound e) {
             return Response.status(Status.NOT_FOUND).build();
         }
     }
 
     /**
+     * @param pDisposition -
      * @return -
      */
     @Path("trackingData")
     @GET
     @Produces({ MediaType.TEXT_XML })
-    public TrackingData getTrackingData() {
+    public Response getTrackingData(@QueryParam("disposition") final String pDisposition) {
         final TrackingData ret = new TrackingData();
         final Sensor sensor = ret.sensors.get(0);
-        for (long i = 0, len = this.arContentService.countAll(); i < len; i++) {
+
+        final List<EArContent> contents = this.arContentService.getAll();
+        for (int i = 0; i < contents.size(); i++) {
+            final EArContent arContent = contents.get(i);
+
             final SensorCOS cos = new SensorCOS();
             cos.sensorCosID = "Patch" + (i + 1); //$NON-NLS-1$
+            cos.parameters.referenceImage.name = "image_" + arContent.getId().longValue() + "." + arContent.getMarker().getType(); //$NON-NLS-1$//$NON-NLS-2$
             sensor.sensorCOS.add(cos);
 
             final Connection connection = new Connection();
@@ -175,7 +194,9 @@ public class ArContentResource {
             connection.sensorSource.sensorCosID = cos.sensorCosID;
             ret.connections.add(connection);
         }
-        return ret;
+        return Response.ok(ret) //
+                .header(HEADER_CONTENT_DISPOSITION, buildContentDisposition(pDisposition, "TrackingData.xml")) // //$NON-NLS-1$
+                .build();
     }
 
     /**
@@ -209,6 +230,11 @@ public class ArContentResource {
 
     private static String buildContentAbsoluteUrl(final EArContent pArContent) {
         return Environment.getAbsoluteRestUrlRoot() + "arContent/" + pArContent.getId().longValue() + "/content"; //$NON-NLS-1$ //$NON-NLS-2$
+    }
+
+    private static String buildContentDisposition(final String pDisposition, final String pFileName) {
+        final String disposition = "inline".equals(pDisposition) ? "inline" : "attachment"; //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+        return disposition + "; filename=\"" + pFileName + "\""; //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     private static String buildMarkerAbsoluteUrl(final EArContent pArContent) {

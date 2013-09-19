@@ -301,20 +301,15 @@ public class ArContentEditPage extends RestrictedPageBase {
             this.in = null;
         }
 
+        @SuppressWarnings("resource")
         @Override
         public InputStream getInputStream() throws ResourceStreamNotFoundException {
-            this.in = getInputStreamCore();
-            return this.in;
-        }
-
-        @SuppressWarnings("resource")
-        private InputStream getInputStreamCore() throws ResourceStreamNotFoundException {
             final LargeDataOperation operation = getMarkerUpload().getOperation();
             switch (operation.getMode()) {
             case DELETE:
                 throw new ResourceStreamNotFoundException();
             case UPDATE:
-                return operation.getData();
+                return operation.getData().getInputStream();
             case NOOP:
                 try {
                     return ArContentEditPage.this.arContentService.getDataInputStream(ArContentEditPage.this.arContent.getMarker());

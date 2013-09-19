@@ -5,16 +5,16 @@ package jp.co.city.tear.model;
 
 import jabara.general.ArgUtil;
 
+import java.io.Closeable;
 import java.io.IOException;
-import java.io.InputStream;
 
 /**
  * @author jabaraster
  */
-public class LargeDataOperation implements AutoCloseable {
+public class LargeDataOperation implements Closeable {
 
-    private Mode        mode = Mode.NOOP;
-    private InputStream data;
+    private Mode             mode = Mode.NOOP;
+    private NamedInputStream data;
 
     /**
      * @return このオブジェクト自身.
@@ -47,7 +47,7 @@ public class LargeDataOperation implements AutoCloseable {
     /**
      * @return the data
      */
-    public InputStream getData() {
+    public NamedInputStream getData() {
         if (this.data == null) {
             return null;
         }
@@ -65,7 +65,7 @@ public class LargeDataOperation implements AutoCloseable {
      * @param pData -
      * @return このオブジェクト自身.
      */
-    public LargeDataOperation update(final InputStream pData) {
+    public LargeDataOperation update(final NamedInputStream pData) {
         ArgUtil.checkNull(pData, "pData"); //$NON-NLS-1$
         this.mode = Mode.UPDATE;
         this.data = pData;
