@@ -72,15 +72,13 @@ public class ArContentResource {
     /**
      * @return -
      */
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
     @Path("/index")
     @GET
     public List<ArContent> getAllContents() {
         final List<ArContent> ret = new ArrayList<>();
         for (final EArContent c : this.arContentService.getAll()) {
-            final ArContent content = new ArContent();
-            content.setMarkerUrl(buildMarkerAbsoluteUrl(c));
-            content.setContentUrl(buildContentAbsoluteUrl(c));
+            final ArContent content = new ArContent(c);
             ret.add(content);
         }
         return ret;
@@ -238,7 +236,8 @@ public class ArContentResource {
     }
 
     private static String buildMarkerAbsoluteUrl(final EArContent pArContent) {
-        return Environment.getAbsoluteRestUrlRoot() + "arContent/" + pArContent.getId().longValue() + "/marker"; //$NON-NLS-1$//$NON-NLS-2$
+        final URI uri = UriBuilder.fromResource(ArContentResource.class).path(String.valueOf(pArContent.getId().longValue())).path("marker").build(); //$NON-NLS-1$
+        return Environment.getAbsoluteRestUrlRoot() + uri.toASCIIString();
     }
 
     private static URI buildMethodUri(final Method pMethod) {
@@ -258,35 +257,57 @@ public class ArContentResource {
      * @author jabaraster
      */
     public static class ArContent {
-        private String markerUrl;
-        private String contentUrl;
+        private final String title;
+        private final String markerUrl;
+        private final String contentUrl;
+        private final String markerFileName;
+        private final String contentFileName;
 
         /**
-         * @return the contentUrl
+         * @param pContent
+         */
+        public ArContent(final EArContent pContent) {
+            ArgUtil.checkNull(pContent, "pContent"); //$NON-NLS-1$
+            this.contentFileName = pContent.getContent().getDataName();
+            this.contentUrl = buildContentAbsoluteUrl(pContent);
+            this.markerFileName = pContent.getMarker().getDataName();
+            this.markerUrl = buildMarkerAbsoluteUrl(pContent);
+            this.title = pContent.getTitle();
+        }
+
+        /**
+         * @return contentFileNameを返す.
+         */
+        public String getContentFileName() {
+            return this.contentFileName;
+        }
+
+        /**
+         * @return contentUrlを返す.
          */
         public String getContentUrl() {
             return this.contentUrl;
         }
 
         /**
-         * @return the markerUrl
+         * @return markerFileNameを返す.
+         */
+        public String getMarkerFileName() {
+            return this.markerFileName;
+        }
+
+        /**
+         * @return markerUrlを返す.
          */
         public String getMarkerUrl() {
             return this.markerUrl;
         }
 
         /**
-         * @param pContentUrl the contentUrl to set
+         * @return titleを返す.
          */
-        public void setContentUrl(final String pContentUrl) {
-            this.contentUrl = pContentUrl;
-        }
-
-        /**
-         * @param pMarkerUrl the markerUrl to set
-         */
-        public void setMarkerUrl(final String pMarkerUrl) {
-            this.markerUrl = pMarkerUrl;
+        public String getTitle() {
+            return this.title;
         }
     }
 }
