@@ -3,7 +3,7 @@
  */
 package jp.co.city.tear.service.impl;
 
-import jabara.jpa_guice.ThreadLocalEntityManagerFactoryHandler;
+import jabara.jpa.ThreadLocalEntityManagerFactoryHandler;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
