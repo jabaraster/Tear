@@ -207,6 +207,7 @@ public class ArContentEditPage extends RestrictedPageBase {
     private FileUploadPanel getMarkerUpload() {
         if (this.markerUpload == null) {
             this.markerUpload = new FileUploadPanel("markerUpload"); //$NON-NLS-1$
+            this.markerUpload.setAutoUpload(true);
             this.markerUpload.getRestorer().setVisible(this.arContent.getMarker().hasData());
         }
         return this.markerUpload;

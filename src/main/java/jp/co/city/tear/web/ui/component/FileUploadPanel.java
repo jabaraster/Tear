@@ -16,6 +16,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -25,10 +27,20 @@ import jp.co.city.tear.model.NamedInputStream;
 import jp.co.city.tear.service.ITempFileService;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.wicket.Component;
+import org.apache.wicket.ajax.AbstractDefaultAjaxBehavior;
+import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.form.AjaxFormSubmitBehavior;
+import org.apache.wicket.markup.head.IHeaderResponse;
+import org.apache.wicket.markup.head.OnDomReadyHeaderItem;
 import org.apache.wicket.markup.html.form.Button;
+import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.form.HiddenField;
 import org.apache.wicket.markup.html.form.upload.FileUpload;
 import org.apache.wicket.markup.html.form.upload.FileUploadField;
 import org.apache.wicket.markup.html.panel.Panel;
+import org.apache.wicket.model.AbstractReadOnlyModel;
+import org.apache.wicket.util.template.PackageTextTemplate;
 
 /**
  * @author jabaraster
@@ -51,6 +63,11 @@ public class FileUploadPanel extends Panel {
     private Button                  uploader;
     private Button                  deleter;
     private Button                  restorer;
+    private HiddenField<String>     uploadId;
+
+    private AjaxFormSubmitBehavior  autoUploadBehavior;
+
+    private boolean                 autoUpload       = false;
 
     /**
      * @param pId -
@@ -62,11 +79,12 @@ public class FileUploadPanel extends Panel {
         this.add(getUploader());
         this.add(getDeleter());
         this.add(getRestorer());
+        this.add(getUploadId());
     }
 
     /**
-     * 
-     */
+ * 
+ */
     public void clear() {
         this.handler.restore();
     }
@@ -130,10 +148,44 @@ public class FileUploadPanel extends Panel {
         return this.restorer;
     }
 
+    /**
+     * @param pAutoUpload -
+     */
+    public void setAutoUpload(final boolean pAutoUpload) {
+        if (pAutoUpload == this.autoUpload) {
+            return;
+        }
+        if (pAutoUpload) {
+            getFileUpload().add(getAutoUploadBehavior());
+        } else {
+            getFileUpload().remove(getAutoUploadBehavior());
+        }
+        this.autoUpload = pAutoUpload;
+    }
+
     private void deleteTemporaryFile() {
         if (this.temporary != null) {
             this.temporary.delete();
         }
+    }
+
+    @SuppressWarnings("serial")
+    private AjaxFormSubmitBehavior getAutoUploadBehavior() {
+        if (this.autoUploadBehavior == null) {
+            this.autoUploadBehavior = new AjaxFormSubmitBehavior("change") { //$NON-NLS-1$
+                @Override
+                protected void onSubmit(final AjaxRequestTarget pTarget) {
+                    FileUploadPanel.this.handler.upload();
+
+                    // TODO 再描画対象を決め打ちするのは良くない. コールバックに作り変えた方がよい.
+                    final Form<?> form = FileUploadPanel.this.findParent(Form.class);
+                    if (form != null) {
+                        pTarget.add(form);
+                    }
+                }
+            };
+        }
+        return this.autoUploadBehavior;
     }
 
     @SuppressWarnings("serial")
@@ -149,9 +201,36 @@ public class FileUploadPanel extends Panel {
         return this.deleter;
     }
 
+    @SuppressWarnings("serial")
     private FileUploadField getFileUpload() {
         if (this.fileUpload == null) {
             this.fileUpload = new FileUploadField("fileUpload"); //$NON-NLS-1$
+            this.fileUpload.add(new AbstractDefaultAjaxBehavior() {
+
+                @SuppressWarnings("nls")
+                @Override
+                public void renderHead(final Component pComponent, final IHeaderResponse pResponse) {
+                    super.renderHead(pComponent, pResponse);
+
+                    try (final PackageTextTemplate text = new PackageTextTemplate(FileUploadPanel.class, FileUploadPanel.class.getSimpleName()
+                            + ".js")) {
+                        final Map<String, Object> params = new HashMap<>();
+                        params.put("formId", getFileUpload().findParent(Form.class).getMarkupId());
+                        params.put("uploadId", getFileUpload().getMarkupId());
+                        params.put("callbackUrl", getCallbackUrl());
+                        pResponse.render(OnDomReadyHeaderItem.forScript(text.asString(params)));
+
+                    } catch (final IOException e) {
+                        throw ExceptionUtil.rethrow(e);
+                    }
+                }
+
+                @Override
+                protected void respond(final AjaxRequestTarget pTarget) {
+                    FileUploadPanel.this.handler.upload();
+                    pTarget.add(FileUploadPanel.this.findParent(Form.class));
+                }
+            });
         }
         return this.fileUpload;
     }
@@ -160,6 +239,14 @@ public class FileUploadPanel extends Panel {
     private Button getUploader() {
         if (this.uploader == null) {
             this.uploader = new Button("uploader") { //$NON-NLS-1$
+                // @Override
+                // public boolean isVisible() {
+                // if (FileUploadPanel.this.autoUpload) {
+                // return false;
+                // }
+                // return super.isVisibilityAllowed();
+                // }
+
                 @Override
                 public void onSubmit() {
                     FileUploadPanel.this.handler.upload();
@@ -167,6 +254,23 @@ public class FileUploadPanel extends Panel {
             };
         }
         return this.uploader;
+    }
+
+    @SuppressWarnings({ "serial", "nls" })
+    private HiddenField<String> getUploadId() {
+        if (this.uploadId == null) {
+            this.uploadId = new HiddenField<>("uploadId", new AbstractReadOnlyModel<String>() {
+                @Override
+                public String getObject() {
+                    return getUploadIdValue();
+                }
+            });
+        }
+        return this.uploadId;
+    }
+
+    private String getUploadIdValue() {
+        return getSession().getId() + "_" + this.getMarkupId(); //$NON-NLS-1$
     }
 
     private static NamedInputStream getDataFromFileUpload(final FileUploadField pField) {
