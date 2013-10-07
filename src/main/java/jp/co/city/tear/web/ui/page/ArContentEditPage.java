@@ -4,9 +4,11 @@
 package jp.co.city.tear.web.ui.page;
 
 import jabara.general.ArgUtil;
-import jabara.general.ExceptionUtil;
 import jabara.general.NotFound;
+import jabara.general.io.DataOperation;
 import jabara.wicket.CssUtil;
+import jabara.wicket.FileUploadPanel;
+import jabara.wicket.IAjaxCallback;
 import jabara.wicket.JavaScriptUtil;
 import jabara.wicket.Models;
 import jabara.wicket.ValidatorUtil;
@@ -19,12 +21,11 @@ import javax.inject.Inject;
 
 import jp.co.city.tear.entity.EArContent;
 import jp.co.city.tear.entity.EArContent_;
-import jp.co.city.tear.model.LargeDataOperation;
 import jp.co.city.tear.service.IArContentService;
 import jp.co.city.tear.web.ui.AppSession;
-import jp.co.city.tear.web.ui.component.FileUploadPanel;
+import jp.co.city.tear.web.ui.component.BodyCssHeaderItem;
 
-import org.apache.commons.io.IOUtils;
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.OnChangeAjaxBehavior;
@@ -112,7 +113,7 @@ public class ArContentEditPage extends RestrictedPageBase {
     public void renderHead(final IHeaderResponse pResponse) {
         super.renderHead(pResponse);
         CssUtil.addComponentCssReference(pResponse, ArContentEditPage.class);
-        addBodyCssReference(pResponse);
+        pResponse.render(BodyCssHeaderItem.get());
         JavaScriptUtil.addFocusScript(pResponse, getTitle());
     }
 
@@ -166,14 +167,32 @@ public class ArContentEditPage extends RestrictedPageBase {
     private Label getContentLabel() {
         if (this.contentLabel == null) {
             this.contentLabel = new Label("contentLabel", new ContentLabelModel());
+            this.contentLabel.add(AttributeModifier.append("class" //
+                    , this.arContent.getContent().hasData() ? "label label-success" : "label label-default")); //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
         }
         return this.contentLabel;
     }
 
     private FileUploadPanel getContentUpload() {
         if (this.contentUpload == null) {
-            this.contentUpload = new FileUploadPanel("contentUpload"); //$NON-NLS-1$
-            this.contentUpload.getRestorer().setVisible(this.arContent.getContent().hasData());
+            this.contentUpload = new FileUploadPanel("contentUpload") { //$NON-NLS-1$
+                @Override
+                protected void onBeforeRender() {
+                    super.onBeforeRender();
+                    getFileValue().setVisible(false);
+                    getRestorer().setVisible(ArContentEditPage.this.arContent.getContent().hasData());
+                }
+            };
+
+            final IAjaxCallback callback = new IAjaxCallback() {
+                @Override
+                public void call(final AjaxRequestTarget pTarget) {
+                    pTarget.add(getContentLabel());
+                }
+            };
+            this.contentUpload.setOnDelete(callback);
+            this.contentUpload.setOnReset(callback);
+            this.contentUpload.setOnUpload(callback);
         }
         return this.contentUpload;
     }
@@ -196,19 +215,31 @@ public class ArContentEditPage extends RestrictedPageBase {
 
     private NonCachingImage getMarkerImage() {
         if (this.markerImage == null) {
-            try (final LargeDataResourceStream stream = new LargeDataResourceStream()) {
-                final ResourceStreamResource resource = new ResourceStreamResource(stream);
-                this.markerImage = new NonCachingImage("markerImage", resource); //$NON-NLS-1$
-            }
+            this.markerImage = new NonCachingImage("markerImage", new ResourceStreamResource(new MarkerDataResourceStream())); //$NON-NLS-1$
         }
         return this.markerImage;
     }
 
     private FileUploadPanel getMarkerUpload() {
         if (this.markerUpload == null) {
-            this.markerUpload = new FileUploadPanel("markerUpload"); //$NON-NLS-1$
-            this.markerUpload.setAutoUpload(true);
-            this.markerUpload.getRestorer().setVisible(this.arContent.getMarker().hasData());
+            this.markerUpload = new FileUploadPanel("markerUpload") { //$NON-NLS-1$
+                @Override
+                protected void onBeforeRender() {
+                    super.onBeforeRender();
+                    getFileValue().setVisible(false);
+                    getRestorer().setVisible(ArContentEditPage.this.arContent.getMarker().hasData());
+                }
+            };
+
+            final IAjaxCallback callback = new IAjaxCallback() {
+                @Override
+                public void call(final AjaxRequestTarget pTarget) {
+                    pTarget.add(getMarkerImage());
+                }
+            };
+            this.markerUpload.setOnDelete(callback);
+            this.markerUpload.setOnReset(callback);
+            this.markerUpload.setOnUpload(callback);
         }
         return this.markerUpload;
     }
@@ -256,57 +287,67 @@ public class ArContentEditPage extends RestrictedPageBase {
         @SuppressWarnings("nls")
         @Override
         public String getObject() {
-            try (LargeDataOperation op = getContentUpload().getOperation()) {
-                switch (op.getMode()) {
-                case DELETE:
-                    return "コンテンツなし";
-                case NOOP:
-                    return ArContentEditPage.this.arContent.getContent().hasData() ? "コンテンツあり" : "コンテンツなし";
-                case UPDATE:
-                    return op.getData() == null ? "コンテンツなし" : "コンテンツあり";
-                default:
-                    throw new IllegalStateException();
-                }
-            } catch (final IOException e) {
-                throw ExceptionUtil.rethrow(e);
+            final DataOperation operation = getContentUpload().getDataOperation();
+            switch (operation.getOperation()) {
+            case DELETE:
+                return "コンテンツなし";
+            case NOOP:
+                return ArContentEditPage.this.arContent.getContent().hasData() ? "コンテンツあり" : "コンテンツなし";
+            case UPDATE:
+                return operation.hasData() ? "コンテンツなし" : "コンテンツあり";
+            default:
+                throw new IllegalStateException();
             }
         }
-
     }
 
     private class Handler implements Serializable {
 
         private void save() {
-            try (LargeDataOperation markerDataOperation = getMarkerUpload().getOperation(); //
-                    LargeDataOperation contentDataOperation = getContentUpload().getOperation()) {
-                ArContentEditPage.this.arContentService.insertOrUpdate( //
-                        getSession().getLoginUser() //
-                        , ArContentEditPage.this.arContent //
-                        , markerDataOperation //
-                        , contentDataOperation);
-                setResponsePage(ArContentEditPage.class, ArContentEditPage.createParameters(ArContentEditPage.this.arContent));
-
-            } catch (final IOException e) {
-                throw ExceptionUtil.rethrow(e);
-            }
+            ArContentEditPage.this.arContentService.insertOrUpdate( //
+                    getSession().getLoginUser() //
+                    , ArContentEditPage.this.arContent //
+                    , getMarkerUpload().getDataOperation() //
+                    , getContentUpload().getDataOperation());
+            setResponsePage(ArContentEditPage.class, ArContentEditPage.createParameters(ArContentEditPage.this.arContent));
         }
     }
 
-    private class LargeDataResourceStream extends AbstractResourceStream {
+    private class MarkerDataResourceStream extends AbstractResourceStream {
 
         private transient InputStream in;
 
         @Override
         public void close() {
-            IOUtils.closeQuietly(this.in);
-            this.in = null;
+            if (this.in != null) {
+                try {
+                    this.in.close();
+                } catch (final IOException e) {
+                    // 無視
+                }
+                this.in = null;
+            }
         }
 
-        @SuppressWarnings("resource")
+        @Override
+        public String getContentType() {
+            final DataOperation operation = getMarkerUpload().getDataOperation();
+            switch (operation.getOperation()) {
+            case DELETE:
+                return super.getContentType();
+            case NOOP:
+                return ArContentEditPage.this.arContent.getMarker().getContentType();
+            case UPDATE:
+                return operation.getData().getContentType();
+            default:
+                throw new IllegalStateException();
+            }
+        }
+
         @Override
         public InputStream getInputStream() throws ResourceStreamNotFoundException {
-            final LargeDataOperation operation = getMarkerUpload().getOperation();
-            switch (operation.getMode()) {
+            final DataOperation operation = getMarkerUpload().getDataOperation();
+            switch (operation.getOperation()) {
             case DELETE:
                 throw new ResourceStreamNotFoundException();
             case UPDATE:

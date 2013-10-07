@@ -6,7 +6,7 @@ package jp.co.city.tear.web.ui.page;
 import jabara.general.IProducer2;
 import jabara.general.Sort;
 import jabara.jpa.entity.EntityBase_;
-import jabara.wicket.CssUtil;
+import jabara.wicket.ComponentCssHeaderItem;
 import jabara.wicket.Models;
 
 import java.util.ArrayList;
@@ -21,6 +21,7 @@ import jp.co.city.tear.model.LoginUser;
 import jp.co.city.tear.service.IUserService;
 import jp.co.city.tear.web.ui.AppSession;
 import jp.co.city.tear.web.ui.component.AttributeColumn;
+import jp.co.city.tear.web.ui.component.BodyCssHeaderItem;
 import jp.co.city.tear.web.ui.component.DateTimeColumn;
 import jp.co.city.tear.web.ui.component.DeleteLinkColumn;
 import jp.co.city.tear.web.ui.component.EditLinkColumn;
@@ -66,8 +67,8 @@ public class UserListPage extends AdministrationPageBase {
     @Override
     public void renderHead(final IHeaderResponse pResponse) {
         super.renderHead(pResponse);
-        addBodyCssReference(pResponse);
-        CssUtil.addComponentCssReference(pResponse, UserListPage.class);
+        pResponse.render(BodyCssHeaderItem.get());
+        pResponse.render(ComponentCssHeaderItem.forType(UserListPage.class));
     }
 
     /**

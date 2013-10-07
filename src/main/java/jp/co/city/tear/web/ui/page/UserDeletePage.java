@@ -16,6 +16,7 @@ import jp.co.city.tear.entity.EUser_;
 import jp.co.city.tear.service.IUserService;
 import jp.co.city.tear.web.ui.AppSession;
 import jp.co.city.tear.web.ui.WicketApplication;
+import jp.co.city.tear.web.ui.component.BodyCssHeaderItem;
 
 import org.apache.wicket.RestartResponseAtInterceptPageException;
 import org.apache.wicket.markup.head.IHeaderResponse;
@@ -69,7 +70,7 @@ public class UserDeletePage extends AdministrationPageBase {
     @Override
     public void renderHead(final IHeaderResponse pResponse) {
         super.renderHead(pResponse);
-        addBodyCssReference(pResponse);
+        pResponse.render(BodyCssHeaderItem.get());
     }
 
     /**

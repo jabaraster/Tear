@@ -24,8 +24,8 @@ public class DateTimeColumn<E> extends DateColumnBase<E> {
      * @param pAttribute -
      */
     /**
-     * @param pMeta
-     * @param pAttribute
+     * @param pMeta -
+     * @param pAttribute -
      */
     public DateTimeColumn(final BeanProperties pMeta, final Attribute<?, ? extends Comparable<?>> pAttribute) {
         super(pMeta, pAttribute, FORMAT);

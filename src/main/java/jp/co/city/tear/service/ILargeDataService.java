@@ -4,6 +4,7 @@
 package jp.co.city.tear.service;
 
 import jabara.general.NotFound;
+import jabara.general.io.DataOperation;
 
 import java.io.InputStream;
 
@@ -32,7 +33,7 @@ public interface ILargeDataService {
 
     /**
      * @param pData -
-     * @param pStream -
+     * @param pOperation -
      */
-    void insertOrUpdate(ELargeData pData, InputStream pStream);
+    void insertOrUpdate(ELargeData pData, DataOperation pOperation);
 }

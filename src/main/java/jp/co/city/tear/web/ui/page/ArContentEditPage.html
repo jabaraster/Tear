@@ -1,3 +1,11 @@
+<!doctype html>
+<html>
+<head>
+  <title></title>
+  <meta charset="UTF-8" />
+</head>
+<body>
+
 <wicket:extend>
 
   <div wicket:id="feedback"></div>
@@ -20,7 +28,7 @@
       <li class="input">
         <span class="label">マーカ画像</span>
         <div wicket:id="markerUpload" class="uploadField"></div>
-        <img wicket:id="markerImage" />
+        <img wicket:id="markerImage" class="markerImage" />
       </li>
     </ul>
   </form>
@@ -30,9 +38,12 @@
       <li class="input">
         <span class="label">コンテンツ</span>
         <div wicket:id="contentUpload" class="uploadField"></div>
-        <span wicket:id="contentLabel"></span>
+        <span wicket:id="contentLabel" class=""></span>
       </li>
     </ul>
   </form>
 
 </wicket:extend>
+
+</body>
+</html>

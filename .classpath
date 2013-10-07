@@ -87,11 +87,6 @@
 			<attribute name="javadoc_location" value="jar:file:/Users/jabaraster/.m2/repository/jabaraster/jabara-bean/1.0/jabara-bean-1.0-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="var" path="M2_REPO/jabaraster/jabara-general/1.4/jabara-general-1.4.jar" sourcepath="M2_REPO/jabaraster/jabara-general/1.4/jabara-general-1.4-sources.jar">
-		<attributes>
-			<attribute name="javadoc_location" value="jar:file:/Users/jabaraster/.m2/repository/jabaraster/jabara-general/1.4/jabara-general-1.4-javadoc.jar!/"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry kind="var" path="M2_REPO/jabaraster/jabara-jax-rs/1.0/jabara-jax-rs-1.0.jar" sourcepath="M2_REPO/jabaraster/jabara-jax-rs/1.0/jabara-jax-rs-1.0-sources.jar">
 		<attributes>
 			<attribute name="javadoc_location" value="jar:file:/Users/jabaraster/.m2/repository/jabaraster/jabara-jax-rs/1.0/jabara-jax-rs-1.0-javadoc.jar!/"/>
@@ -120,11 +115,6 @@
 	<classpathentry kind="var" path="M2_REPO/jabaraster/jabara-servlet/1.2.1/jabara-servlet-1.2.1.jar" sourcepath="M2_REPO/jabaraster/jabara-servlet/1.2.1/jabara-servlet-1.2.1-sources.jar">
 		<attributes>
 			<attribute name="javadoc_location" value="jar:file:/Users/jabaraster/.m2/repository/jabaraster/jabara-servlet/1.2.1/jabara-servlet-1.2.1-javadoc.jar!/"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="var" path="M2_REPO/jabaraster/jabara-wicket/2.1/jabara-wicket-2.1.jar" sourcepath="M2_REPO/jabaraster/jabara-wicket/2.1/jabara-wicket-2.1-sources.jar">
-		<attributes>
-			<attribute name="javadoc_location" value="jar:file:/Users/jabaraster/.m2/repository/jabaraster/jabara-wicket/2.1/jabara-wicket-2.1-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="var" path="M2_REPO/org/codehaus/jackson/jackson-core-asl/1.8.9/jackson-core-asl-1.8.9.jar" sourcepath="M2_REPO/org/codehaus/jackson/jackson-core-asl/1.8.9/jackson-core-asl-1.8.9-sources.jar"/>
@@ -391,5 +381,7 @@
 			<attribute name="owner.project.facets" value="java"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry combineaccessrules="false" kind="src" path="/jabara-wicket"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jabara-general"/>
 	<classpathentry kind="output" path="src/main/webapp/WEB-INF/classes"/>
 </classpath>

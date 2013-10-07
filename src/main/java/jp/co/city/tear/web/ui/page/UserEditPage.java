@@ -5,7 +5,7 @@ package jp.co.city.tear.web.ui.page;
 
 import jabara.general.ArgUtil;
 import jabara.general.NotFound;
-import jabara.wicket.CssUtil;
+import jabara.wicket.ComponentCssHeaderItem;
 import jabara.wicket.ErrorClassAppender;
 import jabara.wicket.JavaScriptUtil;
 import jabara.wicket.beaneditor.BeanEditor;
@@ -19,6 +19,7 @@ import jp.co.city.tear.entity.EUserPassword_;
 import jp.co.city.tear.entity.EUser_;
 import jp.co.city.tear.model.Duplicate;
 import jp.co.city.tear.service.IUserService;
+import jp.co.city.tear.web.ui.component.BodyCssHeaderItem;
 
 import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -97,8 +98,8 @@ public abstract class UserEditPage extends RestrictedPageBase {
     @Override
     public void renderHead(final IHeaderResponse pResponse) {
         super.renderHead(pResponse);
-        addBodyCssReference(pResponse);
-        CssUtil.addComponentCssReference(pResponse, UserEditPage.class);
+        pResponse.render(BodyCssHeaderItem.get());
+        pResponse.render(ComponentCssHeaderItem.forType(UserEditPage.class));
         try {
             JavaScriptUtil.addFocusScript(pResponse, getEditor().findInputComponent(EUser_.userId.getName()).getFirstFormComponent());
         } catch (final NotFound e) {

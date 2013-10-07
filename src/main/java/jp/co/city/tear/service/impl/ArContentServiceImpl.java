@@ -7,6 +7,7 @@ import jabara.general.ArgUtil;
 import jabara.general.ExceptionUtil;
 import jabara.general.NotFound;
 import jabara.general.Sort;
+import jabara.general.io.DataOperation;
 import jabara.jpa.JpaDaoBase;
 import jabara.jpa.entity.EntityBase_;
 
@@ -25,7 +26,6 @@ import jp.co.city.tear.entity.EArContent;
 import jp.co.city.tear.entity.EArContent_;
 import jp.co.city.tear.entity.ELargeData;
 import jp.co.city.tear.entity.EUser;
-import jp.co.city.tear.model.LargeDataOperation;
 import jp.co.city.tear.model.LoginUser;
 import jp.co.city.tear.service.IArContentService;
 import jp.co.city.tear.service.ILargeDataService;
@@ -204,14 +204,14 @@ public class ArContentServiceImpl extends JpaDaoBase implements IArContentServic
 
     /**
      * @see jp.co.city.tear.service.IArContentService#insertOrUpdate(jp.co.city.tear.model.LoginUser, jp.co.city.tear.entity.EArContent,
-     *      jp.co.city.tear.model.LargeDataOperation, jp.co.city.tear.model.LargeDataOperation)
+     *      jabara.general.io.DataOperation, jabara.general.io.DataOperation)
      */
     @Override
     public void insertOrUpdate( //
             final LoginUser pLoginUser //
             , final EArContent pArContent //
-            , final LargeDataOperation pMarkerDataOperation //
-            , final LargeDataOperation pContentDataOperation) {
+            , final DataOperation pMarkerDataOperation //
+            , final DataOperation pContentDataOperation) {
 
         ArgUtil.checkNull(pLoginUser, "pLoginUser"); //$NON-NLS-1$
         ArgUtil.checkNull(pArContent, "pArContent"); //$NON-NLS-1$
@@ -255,44 +255,30 @@ public class ArContentServiceImpl extends JpaDaoBase implements IArContentServic
 
     private void insertCore( //
             final EArContent pArContent //
-            , final LargeDataOperation pMarkerDataOperation //
-            , final LargeDataOperation pContentDataOperation) {
+            , final DataOperation pMarkerDataOperation //
+            , final DataOperation pContentDataOperation) {
 
         final ELargeData marker = pArContent.getMarker();
         final ELargeData content = pArContent.getContent();
 
-        this.largeDataService.insertOrUpdate(marker, pMarkerDataOperation.getData().getInputStream());
-        this.largeDataService.insertOrUpdate(content, pContentDataOperation.getData().getInputStream());
+        this.largeDataService.insertOrUpdate(marker, pMarkerDataOperation);
+        this.largeDataService.insertOrUpdate(content, pContentDataOperation);
 
         getEntityManager().persist(pArContent);
 
-        marker.setDataName("marker_" + pArContent.getId().longValue() + "." + pMarkerDataOperation.getData().getType()); //$NON-NLS-1$//$NON-NLS-2$
-        content.setDataName("content_" + pArContent.getId().longValue() + "." + pContentDataOperation.getData().getType()); //$NON-NLS-1$ //$NON-NLS-2$
+        //        marker.setDataName("marker_" + pArContent.getId().longValue() + "." + pMarkerDataOperation.getData().getName()); //$NON-NLS-1$//$NON-NLS-2$
+        //        content.setDataName("content_" + pArContent.getId().longValue() + "." + pContentDataOperation.getData().getName()); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     private void updateCore( //
             final EArContent pArContent //
-            , final LargeDataOperation pMarkerDataOperation //
-            , final LargeDataOperation pContentDataOperation) {
+            , final DataOperation pMarkerDataOperation //
+            , final DataOperation pContentDataOperation) {
 
-        updateData(pArContent.getMarker(), pMarkerDataOperation);
-        updateData(pArContent.getContent(), pContentDataOperation);
+        this.largeDataService.insertOrUpdate(pArContent.getMarker(), pMarkerDataOperation);
+        this.largeDataService.insertOrUpdate(pArContent.getContent(), pContentDataOperation);
 
         final EArContent inDb = getEntityManager().merge(pArContent);
         inDb.setTitle(pArContent.getTitle());
-    }
-
-    private void updateData(final ELargeData pData, final LargeDataOperation pDataOperation) {
-        switch (pDataOperation.getMode()) {
-        case NOOP:
-            // 処理なし
-            break;
-        case DELETE:
-        case UPDATE:
-            this.largeDataService.insertOrUpdate(pData, pDataOperation.getData().getInputStream());
-            break;
-        default:
-            throw new IllegalStateException();
-        }
     }
 }

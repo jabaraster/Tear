@@ -3,10 +3,11 @@
  */
 package jp.co.city.tear.entity;
 
-import static org.hamcrest.CoreMatchers.is;
+import org.junit.Test;
+
 import static org.junit.Assert.assertThat;
 
-import org.junit.Test;
+import static org.hamcrest.CoreMatchers.is;
 
 /**
  * @author jabaraster
@@ -19,7 +20,7 @@ public class ELargeDataTest {
     @SuppressWarnings({ "boxing", "static-method" })
     @Test
     public void _clearData() {
-        final int LENGTH = 10;
+        final long LENGTH = 10;
         final ELargeData d = new ELargeData();
         d.setDataLength(LENGTH);
 
@@ -45,12 +46,12 @@ public class ELargeDataTest {
     }
 
     /**
-     * Test method for {@link jp.co.city.tear.entity.ELargeData#setDataLength(int)}.
+     * Test method for {@link jp.co.city.tear.entity.ELargeData#setDataLength(long)}.
      */
     @SuppressWarnings({ "boxing", "static-method" })
     @Test
     public void _setDataLength_負数をセット() {
-        final int LENGTH = -1;
+        final long LENGTH = -1;
         final ELargeData d = new ELargeData();
         d.setDataLength(LENGTH);
 

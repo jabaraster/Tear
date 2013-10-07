@@ -5,6 +5,7 @@ package jp.co.city.tear.service;
 
 import jabara.general.NotFound;
 import jabara.general.Sort;
+import jabara.general.io.DataOperation;
 
 import java.io.InputStream;
 import java.util.List;
@@ -12,7 +13,6 @@ import java.util.List;
 import jp.co.city.tear.entity.EArContent;
 import jp.co.city.tear.entity.ELargeData;
 import jp.co.city.tear.entity.EUser;
-import jp.co.city.tear.model.LargeDataOperation;
 import jp.co.city.tear.model.LoginUser;
 import jp.co.city.tear.service.impl.ArContentServiceImpl;
 
@@ -90,6 +90,6 @@ public interface IArContentService {
     void insertOrUpdate( //
             LoginUser pLoginUser //
             , EArContent pArContent //
-            , LargeDataOperation pMarkerDataOperation //
-            , LargeDataOperation pContentDataOperation);
+            , DataOperation pMarkerDataOperation //
+            , DataOperation pContentDataOperation);
 }

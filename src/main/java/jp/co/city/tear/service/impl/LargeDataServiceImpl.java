@@ -4,9 +4,15 @@
 package jp.co.city.tear.service.impl;
 
 import jabara.general.ArgUtil;
+import jabara.general.ExceptionUtil;
+import jabara.general.IoUtil;
 import jabara.general.NotFound;
+import jabara.general.io.DataOperation;
+import jabara.general.io.DataOperation.Operation;
+import jabara.general.io.IReadableData;
 import jabara.jpa.JpaDaoBase;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 import javax.inject.Inject;
@@ -68,39 +74,62 @@ public class LargeDataServiceImpl extends JpaDaoBase implements ILargeDataServic
     }
 
     /**
-     * @see jp.co.city.tear.service.ILargeDataService#insertOrUpdate(jp.co.city.tear.entity.ELargeData, java.io.InputStream)
+     * @see jp.co.city.tear.service.ILargeDataService#insertOrUpdate(jp.co.city.tear.entity.ELargeData, jabara.general.io.DataOperation)
      */
     @Override
-    public void insertOrUpdate(final ELargeData pData, final InputStream pStream) {
+    public void insertOrUpdate(final ELargeData pData, final DataOperation pOperation) {
         ArgUtil.checkNull(pData, "pData"); //$NON-NLS-1$
 
         if (pData.isPersisted()) {
-            updateCore(pData, pStream);
+            updateCore(pData, pOperation);
         } else {
-            insertCore(pData, pStream);
+            insertCore(pData, pOperation);
         }
     }
 
-    private void insertCore(final ELargeData pData, final InputStream pStream) {
-        try {
-            getEntityManager().persist(pData);
+    private void insertCore(final ELargeData pData, final DataOperation pOperation) {
+        getEntityManager().persist(pData);
 
-            final int len = this.dataStore.save(pData.getId().longValue(), pStream);
-            pData.setDataLength(len);
+        if (pOperation.getOperation() == Operation.NOOP || pOperation.getOperation() == Operation.DELETE) {
+            return;
+        }
+        final IReadableData stream = pOperation.getData();
+        try (InputStream in = IoUtil.toBuffered(stream.getInputStream())) {
+            pData.setContentType(stream.getContentType());
+            pData.setDataLength(stream.getSize());
+            pData.setDataName(stream.getName());
+            this.dataStore.save(pData.getId().longValue(), in);
+
         } catch (final EmptyData e) {
             pData.clearData();
+        } catch (final IOException e) {
+            throw ExceptionUtil.rethrow(e);
         }
     }
 
-    private void updateCore(final ELargeData pData, final InputStream pStream) {
-        final ELargeData inDb = getEntityManager().merge(pData);
-        this.dataStore.delete(pData.getId().longValue());
+    private void updateCore(final ELargeData pData, final DataOperation pOperation) {
+        if (pOperation.getOperation() == Operation.NOOP) {
+            return;
+        }
 
-        try {
-            final int len = this.dataStore.save(pData.getId().longValue(), pStream);
-            inDb.setDataLength(len);
+        final ELargeData inDb = getEntityManager().merge(pData);
+        inDb.clearData();
+        this.dataStore.delete(pData.getId().longValue());
+        if (pOperation.getOperation() == Operation.DELETE) {
+            return;
+        }
+
+        final IReadableData stream = pOperation.getData();
+        try (InputStream in = IoUtil.toBuffered(stream.getInputStream())) {
+            this.dataStore.save(pData.getId().longValue(), in);
+            inDb.setContentType(stream.getContentType());
+            inDb.setDataLength(stream.getSize());
+            inDb.setDataName(stream.getName());
+
         } catch (final EmptyData e) {
             inDb.clearData();
+        } catch (final IOException e) {
+            throw ExceptionUtil.rethrow(e);
         }
     }
 }

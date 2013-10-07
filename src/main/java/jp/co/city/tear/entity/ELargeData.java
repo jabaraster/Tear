@@ -15,18 +15,23 @@ import org.apache.commons.lang.StringUtils;
  */
 @Entity
 public class ELargeData extends EntityBase<ELargeData> {
-    private static final long serialVersionUID         = -7306088955859680620L;
+    private static final long serialVersionUID            = -7306088955859680620L;
 
     /**
      * 
      */
-    public static final int   MAX_CHAR_COUNT_DATA_NAME = 1000;
+    public static final int   MAX_CHAR_COUNT_DATA_NAME    = 1000;
+
+    /**
+     * 
+     */
+    public static final int   MAX_CHAR_COUNT_CONTENT_TYPE = 200;
 
     /**
      * 
      */
     @Column(nullable = false)
-    protected boolean         hasData                  = false;
+    protected boolean         hasData                     = false;
 
     /**
      * 
@@ -37,15 +42,29 @@ public class ELargeData extends EntityBase<ELargeData> {
     /**
      * 
      */
+    @Column(nullable = true, length = MAX_CHAR_COUNT_CONTENT_TYPE)
+    protected String          contentType;
+
+    /**
+     * 
+     */
     @Column(nullable = true)
-    protected Integer         length;
+    protected Long            length;
 
     /**
      * 
      */
     public void clearData() {
         this.length = null;
+        this.contentType = null;
         this.hasData = false;
+    }
+
+    /**
+     * @return the contentType
+     */
+    public String getContentType() {
+        return this.contentType;
     }
 
     /**
@@ -58,7 +77,7 @@ public class ELargeData extends EntityBase<ELargeData> {
     /**
      * @return -
      */
-    public Integer getLength() {
+    public Long getLength() {
         return this.length;
     }
 
@@ -77,11 +96,18 @@ public class ELargeData extends EntityBase<ELargeData> {
     }
 
     /**
+     * @param pContentType the contentType to set
+     */
+    public void setContentType(final String pContentType) {
+        this.contentType = pContentType;
+    }
+
+    /**
      * @param pLength -
      */
-    public void setDataLength(final int pLength) {
+    public void setDataLength(final long pLength) {
         this.hasData = true;
-        this.length = Integer.valueOf(pLength);
+        this.length = Long.valueOf(pLength);
     }
 
     /**

@@ -4,7 +4,7 @@
 package jp.co.city.tear.web.ui.page;
 
 import jabara.general.NotFound;
-import jabara.wicket.CssUtil;
+import jabara.wicket.ComponentCssHeaderItem;
 import jabara.wicket.ErrorClassAppender;
 
 import java.io.Serializable;
@@ -17,6 +17,7 @@ import jp.co.city.tear.model.Duplicate;
 import jp.co.city.tear.model.UnmatchPassword;
 import jp.co.city.tear.service.IUserService;
 import jp.co.city.tear.web.ui.AppSession;
+import jp.co.city.tear.web.ui.component.BodyCssHeaderItem;
 
 import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -92,8 +93,8 @@ public class UserUpdatePage extends RestrictedPageBase {
     @Override
     public void renderHead(final IHeaderResponse pResponse) {
         super.renderHead(pResponse);
-        CssUtil.addComponentCssReference(pResponse, UserUpdatePage.class);
-        addBodyCssReference(pResponse);
+        pResponse.render(BodyCssHeaderItem.get());
+        pResponse.render(ComponentCssHeaderItem.forType(UserUpdatePage.class));
     }
 
     /**

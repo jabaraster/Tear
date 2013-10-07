@@ -51,6 +51,8 @@ public class ArContentResource {
     private static final Method     METHOD_TRACKING_DATA       = findMethod("getTrackingData", METHODS); //$NON-NLS-1$
 
     private static final String     HEADER_CONTENT_DISPOSITION = "Content-Disposition";                 //$NON-NLS-1$
+    private static final String     HEADER_CONTENT_TYPE        = "Content-Type";                        //$NON-NLS-1$
+
     private static final String     LOADING_MOVIE_NAME         = "loading.3gp";                         //$NON-NLS-1$
 
     private final IArContentService arContentService;
@@ -106,7 +108,9 @@ public class ArContentResource {
                     }
                 }
             }) //
-                    .header(HEADER_CONTENT_DISPOSITION, buildContentDisposition(pDisposition, content.getContent().getDataName())) //
+                    .header(HEADER_CONTENT_TYPE, content.getContent().getContentType()) //
+                    .header(HEADER_CONTENT_DISPOSITION, buildContentDisposition(pDisposition //
+                            , content.getId().longValue() + "." + content.getContent().getType())) // //$NON-NLS-1$
                     .build();
         } catch (final NotFound e) {
             return Response.status(Status.NOT_FOUND).build();
@@ -160,7 +164,9 @@ public class ArContentResource {
                     }
                 }
             }) //
-                    .header(HEADER_CONTENT_DISPOSITION, buildContentDisposition(pDisposition, content.getMarker().getDataName())) //
+                    .header(HEADER_CONTENT_TYPE, content.getContent().getContentType()) //
+                    .header(HEADER_CONTENT_DISPOSITION, buildContentDisposition(pDisposition //
+                            , content.getId().longValue() + "." + content.getMarker().getType())) // //$NON-NLS-1$
                     .build();
         } catch (final NotFound e) {
             return Response.status(Status.NOT_FOUND).build();
@@ -264,8 +270,9 @@ public class ArContentResource {
         private final String contentFileName;
 
         /**
-         * @param pContent
+         * @param pContent -
          */
+        @SuppressWarnings("synthetic-access")
         public ArContent(final EArContent pContent) {
             ArgUtil.checkNull(pContent, "pContent"); //$NON-NLS-1$
             this.contentFileName = pContent.getContent().getDataName();

@@ -6,7 +6,7 @@ package jp.co.city.tear.web.ui.page;
 import jabara.general.IProducer2;
 import jabara.general.Sort;
 import jabara.jpa.entity.EntityBase_;
-import jabara.wicket.CssUtil;
+import jabara.wicket.ComponentCssHeaderItem;
 import jabara.wicket.Models;
 
 import java.util.ArrayList;
@@ -22,10 +22,12 @@ import jp.co.city.tear.entity.EUser_;
 import jp.co.city.tear.service.IArContentService;
 import jp.co.city.tear.web.ui.AppSession;
 import jp.co.city.tear.web.ui.component.AttributeColumn;
+import jp.co.city.tear.web.ui.component.BodyCssHeaderItem;
 import jp.co.city.tear.web.ui.component.DateTimeColumn;
 import jp.co.city.tear.web.ui.component.DeleteLinkColumn;
 import jp.co.city.tear.web.ui.component.EditLinkColumn;
 
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.extensions.ajax.markup.html.repeater.data.table.AjaxFallbackDefaultDataTable;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
@@ -70,8 +72,8 @@ public class ArContentListPage extends RestrictedPageBase {
     @Override
     public void renderHead(final IHeaderResponse pResponse) {
         super.renderHead(pResponse);
-        addBodyCssReference(pResponse);
-        CssUtil.addComponentCssReference(pResponse, ArContentListPage.class);
+        pResponse.render(BodyCssHeaderItem.get());
+        pResponse.render(ComponentCssHeaderItem.forType(ArContentListPage.class));
     }
 
     /**
@@ -173,7 +175,9 @@ public class ArContentListPage extends RestrictedPageBase {
         public void populateItem(final Item<ICellPopulator<EArContent>> pCellItem, final String pComponentId, final IModel<EArContent> pRowModel) {
             final ELargeData data = this.cellObjectProducer.produce(pRowModel.getObject());
             final String s = data.hasData() ? "登録あり" : "登録なし"; //$NON-NLS-1$//$NON-NLS-2$
-            pCellItem.add(new Label(pComponentId, s));
+            final Label l = new Label(pComponentId, s);
+            l.add(AttributeModifier.append("class", data.hasData() ? "label label-success" : "label label-default")); //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
+            pCellItem.add(l);
         }
     }
 
