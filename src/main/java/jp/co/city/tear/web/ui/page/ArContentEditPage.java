@@ -179,7 +179,6 @@ public class ArContentEditPage extends RestrictedPageBase {
                 @Override
                 protected void onBeforeRender() {
                     super.onBeforeRender();
-                    getFileValue().setVisible(false);
                     getRestorer().setVisible(ArContentEditPage.this.arContent.getContent().hasData());
                 }
             };
@@ -226,7 +225,6 @@ public class ArContentEditPage extends RestrictedPageBase {
                 @Override
                 protected void onBeforeRender() {
                     super.onBeforeRender();
-                    getFileValue().setVisible(false);
                     getRestorer().setVisible(ArContentEditPage.this.arContent.getMarker().hasData());
                 }
             };
@@ -303,7 +301,7 @@ public class ArContentEditPage extends RestrictedPageBase {
 
     private class Handler implements Serializable {
 
-        private void save() {
+        void save() {
             ArContentEditPage.this.arContentService.insertOrUpdate( //
                     getSession().getLoginUser() //
                     , ArContentEditPage.this.arContent //

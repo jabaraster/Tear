@@ -43,7 +43,33 @@ ul.FileUploadPanelButtons > li {
 	}
 }
 
+div.FileUploadPanel {
+    > div {
+        > div {
+            display: inline-block;
+        }
+    }
+    span.fileValue {
+        display: none;
+    }
+    button.btn > span {
+        display: none;
+    }
+}
+
+@contentAreaWidth: 200px;
+@contentAreaMarginLeft: 185px;
+
+div.uploadField ~ span {
+    display: block;
+    width: @contentAreaWidth;
+    height: @contentAreaWidth / 2;
+    margin-left: @contentAreaMarginLeft;
+}
+
 img.markerImage {
-  width: 150px;
+    display: block;
+    width: @contentAreaWidth;
+    margin-left: @contentAreaMarginLeft;
 }
 
