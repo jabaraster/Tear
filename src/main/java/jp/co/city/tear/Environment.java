@@ -103,7 +103,7 @@ public final class Environment {
             throw new IllegalStateException();
         }
 
-        _dataStoreDirectoryCreated.set(true);
+        _dataStoreDirectoryCreated.compareAndSet(false, true);
 
         return file;
     }

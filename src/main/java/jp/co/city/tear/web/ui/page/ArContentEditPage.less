@@ -1,7 +1,10 @@
 @import "Common.less";
 
+@contentAreaWidth: 250px;
+@marginLeft: 200px;
+
 form {
-  .inputs(10em);
+  .inputs(@marginLeft);
 
   li.input > div.progressArea {
     display: block;
@@ -55,11 +58,12 @@ div.FileUploadPanel {
     button.btn > span {
         display: none;
     }
+    button.deleter {
+        margin-left: 64px;
+    }
 }
 
-@contentAreaWidth: 200px;
-@contentAreaMarginLeft: 185px;
-
+@contentAreaMarginLeft: @marginLeft + 4;
 div.uploadField ~ span {
     display: block;
     width: @contentAreaWidth;

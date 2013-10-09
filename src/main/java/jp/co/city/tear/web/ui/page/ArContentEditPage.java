@@ -77,6 +77,8 @@ public class ArContentEditPage extends RestrictedPageBase {
     private FileUploadPanel         contentUpload;
     private Label                   contentLabel;
 
+    private AttributeModifier       contentLabelClassAppender;
+
     /**
      * 
      */
@@ -147,6 +149,12 @@ public class ArContentEditPage extends RestrictedPageBase {
         return this.submitter;
     }
 
+    @SuppressWarnings("nls")
+    private void createContentLabelClassAppender() {
+        final boolean hasData = this.arContent.getContent().hasData() || getContentUpload().getDataOperation().hasData();
+        this.contentLabelClassAppender = AttributeModifier.append("class", hasData ? "label label-success" : "label label-default");
+    }
+
     private Link<?> getCancelar() {
         if (this.cancelar == null) {
             this.cancelar = new BookmarkablePageLink<>("cancelar", ArContentListPage.class); //$NON-NLS-1$
@@ -167,8 +175,8 @@ public class ArContentEditPage extends RestrictedPageBase {
     private Label getContentLabel() {
         if (this.contentLabel == null) {
             this.contentLabel = new Label("contentLabel", new ContentLabelModel());
-            this.contentLabel.add(AttributeModifier.append("class" //
-                    , this.arContent.getContent().hasData() ? "label label-success" : "label label-default")); //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
+            createContentLabelClassAppender();
+            this.contentLabel.add(this.contentLabelClassAppender);
         }
         return this.contentLabel;
     }
@@ -186,7 +194,7 @@ public class ArContentEditPage extends RestrictedPageBase {
             final IAjaxCallback callback = new IAjaxCallback() {
                 @Override
                 public void call(final AjaxRequestTarget pTarget) {
-                    pTarget.add(getContentLabel());
+                    ArContentEditPage.this.handler.onContentUpload(pTarget);
                 }
             };
             this.contentUpload.setOnDelete(callback);
@@ -300,6 +308,14 @@ public class ArContentEditPage extends RestrictedPageBase {
     }
 
     private class Handler implements Serializable {
+
+        void onContentUpload(final AjaxRequestTarget pTarget) {
+            getContentLabel().remove(ArContentEditPage.this.contentLabelClassAppender);
+            createContentLabelClassAppender();
+            getContentLabel().add(ArContentEditPage.this.contentLabelClassAppender);
+
+            pTarget.add(getContentLabel());
+        }
 
         void save() {
             ArContentEditPage.this.arContentService.insertOrUpdate( //
