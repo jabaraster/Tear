@@ -178,20 +178,20 @@ public class WicketApplication extends WebApplication {
         this.mountPage("logout", LogoutPage.class);
         this.mountPage("top", TopPage.class);
 
-        this.mountPage("mainte/user/", UserListPage.class);
-        this.mountPage("mainte/user/index", UserListPage.class);
-        this.mountPage("mainte/user/new", UserInsertPage.class);
-        this.mountPage("mainte/user/edit", UserUpdatePage.class);
-        this.mountPage("mainte/user/delete", UserDeletePage.class);
+        this.mountPage("user/", UserListPage.class);
+        this.mountPage("user/index", UserListPage.class);
+        this.mountPage("user/new", UserInsertPage.class);
+        this.mountPage("user/edit", UserUpdatePage.class);
+        this.mountPage("user/delete", UserDeletePage.class);
 
-        this.mountPage("mainte/content/", ArContentListPage.class);
-        this.mountPage("mainte/content/index", ArContentListPage.class);
-        this.mountPage("mainte/content/new", ArContentInsertPage.class);
-        this.mountPage("mainte/content/edit", ArContentUpdatePage.class);
-        this.mountPage("mainte/content/delete", ArContentDeletePage.class);
+        this.mountPage("content/", ArContentListPage.class);
+        this.mountPage("content/index", ArContentListPage.class);
+        this.mountPage("content/new", ArContentInsertPage.class);
+        this.mountPage("content/edit", ArContentUpdatePage.class);
+        this.mountPage("content/delete", ArContentDeletePage.class);
 
         // TODO
-        this.mountPage("test", TestPage.class);
+        this.mountPage("content/test", TestPage.class);
     }
 
     private void mountResource(final Resource pResource, final String pFilePath, final Duration pCacheDuration) {

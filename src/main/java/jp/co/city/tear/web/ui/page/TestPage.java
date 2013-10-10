@@ -3,7 +3,9 @@
  */
 package jp.co.city.tear.web.ui.page;
 
+import jabara.general.ArgUtil;
 import jabara.general.IoUtil;
+import jabara.general.NotFound;
 import jabara.general.io.DataOperation;
 import jabara.wicket.ComponentCssHeaderItem;
 import jabara.wicket.ErrorClassAppender;
@@ -20,8 +22,11 @@ import javax.inject.Inject;
 import jp.co.city.tear.entity.EArContent;
 import jp.co.city.tear.entity.EArContent_;
 import jp.co.city.tear.service.IArContentService;
+import jp.co.city.tear.web.ui.AppSession;
 import jp.co.city.tear.web.ui.component.BodyCssHeaderItem;
 
+import org.apache.wicket.AttributeModifier;
+import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.extensions.ajax.markup.html.IndicatingAjaxButton;
@@ -31,13 +36,18 @@ import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.image.Image;
 import org.apache.wicket.markup.html.image.NonCachingImage;
+import org.apache.wicket.markup.html.link.BookmarkablePageLink;
+import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.protocol.http.WebApplication;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.request.resource.ResourceStreamResource;
 import org.apache.wicket.util.resource.AbstractResourceStream;
 import org.apache.wicket.util.resource.ResourceStreamNotFoundException;
+import org.apache.wicket.util.string.StringValueConversionException;
 
 /**
  * @author jabaraster
@@ -45,17 +55,19 @@ import org.apache.wicket.util.resource.ResourceStreamNotFoundException;
 @SuppressWarnings({ "nls", "serial", "synthetic-access" })
 public class TestPage extends RestrictedPageBase {
 
-    private final EArContent  arContent = new EArContent();
+    private final EArContent  arContent;
 
-    private final Handler     handler   = new Handler();
+    private final Handler     handler = new Handler();
 
     @Inject
     IArContentService         arContentService;
 
+    private AjaxButton        submitter;
+    private Link<?>           goIndex;
+
     private Form<?>           form;
     private FeedbackPanel     feedback;
     private TextField<String> title;
-    private AjaxButton        submitter;
 
     private Form<?>           markerForm;
     private FileUploadPanel   markerUpload;
@@ -69,10 +81,29 @@ public class TestPage extends RestrictedPageBase {
      * 
      */
     public TestPage() {
-        this.add(getForm());
-        this.add(getSubmitter());
-        this.add(getMarkerForm());
-        this.add(getContentForm());
+        this(new EArContent());
+    }
+
+    /**
+     * @param pArContent -
+     */
+    public TestPage(final EArContent pArContent) {
+        ArgUtil.checkNull(pArContent, "pArContents"); //$NON-NLS-1$
+        this.arContent = pArContent;
+        initialize();
+    }
+
+    /**
+     * @param pParameters -
+     */
+    public TestPage(final PageParameters pParameters) {
+        super(pParameters);
+        try {
+            this.arContent = this.arContentService.findById(AppSession.get().getLoginUser(), pParameters.get(0).toLong());
+            initialize();
+        } catch (StringValueConversionException | NotFound e) {
+            throw new RestartResponseException(WebApplication.get().getHomePage());
+        }
     }
 
     /**
@@ -108,9 +139,11 @@ public class TestPage extends RestrictedPageBase {
             this.contentLabel = new Label("contentLabel", new AbstractReadOnlyModel<String>() {
                 @Override
                 public String getObject() {
-                    return getContentUpload().getDataOperation().hasData() ? "動画あり" : "動画なし";
+                    return hasContentData() ? "動画あり" : "動画なし";
                 }
             });
+            final String c = hasContentData() ? "label label-success" : "label label-default";
+            this.contentLabel.add(AttributeModifier.append("class", c));
         }
         return this.contentLabel;
     }
@@ -119,14 +152,25 @@ public class TestPage extends RestrictedPageBase {
         if (this.contentUpload == null) {
             this.contentUpload = new FileUploadPanel("contentUpload");
 
-            final IAjaxCallback callback = new IAjaxCallback() {
+            // コンテンツがアップロードされたり削除されたら、class属性を書き換える.
+            // 本来この処理はAttributeModifierを使ってWicketの領域で実装したいのだが
+            // そうするとFileUploadPanelが正常に動作しない(アップロードされたデータがなぜか消えてしまう)
+            this.contentUpload.setOnUpload(new IAjaxCallback() {
                 @Override
                 public void call(final AjaxRequestTarget pTarget) {
+                    pTarget.appendJavaScript("$('#" + TestPage.this.contentLabel.getMarkupId()
+                            + "').removeClass('label-default').addClass('label-success')");
                     pTarget.add(getContentLabel());
                 }
-            };
-            this.contentUpload.setOnUpload(callback);
-            this.contentUpload.setOnDelete(callback);
+            });
+            this.contentUpload.setOnDelete(new IAjaxCallback() {
+                @Override
+                public void call(final AjaxRequestTarget pTarget) {
+                    pTarget.appendJavaScript("$('#" + TestPage.this.contentLabel.getMarkupId()
+                            + "').removeClass('label-success').addClass('label-default')");
+                    pTarget.add(getContentLabel());
+                }
+            });
         }
         return this.contentUpload;
     }
@@ -147,6 +191,13 @@ public class TestPage extends RestrictedPageBase {
         return this.form;
     }
 
+    private Link<?> getGoIndex() {
+        if (this.goIndex == null) {
+            this.goIndex = new BookmarkablePageLink<>("goIndex", ArContentListPage.class);
+        }
+        return this.goIndex;
+    }
+
     private Form<?> getMarkerForm() {
         if (this.markerForm == null) {
             this.markerForm = new Form<>("markerForm");
@@ -160,6 +211,9 @@ public class TestPage extends RestrictedPageBase {
     private Image getMarkerImage() {
         if (this.markerImage == null) {
             this.markerImage = new NonCachingImage("markerImage", new ResourceStreamResource(new MarkerImageResourceStream()));
+
+            final String c = hasMarkerData() ? "hasImage" : "nonImage";
+            this.markerImage.add(AttributeModifier.append("class", c));
         }
         return this.markerImage;
     }
@@ -168,14 +222,20 @@ public class TestPage extends RestrictedPageBase {
         if (this.markerUpload == null) {
             this.markerUpload = new FileUploadPanel("markerUpload");
 
-            final IAjaxCallback callback = new IAjaxCallback() {
+            this.markerUpload.setOnUpload(new IAjaxCallback() {
                 @Override
                 public void call(final AjaxRequestTarget pTarget) {
+                    pTarget.appendJavaScript("$('#" + getMarkerImage().getMarkupId() + "').removeClass('nonImage').addClass('hasImage')");
                     pTarget.add(getMarkerImage());
                 }
-            };
-            this.markerUpload.setOnUpload(callback);
-            this.markerUpload.setOnDelete(callback);
+            });
+            this.markerUpload.setOnDelete(new IAjaxCallback() {
+                @Override
+                public void call(final AjaxRequestTarget pTarget) {
+                    pTarget.appendJavaScript("$('#" + getMarkerImage().getMarkupId() + "').removeClass('hasImage').addClass('nonImage')");
+                    pTarget.add(getMarkerImage());
+                }
+            });
         }
         return this.markerUpload;
     }
@@ -205,6 +265,37 @@ public class TestPage extends RestrictedPageBase {
             ValidatorUtil.setSimpleStringValidator(this.title, EArContent.class, EArContent_.title);
         }
         return this.title;
+    }
+
+    private boolean hasContentData() {
+        return this.arContent.getContent().hasData() || getContentUpload().getDataOperation().hasData();
+    }
+
+    private boolean hasMarkerData() {
+        return this.arContent.getMarker().hasData() || getMarkerUpload().getDataOperation().hasData();
+    }
+
+    private void initialize() {
+        this.add(getForm());
+        this.add(getSubmitter());
+        this.add(getGoIndex());
+        this.add(getMarkerForm());
+        this.add(getContentForm());
+    }
+
+    /**
+     * @param pArContent -
+     * @return -
+     */
+    public static PageParameters createParameters(final EArContent pArContent) {
+        ArgUtil.checkNull(pArContent, "pArContent"); //$NON-NLS-1$
+        if (!pArContent.isPersisted()) {
+            throw new IllegalArgumentException("永続化されていないエンティティは処理出来ません."); //$NON-NLS-1$
+        }
+
+        final PageParameters ret = new PageParameters();
+        ret.set(0, pArContent.getId());
+        return ret;
     }
 
     private class Handler implements Serializable {
@@ -247,11 +338,16 @@ public class TestPage extends RestrictedPageBase {
                 return this.stream;
             }
             final DataOperation dataOperation = getMarkerUpload().getDataOperation();
-            if (!dataOperation.hasData()) {
+            if (dataOperation.hasData()) {
+                this.stream = dataOperation.getData().getInputStream();
+                return this.stream;
+            }
+            try {
+                this.stream = TestPage.this.arContentService.getDataInputStream(TestPage.this.arContent.getMarker());
+                return this.stream;
+            } catch (final NotFound e) {
                 throw new ResourceStreamNotFoundException();
             }
-            this.stream = dataOperation.getData().getInputStream();
-            return this.stream;
         }
 
     }

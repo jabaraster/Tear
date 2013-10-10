@@ -8,9 +8,13 @@
 
 <wicket:extend>
 
-  <button wicket:id="submitter" class="btn btn-primary">
+  <button wicket:id="submitter" class="btn btn-lg btn-primary">
       <i class="glyphicon glyphicon-white glyphicon-ok"></i>
       保存
+  </button>
+  <button wicket:id="goIndex" class="btn btn-lg btn-warning">
+      <i class="glyphicon glyphicon-white glyphicon-remove"></i>
+      キャンセル
   </button>
   <hr />
 
@@ -27,7 +31,7 @@
       <h4>マーカ画像</h4>
       <form wicket:id="markerForm">
         <div wicket:id="markerUpload"></div>
-        <img wicket:id="markerImage" src="" class="markerImage" />
+        <img wicket:id="markerImage" src="" class="markerImage img-rounded" />
       </form>
     </fieldset>
 
@@ -35,7 +39,7 @@
       <h4>動画</h4>
       <form wicket:id="contentForm">
         <div wicket:id="contentUpload" class="uploadField"></div>
-        <span wicket:id="contentLabel" class="contentLabel label label-default"></span>
+        <span wicket:id="contentLabel" class="contentLabel"></span>
       </form>
     </fieldset>
 
