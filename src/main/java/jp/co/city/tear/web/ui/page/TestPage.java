@@ -20,6 +20,7 @@ import javax.inject.Inject;
 import jp.co.city.tear.entity.EArContent;
 import jp.co.city.tear.entity.EArContent_;
 import jp.co.city.tear.service.IArContentService;
+import jp.co.city.tear.web.ui.component.BodyCssHeaderItem;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
@@ -81,6 +82,7 @@ public class TestPage extends RestrictedPageBase {
     public void renderHead(final IHeaderResponse pResponse) {
         super.renderHead(pResponse);
 
+        pResponse.render(BodyCssHeaderItem.get());
         pResponse.render(ComponentCssHeaderItem.forType(TestPage.class));
     }
 
