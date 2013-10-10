@@ -20,6 +20,7 @@ import jp.co.city.tear.web.ui.page.ArContentListPage;
 import jp.co.city.tear.web.ui.page.ArContentUpdatePage;
 import jp.co.city.tear.web.ui.page.LoginPage;
 import jp.co.city.tear.web.ui.page.LogoutPage;
+import jp.co.city.tear.web.ui.page.TestPage;
 import jp.co.city.tear.web.ui.page.TopPage;
 import jp.co.city.tear.web.ui.page.UserDeletePage;
 import jp.co.city.tear.web.ui.page.UserEditPage;
@@ -188,6 +189,9 @@ public class WicketApplication extends WebApplication {
         this.mountPage("mainte/content/new", ArContentInsertPage.class);
         this.mountPage("mainte/content/edit", ArContentUpdatePage.class);
         this.mountPage("mainte/content/delete", ArContentDeletePage.class);
+
+        // TODO
+        this.mountPage("test", TestPage.class);
     }
 
     private void mountResource(final Resource pResource, final String pFilePath, final Duration pCacheDuration) {

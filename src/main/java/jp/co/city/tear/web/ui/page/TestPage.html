@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Test</title>
+</head>
+<body>
+
+<wicket:extend>
+
+  <form wicket:id="form">
+    <button wicket:id="submitter" class="btn btn-default">送信</button>
+    <hr/>
+    <input wicket:id="title" type="text" autofocus />
+  </form>
+  <hr/>
+
+  <form wicket:id="markerForm">
+    <div wicket:id="markerUpload"></div>
+    <img src="" class="markerImage" />
+  </form>
+  <hr/>
+
+  <form wicket:id="contentForm">
+    <div wicket:id="contentUpload" class="uploadField"></div>
+    <span wicket:id="contentLabel" class="contentLabel label label-default">コンテンツ</span>
+  </form>
+
+</wicket:extend>
+
+</body>
+</html>

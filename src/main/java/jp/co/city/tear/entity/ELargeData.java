@@ -116,4 +116,14 @@ public class ELargeData extends EntityBase<ELargeData> {
     public void setDataName(final String pDataName) {
         this.dataName = pDataName;
     }
+
+    /**
+     * @see java.lang.Object#toString()
+     */
+    @SuppressWarnings("nls")
+    @Override
+    public String toString() {
+        return "ELargeData [hasData=" + this.hasData + ", dataName=" + this.dataName + ", contentType=" + this.contentType + ", length="
+                + this.length + ", id=" + this.id + "]";
+    }
 }
