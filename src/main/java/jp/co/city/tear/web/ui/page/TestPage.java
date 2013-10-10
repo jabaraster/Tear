@@ -5,6 +5,7 @@ package jp.co.city.tear.web.ui.page;
 
 import jabara.wicket.ComponentCssHeaderItem;
 import jabara.wicket.FileUploadPanel;
+import jabara.wicket.IAjaxCallback;
 import jabara.wicket.Models;
 
 import java.io.Serializable;
@@ -101,6 +102,15 @@ public class TestPage extends RestrictedPageBase {
     private FileUploadPanel getContentUpload() {
         if (this.contentUpload == null) {
             this.contentUpload = new FileUploadPanel("contentUpload");
+
+            final IAjaxCallback callback = new IAjaxCallback() {
+                @Override
+                public void call(final AjaxRequestTarget pTarget) {
+                    pTarget.add(getContentLabel());
+                }
+            };
+            this.contentUpload.setOnUpload(callback);
+            this.contentUpload.setOnDelete(callback);
         }
         return this.contentUpload;
     }
