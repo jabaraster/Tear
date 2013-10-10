@@ -1,11 +1,18 @@
 @import "Common.less";
 
 @contentAreaWidth: 250px;
-@marginLeft: 200px;
+
+div.fields > fieldset {
+    display: inline-block;
+    > form {
+      border: solid 1px rgba(200,200,200,.5);
+      border-radius: @border-radius-small;
+      background: rgba(230,230,230,.5);
+      padding: 3px;
+    }
+}
 
 form {
-  .inputs(@marginLeft);
-
   li.input > div.progressArea {
     display: block;
 
@@ -70,19 +77,12 @@ div.FileUploadPanel {
     }
 }
 
-@contentAreaMarginLeft: @marginLeft + 4;
-div.uploadField ~ span {
-    display: block;
-    width: @contentAreaWidth;
+span.contentLabel {
     height: @contentAreaWidth / 2;
-    margin-left: @contentAreaMarginLeft;
-    margin-top: 1px;
 }
 
-img.markerImage {
+span.contentLabel, img.markerImage {
     display: block;
     width: @contentAreaWidth;
-    margin-left: @contentAreaMarginLeft;
     margin-top: 1px;
 }
-

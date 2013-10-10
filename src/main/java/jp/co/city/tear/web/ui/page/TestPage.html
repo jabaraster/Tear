@@ -8,23 +8,35 @@
 
 <wicket:extend>
 
-  <form wicket:id="form">
-    <button wicket:id="submitter" class="btn btn-default">送信</button>
-    <hr/>
-    <input wicket:id="title" type="text" autofocus />
-  </form>
-  <hr/>
+  <button wicket:id="submitter" class="btn btn-primary"><i class="glyphicon glyphicon-white glyphicon-ok"></i>保存</button>
+  <hr />
 
-  <form wicket:id="markerForm">
-    <div wicket:id="markerUpload"></div>
-    <img src="" class="markerImage" />
-  </form>
-  <hr/>
+  <fieldset>
+    <h4>ARコンテンツタイトル</h4>
+    <form wicket:id="form">
+      <div wicket:id="feedback"></div>
+      <input wicket:id="title" type="text" autofocus />
+    </form>
+  </fieldset>
 
-  <form wicket:id="contentForm">
-    <div wicket:id="contentUpload" class="uploadField"></div>
-    <span wicket:id="contentLabel" class="contentLabel label label-default">コンテンツ</span>
-  </form>
+  <div class="fields">
+    <fieldset>
+      <h4>マーカ画像</h4>
+      <form wicket:id="markerForm">
+        <div wicket:id="markerUpload"></div>
+        <img wicket:id="markerImage" src="" class="markerImage" />
+      </form>
+    </fieldset>
+
+    <fieldset>
+      <h4>動画</h4>
+      <form wicket:id="contentForm">
+        <div wicket:id="contentUpload" class="uploadField"></div>
+        <span wicket:id="contentLabel" class="contentLabel label label-default"></span>
+      </form>
+    </fieldset>
+
+  </div>
 
 </wicket:extend>
 
