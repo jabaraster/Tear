@@ -1,47 +1,57 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
 <head>
-  <title></title>
-  <meta charset="UTF-8" />
+<meta charset="UTF-8">
+<title>Test</title>
 </head>
 <body>
 
 <wicket:extend>
 
-  <div wicket:id="feedback"></div>
+  <button wicket:id="submitter" class="btn btn-lg btn-primary">
+      <i class="glyphicon glyphicon-white glyphicon-ok"></i>
+      保存
+  </button>
+  <button wicket:id="goIndex" class="btn btn-lg btn-warning">
+      <i class="glyphicon glyphicon-white glyphicon-remove"></i>
+      キャンセル
+  </button>
+  <hr />
 
-  <form wicket:id="form" class="submit">
-    <div class="buttonArea">
-      <button wicket:id="submitter" class="btn btn-primary"><i class="glyphicon glyphicon-white glyphicon-ok"></i>保存</button>
-      <a wicket:id="cancelar" href="#" class="btn btn-warning"><i class="glyphicon glyphicon-white glyphicon-remove"></i> キャンセル</a>
-    </div>
-    <ul>
-      <li class="input">
-        <span class="label">ARタイトル</span>
-        <input wicket:id="title" type="text" />
-      </li>
-    </ul>
-  </form>
+  <fieldset>
+    <form wicket:id="form" class="saveForm">
+      <div wicket:id="feedback"></div>
 
-  <form wicket:id="markerForm">
-    <ul>
-      <li class="input">
-        <span class="label">マーカ画像</span>
-        <div wicket:id="markerUpload" class="uploadField"></div>
-        <img wicket:id="markerImage" class="markerImage" />
-      </li>
-    </ul>
-  </form>
+      <h4>ARコンテンツタイトル</h4>
+      <div><input wicket:id="title" type="text" autofocus /></div>
+      <hr/>
+ 
+      <h4>誤差しきい値</h4>
+      <div><input wicket:id="similarityThreshold" type="range" min="-1.0" max="1.0" step="0.05" class="similarityThreshold" /></div>
+      <span class="similarityThreshold"></span>
+      <hr/>
 
-  <form wicket:id="contentForm">
-    <ul>
-      <li class="input">
-        <span class="label">コンテンツ</span>
+    </form>
+  </fieldset>
+
+  <div class="fields">
+    <fieldset>
+      <h4>マーカ画像</h4>
+      <form wicket:id="markerForm">
+        <div wicket:id="markerUpload"></div>
+        <img wicket:id="markerImage" src="" class="markerImage img-rounded" />
+      </form>
+    </fieldset>
+
+    <fieldset>
+      <h4>動画</h4>
+      <form wicket:id="contentForm">
         <div wicket:id="contentUpload" class="uploadField"></div>
-        <span wicket:id="contentLabel" class=""></span>
-      </li>
-    </ul>
-  </form>
+        <span wicket:id="contentLabel" class="contentLabel"></span>
+      </form>
+    </fieldset>
+
+  </div>
 
 </wicket:extend>
 

@@ -4,16 +4,17 @@
 package jp.co.city.tear.web.ui.page;
 
 import jabara.general.ArgUtil;
+import jabara.general.IoUtil;
 import jabara.general.NotFound;
 import jabara.general.io.DataOperation;
-import jabara.wicket.CssUtil;
+import jabara.wicket.ComponentCssHeaderItem;
+import jabara.wicket.ComponentJavaScriptHeaderItem;
+import jabara.wicket.ErrorClassAppender;
 import jabara.wicket.FileUploadPanel;
 import jabara.wicket.IAjaxCallback;
-import jabara.wicket.JavaScriptUtil;
 import jabara.wicket.Models;
 import jabara.wicket.ValidatorUtil;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 
@@ -26,14 +27,17 @@ import jp.co.city.tear.web.ui.AppSession;
 import jp.co.city.tear.web.ui.component.BodyCssHeaderItem;
 
 import org.apache.wicket.AttributeModifier;
+import org.apache.wicket.Component;
 import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.ajax.form.OnChangeAjaxBehavior;
+import org.apache.wicket.ajax.markup.html.form.AjaxButton;
+import org.apache.wicket.extensions.ajax.markup.html.IndicatingAjaxButton;
 import org.apache.wicket.markup.head.IHeaderResponse;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.TextField;
+import org.apache.wicket.markup.html.image.Image;
 import org.apache.wicket.markup.html.image.NonCachingImage;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.link.Link;
@@ -51,33 +55,31 @@ import org.apache.wicket.util.string.StringValueConversionException;
 /**
  * @author jabaraster
  */
-@SuppressWarnings({ "synthetic-access", "serial" })
+@SuppressWarnings({ "nls", "serial", "synthetic-access" })
 public class ArContentEditPage extends RestrictedPageBase {
-    private static final long       serialVersionUID = -4884364205385771240L;
 
-    private final EArContent        arContent;
+    private final EArContent   arContent;
 
-    private final Handler           handler          = new Handler();
+    private final Handler      handler = new Handler();
 
     @Inject
-    IArContentService               arContentService;
+    IArContentService          arContentService;
 
-    private FeedbackPanel           feedback;
+    private AjaxButton         submitter;
+    private Link<?>            goIndex;
 
-    private Form<?>                 form;
-    private TextField<String>       title;
-    private Button                  submitter;
-    private BookmarkablePageLink<?> cancelar;
+    private Form<?>            form;
+    private FeedbackPanel      feedback;
+    private TextField<String>  title;
+    private WebMarkupContainer similarityThreshold;
 
-    private Form<?>                 markerForm;
-    private FileUploadPanel         markerUpload;
-    private NonCachingImage         markerImage;
+    private Form<?>            markerForm;
+    private FileUploadPanel    markerUpload;
+    private NonCachingImage    markerImage;
 
-    private Form<?>                 contentForm;
-    private FileUploadPanel         contentUpload;
-    private Label                   contentLabel;
-
-    private AttributeModifier       contentLabelClassAppender;
+    private Form<?>            contentForm;
+    private FileUploadPanel    contentUpload;
+    private Label              contentLabel;
 
     /**
      * 
@@ -109,14 +111,16 @@ public class ArContentEditPage extends RestrictedPageBase {
     }
 
     /**
-     * @see jp.co.city.tear.web.ui.page.WebPageBase#renderHead(org.apache.wicket.markup.head.IHeaderResponse)
+     * @see org.apache.wicket.Component#renderHead(org.apache.wicket.markup.head.IHeaderResponse)
      */
     @Override
     public void renderHead(final IHeaderResponse pResponse) {
         super.renderHead(pResponse);
-        CssUtil.addComponentCssReference(pResponse, ArContentEditPage.class);
+
         pResponse.render(BodyCssHeaderItem.get());
-        JavaScriptUtil.addFocusScript(pResponse, getTitle());
+        pResponse.render(ComponentCssHeaderItem.forType(ArContentEditPage.class));
+
+        pResponse.render(ComponentJavaScriptHeaderItem.forType(ArContentEditPage.class));
     }
 
     /**
@@ -124,152 +128,175 @@ public class ArContentEditPage extends RestrictedPageBase {
      */
     @Override
     protected IModel<String> getTitleLabelModel() {
-        return Models.readOnly("ARコンテンツの編集"); //$NON-NLS-1$
+        return Models.readOnly("ARコンテンツの編集");
     }
 
     Form<?> getForm() {
         if (this.form == null) {
-            this.form = new Form<>("form"); //$NON-NLS-1$
+            this.form = new Form<>("form");
+            this.form.add(getFeedback());
             this.form.add(getTitle());
-            this.form.add(getSubmitter());
-            this.form.add(getCancelar());
+            this.form.add(getSimilarityThreshold());
         }
         return this.form;
     }
 
-    Button getSubmitter() {
+    AjaxButton getSubmitter() {
         if (this.submitter == null) {
-            this.submitter = new Button("submitter") { //$NON-NLS-1$
+            this.submitter = new IndicatingAjaxButton("submitter", getForm()) {
                 @Override
-                public void onSubmit() {
-                    ArContentEditPage.this.handler.save();
+                protected void onError(final AjaxRequestTarget pTarget, @SuppressWarnings("unused") final Form<?> pForm) {
+                    ArContentEditPage.this.handler.onSubmitError(pTarget);
+                }
+
+                @Override
+                protected void onSubmit(final AjaxRequestTarget pTarget, @SuppressWarnings("unused") final Form<?> pForm) {
+                    ArContentEditPage.this.handler.onSubmit(pTarget);
                 }
             };
         }
         return this.submitter;
     }
 
-    @SuppressWarnings("nls")
-    private void createContentLabelClassAppender() {
-        final boolean hasData = this.arContent.getContent().hasData() || getContentUpload().getDataOperation().hasData();
-        this.contentLabelClassAppender = AttributeModifier.append("class", hasData ? "label label-success" : "label label-default");
-    }
-
-    private Link<?> getCancelar() {
-        if (this.cancelar == null) {
-            this.cancelar = new BookmarkablePageLink<>("cancelar", ArContentListPage.class); //$NON-NLS-1$
-        }
-        return this.cancelar;
-    }
-
     private Form<?> getContentForm() {
         if (this.contentForm == null) {
-            this.contentForm = new Form<>("contentForm"); //$NON-NLS-1$
+            this.contentForm = new Form<>("contentForm");
             this.contentForm.add(getContentUpload());
             this.contentForm.add(getContentLabel());
         }
         return this.contentForm;
     }
 
-    @SuppressWarnings("nls")
     private Label getContentLabel() {
         if (this.contentLabel == null) {
-            this.contentLabel = new Label("contentLabel", new ContentLabelModel());
-            createContentLabelClassAppender();
-            this.contentLabel.add(this.contentLabelClassAppender);
+            this.contentLabel = new Label("contentLabel", new AbstractReadOnlyModel<String>() {
+                @Override
+                public String getObject() {
+                    return hasContentData() ? "動画あり" : "動画なし";
+                }
+            });
+            final String c = hasContentData() ? "label label-success" : "label label-default";
+            this.contentLabel.add(AttributeModifier.append("class", c));
         }
         return this.contentLabel;
     }
 
     private FileUploadPanel getContentUpload() {
         if (this.contentUpload == null) {
-            this.contentUpload = new FileUploadPanel("contentUpload") { //$NON-NLS-1$
-                @Override
-                protected void onBeforeRender() {
-                    super.onBeforeRender();
-                    getRestorer().setVisible(ArContentEditPage.this.arContent.getContent().hasData());
-                }
-            };
+            this.contentUpload = new FileUploadPanel("contentUpload");
 
-            final IAjaxCallback callback = new IAjaxCallback() {
+            // コンテンツがアップロードされたり削除されたら、class属性を書き換える.
+            // 本来この処理はAttributeModifierを使ってWicketの領域で実装したいのだが
+            // そうするとFileUploadPanelが正常に動作しない(アップロードされたデータがなぜか消えてしまう)
+            final String labelSuccess = "label-success";
+            final String labelDefault = "label-default";
+            this.contentUpload.setOnUpload(new IAjaxCallback() {
                 @Override
                 public void call(final AjaxRequestTarget pTarget) {
-                    ArContentEditPage.this.handler.onContentUpload(pTarget);
+                    pTarget.appendJavaScript(buildClassValueReplaceScript(getContentLabel(), labelDefault, labelSuccess));
+                    pTarget.add(getContentLabel());
                 }
-            };
-            this.contentUpload.setOnDelete(callback);
-            this.contentUpload.setOnReset(callback);
-            this.contentUpload.setOnUpload(callback);
+            });
+            this.contentUpload.setOnDelete(new IAjaxCallback() {
+                @Override
+                public void call(final AjaxRequestTarget pTarget) {
+                    pTarget.appendJavaScript(buildClassValueReplaceScript(getContentLabel(), labelSuccess, labelDefault));
+                    pTarget.add(getContentLabel());
+                }
+            });
         }
         return this.contentUpload;
     }
 
     private FeedbackPanel getFeedback() {
         if (this.feedback == null) {
-            this.feedback = new FeedbackPanel("feedback"); //$NON-NLS-1$
+            this.feedback = new FeedbackPanel("feedback");
         }
         return this.feedback;
     }
 
+    private Link<?> getGoIndex() {
+        if (this.goIndex == null) {
+            this.goIndex = new BookmarkablePageLink<>("goIndex", ArContentListPage.class);
+        }
+        return this.goIndex;
+    }
+
     private Form<?> getMarkerForm() {
         if (this.markerForm == null) {
-            this.markerForm = new Form<>("markerForm"); //$NON-NLS-1$
-            this.markerForm.add(getMarkerImage());
+            this.markerForm = new Form<>("markerForm");
             this.markerForm.add(getMarkerUpload());
+            this.markerForm.add(getMarkerImage());
         }
         return this.markerForm;
     }
 
-    private NonCachingImage getMarkerImage() {
+    @SuppressWarnings("resource")
+    private Image getMarkerImage() {
         if (this.markerImage == null) {
-            this.markerImage = new NonCachingImage("markerImage", new ResourceStreamResource(new MarkerDataResourceStream())); //$NON-NLS-1$
+            this.markerImage = new NonCachingImage("markerImage", new ResourceStreamResource(new MarkerImageResourceStream()));
+
+            final String c = hasMarkerData() ? "hasImage" : "nonImage";
+            this.markerImage.add(AttributeModifier.append("class", c));
         }
         return this.markerImage;
     }
 
     private FileUploadPanel getMarkerUpload() {
         if (this.markerUpload == null) {
-            this.markerUpload = new FileUploadPanel("markerUpload") { //$NON-NLS-1$
-                @Override
-                protected void onBeforeRender() {
-                    super.onBeforeRender();
-                    getRestorer().setVisible(ArContentEditPage.this.arContent.getMarker().hasData());
-                }
-            };
+            this.markerUpload = new FileUploadPanel("markerUpload");
 
-            final IAjaxCallback callback = new IAjaxCallback() {
+            final String nonImage = "nonImage";
+            final String hasImage = "hasImage";
+            this.markerUpload.setOnUpload(new IAjaxCallback() {
                 @Override
                 public void call(final AjaxRequestTarget pTarget) {
+                    pTarget.appendJavaScript(buildClassValueReplaceScript(getMarkerImage(), nonImage, hasImage));
                     pTarget.add(getMarkerImage());
                 }
-            };
-            this.markerUpload.setOnDelete(callback);
-            this.markerUpload.setOnReset(callback);
-            this.markerUpload.setOnUpload(callback);
+            });
+            this.markerUpload.setOnDelete(new IAjaxCallback() {
+                @Override
+                public void call(final AjaxRequestTarget pTarget) {
+                    pTarget.appendJavaScript(buildClassValueReplaceScript(getMarkerImage(), hasImage, nonImage));
+                    pTarget.add(getMarkerImage());
+                }
+            });
         }
         return this.markerUpload;
     }
 
+    private WebMarkupContainer getSimilarityThreshold() {
+        if (this.similarityThreshold == null) {
+            this.similarityThreshold = new WebMarkupContainer("similarityThreshold", new PropertyModel<Object>(this.arContent,
+                    EArContent_.similarityThreshold.getName()));
+            this.similarityThreshold.add(AttributeModifier.replace("value", Float.valueOf(this.arContent.getSimilarityThreshold())));
+        }
+        return this.similarityThreshold;
+    }
+
     private TextField<String> getTitle() {
         if (this.title == null) {
-            this.title = new TextField<>(EArContent_.title.getName(), new PropertyModel<String>(this.arContent, EArContent_.title.getName()));
+            this.title = new TextField<>("title" //
+                    , new PropertyModel<String>(this.arContent, EArContent_.title.getName()) //
+                    , String.class);
             ValidatorUtil.setSimpleStringValidator(this.title, EArContent.class, EArContent_.title);
-
-            // タイトルを入力した後に「保存」を押さずにファイルをアップロードすると入力内容が消えてしまう.
-            // この現象に対処するため、タイトルテキストの変更内容を随時Ajaxで送ってもらうようにする.
-            this.title.add(new OnChangeAjaxBehavior() {
-                @Override
-                protected void onUpdate(@SuppressWarnings("unused") final AjaxRequestTarget pTarget) {
-                    // 画面更新の必要はないので、ここで行う処理はない.
-                }
-            });
         }
         return this.title;
     }
 
+    private boolean hasContentData() {
+        return this.arContent.getContent().hasData() || getContentUpload().getDataOperation().hasData();
+    }
+
+    private boolean hasMarkerData() {
+        return this.arContent.getMarker().hasData() || getMarkerUpload().getDataOperation().hasData();
+    }
+
     private void initialize() {
-        this.add(getFeedback());
         this.add(getForm());
+        this.add(getSubmitter());
+        this.add(getGoIndex());
         this.add(getMarkerForm());
         this.add(getContentForm());
     }
@@ -289,92 +316,64 @@ public class ArContentEditPage extends RestrictedPageBase {
         return ret;
     }
 
-    private class ContentLabelModel extends AbstractReadOnlyModel<String> {
-        @SuppressWarnings("nls")
-        @Override
-        public String getObject() {
-            final DataOperation operation = getContentUpload().getDataOperation();
-            switch (operation.getOperation()) {
-            case DELETE:
-                return "コンテンツなし";
-            case NOOP:
-                return ArContentEditPage.this.arContent.getContent().hasData() ? "コンテンツあり" : "コンテンツなし";
-            case UPDATE:
-                return operation.hasData() ? "コンテンツなし" : "コンテンツあり";
-            default:
-                throw new IllegalStateException();
-            }
+    private static String buildClassValueReplaceScript(final Component pComponent, final String pRemoveValue, final String pAddValue) {
+        if (!pComponent.getOutputMarkupId()) {
+            throw new IllegalStateException();
         }
+        final String markupId = pComponent.getMarkupId();
+        return "$('#" + markupId + "').removeClass('" + pRemoveValue + "').addClass('" + pAddValue + "')";
     }
 
     private class Handler implements Serializable {
 
-        void onContentUpload(final AjaxRequestTarget pTarget) {
-            getContentLabel().remove(ArContentEditPage.this.contentLabelClassAppender);
-            createContentLabelClassAppender();
-            getContentLabel().add(ArContentEditPage.this.contentLabelClassAppender);
+        private final ErrorClassAppender errorClassAppender = new ErrorClassAppender(Models.readOnly("error"));
 
-            pTarget.add(getContentLabel());
-        }
-
-        void save() {
+        void onSubmit(final AjaxRequestTarget pTarget) {
             ArContentEditPage.this.arContentService.insertOrUpdate( //
                     getSession().getLoginUser() //
                     , ArContentEditPage.this.arContent //
                     , getMarkerUpload().getDataOperation() //
                     , getContentUpload().getDataOperation());
-            setResponsePage(ArContentEditPage.class, ArContentEditPage.createParameters(ArContentEditPage.this.arContent));
+            info("保存しました！");
+
+            this.errorClassAppender.addErrorClass(getForm());
+            pTarget.add(getTitle());
+            pTarget.add(getFeedback());
+        }
+
+        void onSubmitError(final AjaxRequestTarget pTarget) {
+            this.errorClassAppender.addErrorClass(getForm());
+            pTarget.add(getTitle());
+            pTarget.add(getFeedback());
         }
     }
 
-    private class MarkerDataResourceStream extends AbstractResourceStream {
-
-        private transient InputStream in;
+    private class MarkerImageResourceStream extends AbstractResourceStream {
+        private InputStream stream;
 
         @Override
         public void close() {
-            if (this.in != null) {
-                try {
-                    this.in.close();
-                } catch (final IOException e) {
-                    // 無視
-                }
-                this.in = null;
-            }
-        }
-
-        @Override
-        public String getContentType() {
-            final DataOperation operation = getMarkerUpload().getDataOperation();
-            switch (operation.getOperation()) {
-            case DELETE:
-                return super.getContentType();
-            case NOOP:
-                return ArContentEditPage.this.arContent.getMarker().getContentType();
-            case UPDATE:
-                return operation.getData().getContentType();
-            default:
-                throw new IllegalStateException();
-            }
+            IoUtil.close(this.stream);
+            this.stream = null;
         }
 
         @Override
         public InputStream getInputStream() throws ResourceStreamNotFoundException {
-            final DataOperation operation = getMarkerUpload().getDataOperation();
-            switch (operation.getOperation()) {
-            case DELETE:
+            if (this.stream != null) {
+                return this.stream;
+            }
+            final DataOperation dataOperation = getMarkerUpload().getDataOperation();
+            if (dataOperation.hasData()) {
+                this.stream = dataOperation.getData().getInputStream();
+                return this.stream;
+            }
+            try {
+                this.stream = ArContentEditPage.this.arContentService.getDataInputStream(ArContentEditPage.this.arContent.getMarker());
+                return this.stream;
+            } catch (final NotFound e) {
                 throw new ResourceStreamNotFoundException();
-            case UPDATE:
-                return operation.getData().getInputStream();
-            case NOOP:
-                try {
-                    return ArContentEditPage.this.arContentService.getDataInputStream(ArContentEditPage.this.arContent.getMarker());
-                } catch (final NotFound e1) {
-                    throw new ResourceStreamNotFoundException();
-                }
-            default:
-                throw new IllegalStateException();
             }
         }
+
     }
 }

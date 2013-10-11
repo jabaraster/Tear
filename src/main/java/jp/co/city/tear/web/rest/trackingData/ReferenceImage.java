@@ -11,12 +11,12 @@ public class ReferenceImage {
      * 
      */
     @XmlAttribute(name = "WidthMM")
-    public int    widthMM  = 80;
+    public int    widthMM  = 60;
     /**
      * 
      */
     @XmlAttribute(name = "HeightMM")
-    public int    heightMM = 80;
+    public int    heightMM = 60;
     /**
      * 
      */

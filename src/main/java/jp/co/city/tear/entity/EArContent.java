@@ -24,14 +24,19 @@ import javax.validation.constraints.Size;
  */
 @Entity
 public class EArContent extends EntityBase<EArContent> {
-    private static final long           serialVersionUID     = 9049354788625755282L;
+    private static final long           serialVersionUID             = 9049354788625755282L;
 
-    private static final BeanProperties _properties          = BeanProperties.getInstance(EArContent.class);
+    private static final BeanProperties _properties                  = BeanProperties.getInstance(EArContent.class);
 
     /**
      * 
      */
-    public static final int             MAX_CHAR_COUNT_TITLE = 100;
+    public static final int             MAX_CHAR_COUNT_TITLE         = 100;
+
+    /**
+     * 
+     */
+    public static final float           DEFAULT_SIMILARITY_THRESHOLD = 0.7f;
 
     /**
      * 
@@ -51,16 +56,21 @@ public class EArContent extends EntityBase<EArContent> {
     /**
      * 
      */
-    @OneToOne
-    @JoinColumn(nullable = false)
-    protected ELargeData                marker               = new ELargeData();
+    protected float                     similarityThreshold          = DEFAULT_SIMILARITY_THRESHOLD;
 
     /**
      * 
      */
     @OneToOne
     @JoinColumn(nullable = false)
-    protected ELargeData                content              = new ELargeData();
+    protected ELargeData                marker                       = new ELargeData();
+
+    /**
+     * 
+     */
+    @OneToOne
+    @JoinColumn(nullable = false)
+    protected ELargeData                content                      = new ELargeData();
 
     /**
      * @param pOperation -
@@ -116,6 +126,13 @@ public class EArContent extends EntityBase<EArContent> {
     }
 
     /**
+     * @return the similarityThreshold
+     */
+    public float getSimilarityThreshold() {
+        return this.similarityThreshold;
+    }
+
+    /**
      * @return titleを返す.
      */
     @Localized
@@ -149,6 +166,13 @@ public class EArContent extends EntityBase<EArContent> {
      */
     public void setOwner(final EUser pOwner) {
         this.owner = pOwner;
+    }
+
+    /**
+     * @param pSimilarityThreshold the similarityThreshold to set
+     */
+    public void setSimilarityThreshold(final float pSimilarityThreshold) {
+        this.similarityThreshold = pSimilarityThreshold;
     }
 
     /**

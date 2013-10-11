@@ -1,49 +1,37 @@
 @import "Common.less";
 
-@contentAreaWidth: 250px;
-@marginLeft: 200px;
+@contentAreaWidth: 400px;
 
-form {
-  .inputs(@marginLeft);
-
-  li.input > div.progressArea {
-    display: block;
-
-    > div.progressBar {
-      height: 20px;
-      width: 100%;
-      background: rgba(200,200,200,1);
-      border: solid 1px rgba(150,150,150,1);
-
-      > div {
-        background: rgba(100,200,100,1);
-        width: 0;
-        white-space: nowrap;
-      }
+fieldset form {
+    input {
     }
-  }
+    input[type='text'] {
+        width: @contentAreaWidth;
+        font-size: large;
+    }
+    input[type='range'] {
+        width: @contentAreaWidth - 100;
+        margin-bottom: 10px;
+    }
+    span.similarityThreshold {
+        display: block;
+        margin-top: -75px;
+        margin-left: 300px;
+        font-size: 500%;
+        font-family: Georgia, Constantia, Hoefler Text, serif;
+        font-style: italic;
+    }
 }
 
-div.buttonArea {
-	> * {
-	  margin-bottom: 0.5em;
-	}
-    margin-bottom: 0.5em;
-    border-bottom: solid 1px rgba(0,0,0,.2);
-    box-shadow: rgba(0,0,0,.3) 0px 1px;
-}
-
-div.uploadField {
+div.fields > fieldset {
     display: inline-block;
-}
-
-
-ul.FileUploadPanelButtons > li {
-    margin: 0.5em;
-
-	> button {
-	    width: 10em;
-	}
+    vertical-align: top;
+    > form {
+      border: solid 1px rgba(200,200,200,.5);
+      border-radius: @border-radius-small;
+      background: rgba(230,230,230,.5);
+      padding: 3px;
+    }
 }
 
 div.FileUploadPanel {
@@ -58,28 +46,33 @@ div.FileUploadPanel {
     button.btn > span {
         display: none;
     }
-    button.deleter {
-        margin-left: 64px;
+    div.restorerArea {
+        display: none;
+    }
+    div.deleterArea {
+        display: none;
     }
     div.progressBarArea {
         position: absolute;
         width: @contentAreaWidth;
+
+        div.progress-bar {
+            white-space: nowrap;
+        }
     }
 }
 
-@contentAreaMarginLeft: @marginLeft + 4;
-div.uploadField ~ span {
-    display: block;
-    width: @contentAreaWidth;
+span.contentLabel {
     height: @contentAreaWidth / 2;
-    margin-left: @contentAreaMarginLeft;
-    margin-top: 1px;
+    padding-top: 30px;
 }
 
-img.markerImage {
+span.contentLabel, img.markerImage {
     display: block;
     width: @contentAreaWidth;
-    margin-left: @contentAreaMarginLeft;
     margin-top: 1px;
 }
 
+img.nonImage {
+    height: @contentAreaWidth / 2;
+}
