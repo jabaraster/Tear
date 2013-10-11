@@ -5,19 +5,36 @@
         var similarityThreshold = $('form.saveForm input[type="range"].similarityThreshold');
         var similarityThresholdValueLabel = $('form.saveForm span.similarityThreshold');
 
-        similarityThresholdValueLabel.text(similarityThreshold.val());
+        setSimilarityThresholdValueToLabel(similarityThreshold, similarityThresholdValueLabel);
 
         similarityThreshold.on('change', function() {
-            var val = similarityThreshold.val() + '';
-            if (val === '1') {
-                similarityThresholdValueLabel.text('1.00');
-            } else if (val === '0') {
-                similarityThresholdValueLabel.text('0.00');
-            } else if (val.length === 3) {
-                similarityThresholdValueLabel.text(val + '0');
-            } else {
-                similarityThresholdValueLabel.text(val);
-            }
+            setSimilarityThresholdValueToLabel(similarityThreshold, similarityThresholdValueLabel);
         });
+    }
+
+    function setSimilarityThresholdValueToLabel(pSimilarityThreshold, pSimilarityThresholdValueLabel) {
+        var val = pSimilarityThreshold.val() - 0; // numberに変換
+        if (isNaN(val)) {
+            pSimilarityThresholdValueLabel.text('NaN');
+            return;
+        }
+        var absVal = Math.abs(val);
+        var text = toText(absVal);
+        var sign = val < 0 ? '-' : '+';
+        pSimilarityThresholdValueLabel.text(sign + text);
+    }
+
+    function toText(pNumber) {
+        var s = pNumber + "";
+        switch (s.length) {
+        case 1: // '0' or '1'
+            return s + '.00';
+        case 3: // '0.1' のようなケース
+            return s + '0';
+        case 4: // '0.15' のようなケース
+            return s;
+        default: // 想定外
+            return s;
+        }
     }
 })();

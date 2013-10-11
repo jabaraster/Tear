@@ -128,6 +128,8 @@ public class EArContent extends EntityBase<EArContent> {
     /**
      * @return the similarityThreshold
      */
+    @Localized
+    @Order(250)
     public float getSimilarityThreshold() {
         return this.similarityThreshold;
     }

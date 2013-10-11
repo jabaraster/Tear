@@ -111,7 +111,7 @@ public class ArContentListPage extends RestrictedPageBase {
                     return pArgument.getContent();
                 }
             }));
-
+            columns.add(new AttributeColumn<EArContent>(EArContent.getMeta(), EArContent_.similarityThreshold));
             columns.add(new DateTimeColumn<EArContent>(EArContent.getMeta(), EntityBase_.created));
             columns.add(new DateTimeColumn<EArContent>(EArContent.getMeta(), EntityBase_.updated));
 

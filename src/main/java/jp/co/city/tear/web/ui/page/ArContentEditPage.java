@@ -25,6 +25,7 @@ import jp.co.city.tear.entity.EArContent_;
 import jp.co.city.tear.service.IArContentService;
 import jp.co.city.tear.web.ui.AppSession;
 import jp.co.city.tear.web.ui.component.BodyCssHeaderItem;
+import jp.co.city.tear.web.ui.component.RangeField;
 
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
@@ -55,31 +56,47 @@ import org.apache.wicket.util.string.StringValueConversionException;
 /**
  * @author jabaraster
  */
-@SuppressWarnings({ "nls", "serial", "synthetic-access" })
+@SuppressWarnings({ "serial", "synthetic-access" })
 public class ArContentEditPage extends RestrictedPageBase {
+    private static final long serialVersionUID          = 980535287221358707L;
 
-    private final EArContent   arContent;
+    /**
+     * 
+     */
+    public static final Float SIMILARITY_THRESHOLD_MIN  = Float.valueOf(-1f);
 
-    private final Handler      handler = new Handler();
+    /**
+     * 
+     */
+    public static final Float SIMILARITY_THRESHOLD_MAX  = Float.valueOf(1f);
+
+    /**
+     * 
+     */
+    public static final Float SIMILARITY_THRESHOLD_STEP = Float.valueOf(0.05f);
+
+    private final EArContent  arContent;
+
+    private final Handler     handler                   = new Handler();
 
     @Inject
-    IArContentService          arContentService;
+    IArContentService         arContentService;
 
-    private AjaxButton         submitter;
-    private Link<?>            goIndex;
+    private AjaxButton        submitter;
+    private Link<?>           goIndex;
 
-    private Form<?>            form;
-    private FeedbackPanel      feedback;
-    private TextField<String>  title;
-    private WebMarkupContainer similarityThreshold;
+    private Form<?>           form;
+    private FeedbackPanel     feedback;
+    private TextField<String> title;
+    private RangeField<Float> similarityThreshold;
 
-    private Form<?>            markerForm;
-    private FileUploadPanel    markerUpload;
-    private NonCachingImage    markerImage;
+    private Form<?>           markerForm;
+    private FileUploadPanel   markerUpload;
+    private NonCachingImage   markerImage;
 
-    private Form<?>            contentForm;
-    private FileUploadPanel    contentUpload;
-    private Label              contentLabel;
+    private Form<?>           contentForm;
+    private FileUploadPanel   contentUpload;
+    private Label             contentLabel;
 
     /**
      * 
@@ -128,12 +145,12 @@ public class ArContentEditPage extends RestrictedPageBase {
      */
     @Override
     protected IModel<String> getTitleLabelModel() {
-        return Models.readOnly("ARコンテンツの編集");
+        return Models.readOnly("ARコンテンツの編集"); //$NON-NLS-1$
     }
 
     Form<?> getForm() {
         if (this.form == null) {
-            this.form = new Form<>("form");
+            this.form = new Form<>("form"); //$NON-NLS-1$
             this.form.add(getFeedback());
             this.form.add(getTitle());
             this.form.add(getSimilarityThreshold());
@@ -143,7 +160,7 @@ public class ArContentEditPage extends RestrictedPageBase {
 
     AjaxButton getSubmitter() {
         if (this.submitter == null) {
-            this.submitter = new IndicatingAjaxButton("submitter", getForm()) {
+            this.submitter = new IndicatingAjaxButton("submitter", getForm()) { //$NON-NLS-1$
                 @Override
                 protected void onError(final AjaxRequestTarget pTarget, @SuppressWarnings("unused") final Form<?> pForm) {
                     ArContentEditPage.this.handler.onSubmitError(pTarget);
@@ -160,13 +177,14 @@ public class ArContentEditPage extends RestrictedPageBase {
 
     private Form<?> getContentForm() {
         if (this.contentForm == null) {
-            this.contentForm = new Form<>("contentForm");
+            this.contentForm = new Form<>("contentForm"); //$NON-NLS-1$
             this.contentForm.add(getContentUpload());
             this.contentForm.add(getContentLabel());
         }
         return this.contentForm;
     }
 
+    @SuppressWarnings("nls")
     private Label getContentLabel() {
         if (this.contentLabel == null) {
             this.contentLabel = new Label("contentLabel", new AbstractReadOnlyModel<String>() {
@@ -183,13 +201,13 @@ public class ArContentEditPage extends RestrictedPageBase {
 
     private FileUploadPanel getContentUpload() {
         if (this.contentUpload == null) {
-            this.contentUpload = new FileUploadPanel("contentUpload");
+            this.contentUpload = new FileUploadPanel("contentUpload"); //$NON-NLS-1$
 
             // コンテンツがアップロードされたり削除されたら、class属性を書き換える.
             // 本来この処理はAttributeModifierを使ってWicketの領域で実装したいのだが
             // そうするとFileUploadPanelが正常に動作しない(アップロードされたデータがなぜか消えてしまう)
-            final String labelSuccess = "label-success";
-            final String labelDefault = "label-default";
+            final String labelSuccess = "label-success"; //$NON-NLS-1$
+            final String labelDefault = "label-default"; //$NON-NLS-1$
             this.contentUpload.setOnUpload(new IAjaxCallback() {
                 @Override
                 public void call(final AjaxRequestTarget pTarget) {
@@ -210,21 +228,21 @@ public class ArContentEditPage extends RestrictedPageBase {
 
     private FeedbackPanel getFeedback() {
         if (this.feedback == null) {
-            this.feedback = new FeedbackPanel("feedback");
+            this.feedback = new FeedbackPanel("feedback"); //$NON-NLS-1$
         }
         return this.feedback;
     }
 
     private Link<?> getGoIndex() {
         if (this.goIndex == null) {
-            this.goIndex = new BookmarkablePageLink<>("goIndex", ArContentListPage.class);
+            this.goIndex = new BookmarkablePageLink<>("goIndex", ArContentListPage.class); //$NON-NLS-1$
         }
         return this.goIndex;
     }
 
     private Form<?> getMarkerForm() {
         if (this.markerForm == null) {
-            this.markerForm = new Form<>("markerForm");
+            this.markerForm = new Form<>("markerForm"); //$NON-NLS-1$
             this.markerForm.add(getMarkerUpload());
             this.markerForm.add(getMarkerImage());
         }
@@ -234,20 +252,20 @@ public class ArContentEditPage extends RestrictedPageBase {
     @SuppressWarnings("resource")
     private Image getMarkerImage() {
         if (this.markerImage == null) {
-            this.markerImage = new NonCachingImage("markerImage", new ResourceStreamResource(new MarkerImageResourceStream()));
+            this.markerImage = new NonCachingImage("markerImage", new ResourceStreamResource(new MarkerImageResourceStream())); //$NON-NLS-1$
 
-            final String c = hasMarkerData() ? "hasImage" : "nonImage";
-            this.markerImage.add(AttributeModifier.append("class", c));
+            final String c = hasMarkerData() ? "hasImage" : "nonImage"; //$NON-NLS-1$ //$NON-NLS-2$
+            this.markerImage.add(AttributeModifier.append("class", c)); //$NON-NLS-1$
         }
         return this.markerImage;
     }
 
     private FileUploadPanel getMarkerUpload() {
         if (this.markerUpload == null) {
-            this.markerUpload = new FileUploadPanel("markerUpload");
+            this.markerUpload = new FileUploadPanel("markerUpload"); //$NON-NLS-1$
 
-            final String nonImage = "nonImage";
-            final String hasImage = "hasImage";
+            final String nonImage = "nonImage"; //$NON-NLS-1$
+            final String hasImage = "hasImage"; //$NON-NLS-1$
             this.markerUpload.setOnUpload(new IAjaxCallback() {
                 @Override
                 public void call(final AjaxRequestTarget pTarget) {
@@ -268,16 +286,22 @@ public class ArContentEditPage extends RestrictedPageBase {
 
     private WebMarkupContainer getSimilarityThreshold() {
         if (this.similarityThreshold == null) {
-            this.similarityThreshold = new WebMarkupContainer("similarityThreshold", new PropertyModel<Object>(this.arContent,
-                    EArContent_.similarityThreshold.getName()));
-            this.similarityThreshold.add(AttributeModifier.replace("value", Float.valueOf(this.arContent.getSimilarityThreshold())));
+            this.similarityThreshold = new RangeField<>( //
+                    "similarityThreshold" // //$NON-NLS-1$
+                    , Float.class //
+                    , new PropertyModel<Float>(this.arContent, EArContent_.similarityThreshold.getName()) //
+                    , Models.of(SIMILARITY_THRESHOLD_MIN) //
+                    , Models.of(SIMILARITY_THRESHOLD_MAX) //
+                    , Models.of(SIMILARITY_THRESHOLD_STEP) //
+            );
+            this.similarityThreshold.setRangeValidator();
         }
         return this.similarityThreshold;
     }
 
     private TextField<String> getTitle() {
         if (this.title == null) {
-            this.title = new TextField<>("title" //
+            this.title = new TextField<>("title" // //$NON-NLS-1$
                     , new PropertyModel<String>(this.arContent, EArContent_.title.getName()) //
                     , String.class);
             ValidatorUtil.setSimpleStringValidator(this.title, EArContent.class, EArContent_.title);
@@ -316,6 +340,7 @@ public class ArContentEditPage extends RestrictedPageBase {
         return ret;
     }
 
+    @SuppressWarnings("nls")
     private static String buildClassValueReplaceScript(final Component pComponent, final String pRemoveValue, final String pAddValue) {
         if (!pComponent.getOutputMarkupId()) {
             throw new IllegalStateException();
@@ -326,7 +351,7 @@ public class ArContentEditPage extends RestrictedPageBase {
 
     private class Handler implements Serializable {
 
-        private final ErrorClassAppender errorClassAppender = new ErrorClassAppender(Models.readOnly("error"));
+        private final ErrorClassAppender errorClassAppender = new ErrorClassAppender(Models.readOnly("error")); //$NON-NLS-1$
 
         void onSubmit(final AjaxRequestTarget pTarget) {
             ArContentEditPage.this.arContentService.insertOrUpdate( //
@@ -334,7 +359,7 @@ public class ArContentEditPage extends RestrictedPageBase {
                     , ArContentEditPage.this.arContent //
                     , getMarkerUpload().getDataOperation() //
                     , getContentUpload().getDataOperation());
-            info("保存しました！");
+            info("保存しました！"); //$NON-NLS-1$
 
             this.errorClassAppender.addErrorClass(getForm());
             pTarget.add(getTitle());

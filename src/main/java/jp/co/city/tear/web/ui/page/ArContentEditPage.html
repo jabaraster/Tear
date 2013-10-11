@@ -20,16 +20,15 @@
 
   <fieldset>
     <form wicket:id="form" class="saveForm">
-      <div wicket:id="feedback"></div>
 
       <h4>ARコンテンツタイトル</h4>
+      <div wicket:id="feedback"></div>
       <div><input wicket:id="title" type="text" autofocus /></div>
       <hr/>
  
       <h4>誤差しきい値</h4>
       <div><input wicket:id="similarityThreshold" type="range" min="-1.0" max="1.0" step="0.05" class="similarityThreshold" /></div>
       <span class="similarityThreshold"></span>
-      <hr/>
 
     </form>
   </fieldset>
