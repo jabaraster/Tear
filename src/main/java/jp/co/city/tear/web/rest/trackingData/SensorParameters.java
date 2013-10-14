@@ -9,21 +9,21 @@ public class SensorParameters {
     /**
      * 
      */
-    @XmlElement
-    public String FeatureDescriptorAlignment  = "regular"; //$NON-NLS-1$
+    @XmlElement(name = "FeatureDescriptorAlignment")
+    public String featureDescriptorAlignment  = "regular"; //$NON-NLS-1$
     /**
      * 
      */
-    @XmlElement
-    public int    MaxObjectsToDetectPerFrame  = 5;
+    @XmlElement(name = "MaxObjectsToDetectPerFrame")
+    public int    maxObjectsToDetectPerFrame  = 5;
     /**
      * 
      */
-    @XmlElement
-    public int    MaxObjectsToTrackInParallel = 1;
+    @XmlElement(name = "MaxObjectsToTrackInParallel")
+    public int    maxObjectsToTrackInParallel = 1;
     /**
      * 
      */
-    @XmlElement
-    public float  SimilarityThreshold         = 0.7f;
+    @XmlElement(name = "SimilarityThreshold")
+    public float  similarityThreshold         = 0.7f;
 }

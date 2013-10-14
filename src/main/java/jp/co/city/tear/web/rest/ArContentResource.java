@@ -191,6 +191,7 @@ public class ArContentResource {
             final SensorCOS cos = new SensorCOS();
             cos.sensorCosID = "Patch" + (i + 1); //$NON-NLS-1$
             cos.parameters.referenceImage.name = "image_" + arContent.getId().longValue() + "." + arContent.getMarker().getType(); //$NON-NLS-1$//$NON-NLS-2$
+            cos.parameters.similarityThreshold = arContent.getSimilarityThreshold();
             sensor.sensorCOS.add(cos);
 
             final Connection connection = new Connection();
@@ -220,10 +221,8 @@ public class ArContentResource {
         sb.append(absoluteUrlRoot).append(loadedMovieUri.toASCIIString()).append(lineSeparator);
 
         final String separator = ","; //$NON-NLS-1$
-        final List<EArContent> contents = this.arContentService.getAll();
-        for (int i = 0; i < contents.size(); i++) {
-            final EArContent content = contents.get(i);
-            sb.append(i + 1) //
+        for (final EArContent content : this.arContentService.getAll()) {
+            sb.append(content.getId().longValue()) //
                     .append(separator).append(buildMarkerAbsoluteUrl(content)) //
                     .append(separator).append(buildContentAbsoluteUrl(content)) //
                     .append(lineSeparator);

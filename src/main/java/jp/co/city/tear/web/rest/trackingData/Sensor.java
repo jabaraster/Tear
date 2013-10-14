@@ -13,8 +13,8 @@ public class Sensor {
     /**
      * 
      */
-    @XmlElement
-    public String                 SensorID  = "FeatureTracking1";        //$NON-NLS-1$
+    @XmlElement(name = "SensorID")
+    public String                 sensorID  = "FeatureTracking1";        //$NON-NLS-1$
     /**
      * 
      */

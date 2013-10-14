@@ -9,7 +9,7 @@ public class SensorCOS {
     /**
      * 
      */
-    @XmlElement
+    @XmlElement(name = "SensorCosID")
     public String                    sensorCosID = "Patch";                  //$NON-NLS-1$
     /**
      * 
