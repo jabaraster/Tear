@@ -59,47 +59,50 @@ import org.apache.wicket.util.string.StringValueConversionException;
  */
 @SuppressWarnings({ "serial", "synthetic-access" })
 public class ArContentEditPage extends RestrictedPageBase {
-    private static final long serialVersionUID          = 980535287221358707L;
+    private static final long   serialVersionUID           = 980535287221358707L;
 
     /**
      * 
      */
-    public static final Float SIMILARITY_THRESHOLD_MIN  = Float.valueOf(-1f);
+    public static final Float   SIMILARITY_THRESHOLD_MIN   = Float.valueOf(-1f);
 
     /**
      * 
      */
-    public static final Float SIMILARITY_THRESHOLD_MAX  = Float.valueOf(1f);
+    public static final Float   SIMILARITY_THRESHOLD_MAX   = Float.valueOf(1f);
 
     /**
      * 
      */
-    public static final Float SIMILARITY_THRESHOLD_STEP = Float.valueOf(0.05f);
+    public static final Float   SIMILARITY_THRESHOLD_STEP  = Float.valueOf(0.05f);
 
-    private final EArContent  arContent;
+    private static final String CLASS_VALUE_HAS_CONTENT    = "label-warning";     //$NON-NLS-1$
+    private static final String CLASS_VALUE_HAS_NO_CONTENT = "label-default";     //$NON-NLS-1$
 
-    private final Handler     handler                   = new Handler();
+    private final EArContent    arContent;
+
+    private final Handler       handler                    = new Handler();
 
     @Inject
-    IArContentService         arContentService;
+    IArContentService           arContentService;
 
-    private FeedbackPanel     feedback;
+    private FeedbackPanel       feedback;
 
-    private AjaxButton        submitter;
-    private Link<?>           goIndex;
+    private AjaxButton          submitter;
+    private Link<?>             goIndex;
 
-    private Form<?>           form;
-    private FeedbackPanel     titleFeedback;
-    private TextField<String> title;
-    private RangeField<Float> similarityThreshold;
+    private Form<?>             form;
+    private FeedbackPanel       titleFeedback;
+    private TextField<String>   title;
+    private RangeField<Float>   similarityThreshold;
 
-    private Form<?>           markerForm;
-    private FileUploadPanel   markerUpload;
-    private NonCachingImage   markerImage;
+    private Form<?>             markerForm;
+    private FileUploadPanel     markerUpload;
+    private NonCachingImage     markerImage;
 
-    private Form<?>           contentForm;
-    private FileUploadPanel   contentUpload;
-    private Label             contentLabel;
+    private Form<?>             contentForm;
+    private FileUploadPanel     contentUpload;
+    private Label               contentLabel;
 
     /**
      * 
@@ -196,7 +199,7 @@ public class ArContentEditPage extends RestrictedPageBase {
                     return hasContentData() ? "動画あり" : "動画なし";
                 }
             });
-            final String c = hasContentData() ? "label label-success" : "label label-default";
+            final String c = hasContentData() ? CLASS_VALUE_HAS_CONTENT : CLASS_VALUE_HAS_NO_CONTENT;
             this.contentLabel.add(AttributeModifier.append("class", c));
         }
         return this.contentLabel;
@@ -209,19 +212,19 @@ public class ArContentEditPage extends RestrictedPageBase {
             // コンテンツがアップロードされたり削除されたら、class属性を書き換える.
             // 本来この処理はAttributeModifierを使ってWicketの領域で実装したいのだが
             // そうするとFileUploadPanelが正常に動作しない(アップロードされたデータがなぜか消えてしまう)
-            final String labelSuccess = "label-success"; //$NON-NLS-1$
-            final String labelDefault = "label-default"; //$NON-NLS-1$
             this.contentUpload.setOnUpload(new IAjaxCallback() {
                 @Override
                 public void call(final AjaxRequestTarget pTarget) {
-                    pTarget.appendJavaScript(buildClassValueReplaceScript(getContentLabel(), labelDefault, labelSuccess));
+                    pTarget.appendJavaScript(buildClassValueReplaceScript(getContentLabel(), ArContentEditPage.CLASS_VALUE_HAS_NO_CONTENT,
+                            ArContentEditPage.CLASS_VALUE_HAS_CONTENT));
                     pTarget.add(getContentLabel());
                 }
             });
             this.contentUpload.setOnDelete(new IAjaxCallback() {
                 @Override
                 public void call(final AjaxRequestTarget pTarget) {
-                    pTarget.appendJavaScript(buildClassValueReplaceScript(getContentLabel(), labelSuccess, labelDefault));
+                    pTarget.appendJavaScript(buildClassValueReplaceScript(getContentLabel(), ArContentEditPage.CLASS_VALUE_HAS_CONTENT,
+                            ArContentEditPage.CLASS_VALUE_HAS_NO_CONTENT));
                     pTarget.add(getContentLabel());
                 }
             });
