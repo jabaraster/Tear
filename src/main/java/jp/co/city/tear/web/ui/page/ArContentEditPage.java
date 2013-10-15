@@ -42,6 +42,7 @@ import org.apache.wicket.markup.html.image.Image;
 import org.apache.wicket.markup.html.image.NonCachingImage;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.link.Link;
+import org.apache.wicket.markup.html.panel.ComponentFeedbackPanel;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
@@ -82,11 +83,13 @@ public class ArContentEditPage extends RestrictedPageBase {
     @Inject
     IArContentService         arContentService;
 
+    private FeedbackPanel     feedback;
+
     private AjaxButton        submitter;
     private Link<?>           goIndex;
 
     private Form<?>           form;
-    private FeedbackPanel     feedback;
+    private FeedbackPanel     titleFeedback;
     private TextField<String> title;
     private RangeField<Float> similarityThreshold;
 
@@ -151,7 +154,7 @@ public class ArContentEditPage extends RestrictedPageBase {
     Form<?> getForm() {
         if (this.form == null) {
             this.form = new Form<>("form"); //$NON-NLS-1$
-            this.form.add(getFeedback());
+            this.form.add(getTitleFeedback());
             this.form.add(getTitle());
             this.form.add(getSimilarityThreshold());
         }
@@ -228,7 +231,7 @@ public class ArContentEditPage extends RestrictedPageBase {
 
     private FeedbackPanel getFeedback() {
         if (this.feedback == null) {
-            this.feedback = new FeedbackPanel("feedback"); //$NON-NLS-1$
+            this.feedback = new ComponentFeedbackPanel("feedback", this); //$NON-NLS-1$
         }
         return this.feedback;
     }
@@ -309,6 +312,13 @@ public class ArContentEditPage extends RestrictedPageBase {
         return this.title;
     }
 
+    private FeedbackPanel getTitleFeedback() {
+        if (this.titleFeedback == null) {
+            this.titleFeedback = new ComponentFeedbackPanel("titleFeedback", getTitle()); //$NON-NLS-1$
+        }
+        return this.titleFeedback;
+    }
+
     private boolean hasContentData() {
         return this.arContent.getContent().hasData() || getContentUpload().getDataOperation().hasData();
     }
@@ -318,6 +328,7 @@ public class ArContentEditPage extends RestrictedPageBase {
     }
 
     private void initialize() {
+        this.add(getFeedback());
         this.add(getForm());
         this.add(getSubmitter());
         this.add(getGoIndex());
@@ -362,13 +373,17 @@ public class ArContentEditPage extends RestrictedPageBase {
             info("保存しました！"); //$NON-NLS-1$
 
             this.errorClassAppender.addErrorClass(getForm());
+            pTarget.appendJavaScript("setTimeout(function() { $('#" + getFeedback().getMarkupId() + "').hide('slow'); }, 1000);"); //$NON-NLS-1$ //$NON-NLS-2$
+
             pTarget.add(getTitle());
+            pTarget.add(getTitleFeedback());
             pTarget.add(getFeedback());
         }
 
         void onSubmitError(final AjaxRequestTarget pTarget) {
             this.errorClassAppender.addErrorClass(getForm());
             pTarget.add(getTitle());
+            pTarget.add(getTitleFeedback());
             pTarget.add(getFeedback());
         }
     }

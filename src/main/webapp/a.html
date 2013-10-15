@@ -12,22 +12,23 @@
       box-shadow: rgba(0,0,0,.3) 0px 1px;
     }
   </style>
+  <script type="text/javascript" src="/ui/wicket/resource/org.apache.wicket.resource.JQueryResourceReference/jquery/jquery-1.10.1-ver-1378336460000.js"></script>
 </head>
 <body>
 
-  <div id="container">
-    <img src="/ui/wicket/resource/org.apache.wicket.ajax.AbstractDefaultAjaxBehavior/indicator-ver-1378255270000.gif" />
-    Now loading ...
-  </div>
-
-  <button id="bt">Ajax</button>
-
-
-  <div id="scripts" style="display: none;">
-  </div>
-
-  <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
-  <script src="a.js"></script>
+  <button>postLog</button>
+  <script>
+    $('button').click(function() {
+        $.ajax({
+            type: 'post',
+            url: '/rest/log/new',
+            headers: {
+                'content-type': 'application/json'
+            },
+            data: '{ "playDatetime": 20000000, "arContentId": 10, "trackingDescriptor": "abcde" }'
+        });
+    });
+  </script>
 
 </body>
 </html>

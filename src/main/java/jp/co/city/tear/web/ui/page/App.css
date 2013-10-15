@@ -1,1 +1,1 @@
-@charset "UTF-8";li{list-style:none}input.error{color:#9b1e1e;background:#ffb4b4}form div.button{text-align:right}
+@charset "UTF-8";li{list-style:none}input.error{color:#9b1e1e;background:#ffb4b4}hr{margin-top:10px;margin-bottom:20px}div.feedback{margin-top:5px;margin-bottom:5px;font-size:120%}div.feedback ul.feedbackPanel{padding-left:5px}div.feedback ul.feedbackPanel li.feedbackPanelERROR{color:#ffe6e6;background:#ff1e1e}
