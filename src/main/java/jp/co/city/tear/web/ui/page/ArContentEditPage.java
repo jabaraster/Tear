@@ -9,9 +9,9 @@ import jabara.general.NotFound;
 import jabara.general.io.DataOperation;
 import jabara.wicket.ComponentCssHeaderItem;
 import jabara.wicket.ComponentJavaScriptHeaderItem;
+import jabara.wicket.ContentTypeValidator;
 import jabara.wicket.ErrorClassAppender;
 import jabara.wicket.FileUploadPanel;
-import jabara.wicket.IAjaxCallback;
 import jabara.wicket.Models;
 import jabara.wicket.ValidatorUtil;
 
@@ -99,10 +99,12 @@ public class ArContentEditPage extends RestrictedPageBase {
     private Form<?>             markerForm;
     private FileUploadPanel     markerUpload;
     private NonCachingImage     markerImage;
+    private FeedbackPanel       markerUploadFeedback;
 
     private Form<?>             contentForm;
     private FileUploadPanel     contentUpload;
     private Label               contentLabel;
+    private FeedbackPanel       contentUploadFeedback;
 
     /**
      * 
@@ -186,6 +188,7 @@ public class ArContentEditPage extends RestrictedPageBase {
             this.contentForm = new Form<>("contentForm"); //$NON-NLS-1$
             this.contentForm.add(getContentUpload());
             this.contentForm.add(getContentLabel());
+            this.contentForm.add(getContentUploadFeedback());
         }
         return this.contentForm;
     }
@@ -207,29 +210,27 @@ public class ArContentEditPage extends RestrictedPageBase {
 
     private FileUploadPanel getContentUpload() {
         if (this.contentUpload == null) {
-            this.contentUpload = new FileUploadPanel("contentUpload"); //$NON-NLS-1$
+            this.contentUpload = new FileUploadPanel("contentUpload") { //$NON-NLS-1$
+                @Override
+                protected void onUploadError(final AjaxRequestTarget pTarget, @SuppressWarnings("unused") final Form<?> pForm) {
+                    ArContentEditPage.this.handler.onContentUploadError(pTarget);
+                }
 
-            // コンテンツがアップロードされたり削除されたら、class属性を書き換える.
-            // 本来この処理はAttributeModifierを使ってWicketの領域で実装したいのだが
-            // そうするとFileUploadPanelが正常に動作しない(アップロードされたデータがなぜか消えてしまう)
-            this.contentUpload.setOnUpload(new IAjaxCallback() {
                 @Override
-                public void call(final AjaxRequestTarget pTarget) {
-                    pTarget.appendJavaScript(buildClassValueReplaceScript(getContentLabel(), ArContentEditPage.CLASS_VALUE_HAS_NO_CONTENT,
-                            ArContentEditPage.CLASS_VALUE_HAS_CONTENT));
-                    pTarget.add(getContentLabel());
+                protected void onUploadSubmit(final AjaxRequestTarget pTarget, @SuppressWarnings("unused") final Form<?> pForm) {
+                    ArContentEditPage.this.handler.onContentUploadSubmit(pTarget);
                 }
-            });
-            this.contentUpload.setOnDelete(new IAjaxCallback() {
-                @Override
-                public void call(final AjaxRequestTarget pTarget) {
-                    pTarget.appendJavaScript(buildClassValueReplaceScript(getContentLabel(), ArContentEditPage.CLASS_VALUE_HAS_CONTENT,
-                            ArContentEditPage.CLASS_VALUE_HAS_NO_CONTENT));
-                    pTarget.add(getContentLabel());
-                }
-            });
+            };
+            this.contentUpload.getFile().add(ContentTypeValidator.type("video", "動画")); //$NON-NLS-1$//$NON-NLS-2$
         }
         return this.contentUpload;
+    }
+
+    private FeedbackPanel getContentUploadFeedback() {
+        if (this.contentUploadFeedback == null) {
+            this.contentUploadFeedback = new ComponentFeedbackPanel("contentUploadFeedback", getContentUpload().getFile()); //$NON-NLS-1$
+        }
+        return this.contentUploadFeedback;
     }
 
     private FeedbackPanel getFeedback() {
@@ -251,6 +252,7 @@ public class ArContentEditPage extends RestrictedPageBase {
             this.markerForm = new Form<>("markerForm"); //$NON-NLS-1$
             this.markerForm.add(getMarkerUpload());
             this.markerForm.add(getMarkerImage());
+            this.markerForm.add(getMarkerUploadFeedback());
         }
         return this.markerForm;
     }
@@ -268,26 +270,27 @@ public class ArContentEditPage extends RestrictedPageBase {
 
     private FileUploadPanel getMarkerUpload() {
         if (this.markerUpload == null) {
-            this.markerUpload = new FileUploadPanel("markerUpload"); //$NON-NLS-1$
+            this.markerUpload = new FileUploadPanel("markerUpload") { //$NON-NLS-1$
+                @Override
+                protected void onUploadError(final AjaxRequestTarget pTarget, @SuppressWarnings("unused") final Form<?> pForm) {
+                    ArContentEditPage.this.handler.onMarkerUploadError(pTarget);
+                }
 
-            final String nonImage = "nonImage"; //$NON-NLS-1$
-            final String hasImage = "hasImage"; //$NON-NLS-1$
-            this.markerUpload.setOnUpload(new IAjaxCallback() {
                 @Override
-                public void call(final AjaxRequestTarget pTarget) {
-                    pTarget.appendJavaScript(buildClassValueReplaceScript(getMarkerImage(), nonImage, hasImage));
-                    pTarget.add(getMarkerImage());
+                protected void onUploadSubmit(final AjaxRequestTarget pTarget, @SuppressWarnings("unused") final Form<?> pForm) {
+                    ArContentEditPage.this.handler.onMarkerUploadSubmit(pTarget);
                 }
-            });
-            this.markerUpload.setOnDelete(new IAjaxCallback() {
-                @Override
-                public void call(final AjaxRequestTarget pTarget) {
-                    pTarget.appendJavaScript(buildClassValueReplaceScript(getMarkerImage(), hasImage, nonImage));
-                    pTarget.add(getMarkerImage());
-                }
-            });
+            };
+            this.markerUpload.getFile().add(ContentTypeValidator.type("image", "画像")); //$NON-NLS-1$//$NON-NLS-2$
         }
         return this.markerUpload;
+    }
+
+    private FeedbackPanel getMarkerUploadFeedback() {
+        if (this.markerUploadFeedback == null) {
+            this.markerUploadFeedback = new ComponentFeedbackPanel("markerUploadFeedback", getMarkerUpload().getFile()); //$NON-NLS-1$
+        }
+        return this.markerUploadFeedback;
     }
 
     private WebMarkupContainer getSimilarityThreshold() {
@@ -366,6 +369,32 @@ public class ArContentEditPage extends RestrictedPageBase {
     private class Handler implements Serializable {
 
         private final ErrorClassAppender errorClassAppender = new ErrorClassAppender(Models.readOnly("error")); //$NON-NLS-1$
+
+        void onContentUploadError(final AjaxRequestTarget pTarget) {
+            pTarget.add(getContentUploadFeedback());
+        }
+
+        void onContentUploadSubmit(final AjaxRequestTarget pTarget) {
+            // コンテンツがアップロードされたり削除されたら、class属性を書き換える.
+            // 本来この処理はAttributeModifierを使ってWicketの領域で実装したいのだが
+            // そうするとFileUploadPanelが正常に動作しない(アップロードされたデータがなぜか消えてしまう)
+            pTarget.appendJavaScript(buildClassValueReplaceScript( //
+                    getContentLabel() //
+                    , ArContentEditPage.CLASS_VALUE_HAS_NO_CONTENT //
+                    , ArContentEditPage.CLASS_VALUE_HAS_CONTENT));
+            pTarget.add(getContentLabel());
+            pTarget.add(getContentUploadFeedback());
+        }
+
+        void onMarkerUploadError(final AjaxRequestTarget pTarget) {
+            pTarget.add(getMarkerUploadFeedback());
+        }
+
+        void onMarkerUploadSubmit(final AjaxRequestTarget pTarget) {
+            pTarget.appendJavaScript(buildClassValueReplaceScript(getMarkerImage(), "nonImage", "hasImage")); //$NON-NLS-1$ //$NON-NLS-2$
+            pTarget.add(getMarkerImage());
+            pTarget.add(getMarkerUploadFeedback());
+        }
 
         void onSubmit(final AjaxRequestTarget pTarget) {
             ArContentEditPage.this.arContentService.insertOrUpdate( //
