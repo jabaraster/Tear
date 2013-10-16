@@ -25,7 +25,7 @@
     }
 
     function toText(pNumber) {
-        var s = pNumber + "";
+        var s = (Math.floor(pNumber * 100) / 100) + ''; // Safari対策. 0.70に誤差が付与されるので、小数点第３位を切り捨てる.
         switch (s.length) {
         case 1: // '0' or '1'
             return s + '.00';
