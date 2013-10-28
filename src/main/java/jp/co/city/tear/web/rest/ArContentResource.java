@@ -13,6 +13,8 @@ import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URL;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -190,7 +192,9 @@ public class ArContentResource {
 
             final SensorCOS cos = new SensorCOS();
             cos.sensorCosID = "Patch" + (i + 1); //$NON-NLS-1$
-            cos.parameters.referenceImage.name = "image_" + arContent.getId().longValue() + "." + arContent.getMarker().getType(); //$NON-NLS-1$//$NON-NLS-2$
+            cos.parameters.referenceImage.name = "marker_" + arContent.getId().longValue() + "." + arContent.getMarker().getType(); //$NON-NLS-1$//$NON-NLS-2$
+            cos.parameters.referenceImage.widthMM = 80;
+            cos.parameters.referenceImage.heightMM = 80;
             cos.parameters.similarityThreshold = arContent.getSimilarityThreshold();
             sensor.sensorCOS.add(cos);
 
@@ -220,9 +224,11 @@ public class ArContentResource {
         sb.append(absoluteUrlRoot).append(trackingDataUri.toASCIIString()).append(lineSeparator);
         sb.append(absoluteUrlRoot).append(loadedMovieUri.toASCIIString()).append(lineSeparator);
 
+        final DateFormat fmt = new SimpleDateFormat("yyyyMMddHHmmss"); //$NON-NLS-1$
         final String separator = ","; //$NON-NLS-1$
         for (final EArContent content : this.arContentService.getAll()) {
             sb.append(content.getId().longValue()) //
+                    .append(separator).append(fmt.format(content.getUpdated())) //
                     .append(separator).append(buildMarkerAbsoluteUrl(content)) //
                     .append(separator).append(buildContentAbsoluteUrl(content)) //
                     .append(lineSeparator);
