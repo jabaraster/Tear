@@ -47,6 +47,11 @@ public final class Environment {
      */
     public static final String         PARAM_COPYRIGHT              = PARAM_PREFIX + "copyright";
 
+    /**
+     * 
+     */
+    public static final String         PARAM_APPLICATION_TIME_ZONE  = PARAM_PREFIX + "applicationTimeZone";
+
     private static final AtomicBoolean _dataStoreDirectoryCreated   = new AtomicBoolean(false);
 
     /**
@@ -61,6 +66,13 @@ public final class Environment {
      */
     public static String getApplicationName() {
         return APPLICATION_NAME;
+    }
+
+    /**
+     * @return -
+     */
+    public static String getApplicationTimeZone() {
+        return getString(PARAM_APPLICATION_TIME_ZONE, "Asia/Tokyo");
     }
 
     /**

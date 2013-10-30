@@ -3,8 +3,6 @@
  */
 package jp.co.city.tear.entity;
 
-import jabara.jpa.entity.EntityBase;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 
@@ -14,7 +12,7 @@ import org.apache.commons.lang.StringUtils;
  * @author jabaraster
  */
 @Entity
-public class ELargeData extends EntityBase<ELargeData> {
+public class ELargeData extends TearEntityBase<ELargeData> {
     private static final long serialVersionUID            = -7306088955859680620L;
 
     /**

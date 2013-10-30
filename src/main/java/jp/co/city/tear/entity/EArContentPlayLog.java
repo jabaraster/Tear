@@ -3,8 +3,6 @@
  */
 package jp.co.city.tear.entity;
 
-import jabara.jpa.entity.EntityBase;
-
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -16,7 +14,7 @@ import javax.persistence.TemporalType;
  * @author jabaraster
  */
 @Entity
-public class EArContentPlayLog extends EntityBase<EArContentPlayLog> {
+public class EArContentPlayLog extends TearEntityBase<EArContentPlayLog> {
     private static final long serialVersionUID                   = 1737456524802201838L;
 
     /**

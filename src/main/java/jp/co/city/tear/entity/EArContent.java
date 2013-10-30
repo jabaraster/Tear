@@ -7,7 +7,6 @@ import jabara.bean.BeanProperties;
 import jabara.bean.annotation.Localized;
 import jabara.bean.annotation.Order;
 import jabara.general.ArgUtil;
-import jabara.jpa.entity.EntityBase;
 
 import java.util.Date;
 
@@ -23,7 +22,7 @@ import javax.validation.constraints.Size;
  * @author jabaraster
  */
 @Entity
-public class EArContent extends EntityBase<EArContent> {
+public class EArContent extends TearEntityBase<EArContent> {
     private static final long           serialVersionUID             = 9049354788625755282L;
 
     private static final BeanProperties _properties                  = BeanProperties.getInstance(EArContent.class);

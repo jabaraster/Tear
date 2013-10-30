@@ -3,8 +3,6 @@
  */
 package jp.co.city.tear.entity;
 
-import jabara.jpa.entity.EntityBase;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 
@@ -12,7 +10,7 @@ import javax.persistence.Entity;
  * @author jabaraster
  */
 @Entity
-public class EPlayLogTrackingDescriptor extends EntityBase<EPlayLogTrackingDescriptor> {
+public class EPlayLogTrackingDescriptor extends TearEntityBase<EPlayLogTrackingDescriptor> {
     private static final long serialVersionUID          = 7816070476300283311L;
 
     /**

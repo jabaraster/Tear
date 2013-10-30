@@ -5,7 +5,6 @@ package jp.co.city.tear.entity;
 
 import jabara.general.Empty;
 import jabara.general.ExceptionUtil;
-import jabara.jpa.entity.EntityBase;
 
 import java.nio.charset.Charset;
 import java.security.MessageDigest;
@@ -21,7 +20,7 @@ import javax.persistence.OneToOne;
  * @author jabaraster
  */
 @Entity
-public class EUserPassword extends EntityBase<EUserPassword> {
+public class EUserPassword extends TearEntityBase<EUserPassword> {
     private static final long          serialVersionUID = 7885103086152737376L;
 
     private static final Charset       ENCODING         = Charset.forName("utf-8"); //$NON-NLS-1$

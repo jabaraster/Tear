@@ -7,7 +7,6 @@ import jabara.bean.BeanProperties;
 import jabara.bean.annotation.Hidden;
 import jabara.bean.annotation.Localized;
 import jabara.bean.annotation.Order;
-import jabara.jpa.entity.EntityBase;
 
 import java.util.Date;
 
@@ -20,7 +19,7 @@ import javax.validation.constraints.Size;
  * @author jabaraster
  */
 @Entity
-public class EUser extends EntityBase<EUser> {
+public class EUser extends TearEntityBase<EUser> {
     private static final long           serialVersionUID               = 5322511553248558567L;
 
     private static final BeanProperties _properties                    = BeanProperties.getInstance(EUser.class);
