@@ -116,6 +116,14 @@ public class EArContent extends TearEntityBase<EArContent> {
     }
 
     /**
+     * @return -
+     */
+    @Localized
+    public Date getNewestUpdated() {
+        return max(getUpdated(), this.marker.getUpdated(), this.content.getUpdated());
+    }
+
+    /**
      * @return ownerを返す.
      */
     @Localized
@@ -188,6 +196,26 @@ public class EArContent extends TearEntityBase<EArContent> {
      */
     public static BeanProperties getMeta() {
         return _properties;
+    }
+
+    @SuppressWarnings("null")
+    private static Date max(final Date... pDates) {
+        Date ret = pDates[0];
+        for (int i = 1; i < pDates.length; i++) {
+            final Date d1 = ret;
+            final Date d2 = pDates[i];
+            if (d1 == null && d2 == null) {
+                continue;
+            }
+            if (d1 == null && d2 != null) {
+                ret = d2;
+            }
+            if (d1 != null && d2 != null) {
+                ret = d1;
+            }
+            ret = d1.compareTo(d2) < 0 ? d2 : d1;
+        }
+        return ret;
     }
 
     /**

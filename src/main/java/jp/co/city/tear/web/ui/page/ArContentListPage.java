@@ -3,13 +3,16 @@
  */
 package jp.co.city.tear.web.ui.page;
 
+import jabara.general.Empty;
 import jabara.general.IProducer2;
 import jabara.general.Sort;
 import jabara.jpa.entity.EntityBase_;
 import jabara.wicket.ComponentCssHeaderItem;
 import jabara.wicket.Models;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -33,6 +36,7 @@ import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulato
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.AbstractColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
+import org.apache.wicket.extensions.markup.html.repeater.data.table.PropertyColumn;
 import org.apache.wicket.extensions.markup.html.repeater.util.SortParam;
 import org.apache.wicket.extensions.markup.html.repeater.util.SortableDataProvider;
 import org.apache.wicket.markup.head.IHeaderResponse;
@@ -113,7 +117,22 @@ public class ArContentListPage extends RestrictedPageBase {
             }));
             columns.add(new AttributeColumn<EArContent>(EArContent.getMeta(), EArContent_.similarityThreshold));
             columns.add(new DateTimeColumn<EArContent>(EArContent.getMeta(), EntityBase_.created));
-            columns.add(new DateTimeColumn<EArContent>(EArContent.getMeta(), EntityBase_.updated));
+            // columns.add(new DateTimeColumn<EArContent>(EArContent.getMeta(), EntityBase_.updated));
+
+            final String newestUpdatedColumnName = "newestUpdated";
+            columns.add(new PropertyColumn<EArContent, String>( //
+                    Models.readOnly(EArContent.getMeta().get(newestUpdatedColumnName).getLocalizedName()) //
+                    , newestUpdatedColumnName //
+                    , newestUpdatedColumnName) {
+                @Override
+                public IModel<Object> getDataModel(final IModel<EArContent> pRowModel) {
+                    final Date d = pRowModel.getObject().getNewestUpdated();
+                    if (d == null) {
+                        return Models.<Object> readOnly(Empty.STRING);
+                    }
+                    return Models.<Object> readOnly(new SimpleDateFormat(DateTimeColumn.FORMAT).format(d));
+                }
+            });
 
             final IProducer2<EArContent, PageParameters> p = new IProducer2<EArContent, PageParameters>() {
                 @Override

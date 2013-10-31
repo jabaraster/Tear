@@ -7,11 +7,13 @@ import jabara.general.ArgUtil;
 import jabara.general.ExceptionUtil;
 import jabara.general.NotFound;
 import jabara.general.Sort;
+import jabara.general.SortRule;
 import jabara.general.io.DataOperation;
 import jabara.jpa.JpaDaoBase;
 import jabara.jpa.entity.EntityBase_;
 
 import java.io.InputStream;
+import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -19,7 +21,10 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.JoinType;
+import javax.persistence.criteria.Order;
+import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Root;
 
 import jp.co.city.tear.entity.EArContent;
@@ -146,9 +151,7 @@ public class ArContentServiceImpl extends JpaDaoBase implements IArContentServic
             );
         }
 
-        query.orderBy( //
-        convertOrder(pSort, builder, root) //
-        );
+        query.orderBy(order(pSort, builder, root));
 
         return em.createQuery(query).setFirstResult(first).setMaxResults(count).getResultList();
     }
@@ -280,5 +283,37 @@ public class ArContentServiceImpl extends JpaDaoBase implements IArContentServic
 
         final EArContent inDb = getEntityManager().merge(pArContent);
         inDb.setTitle(pArContent.getTitle());
+    }
+
+    private static Order order(final Sort pSort, final CriteriaBuilder pBuilder, final Path<EArContent> pPath) {
+        if (!pSort.getColumnName().equals("newestUpdated")) { //$NON-NLS-1$
+            return convertOrder(pSort, pBuilder, pPath);
+        }
+        final Path<Date> updated = pPath.get(EntityBase_.updated);
+        final Path<Date> markerUpdated = pPath.get(EArContent_.marker).get(EntityBase_.updated);
+        final Path<Date> contentUpdated = pPath.get(EArContent_.content).get(EntityBase_.updated);
+        final Expression<Object> newestUpdated = pBuilder.selectCase() //
+                .when( //
+                pBuilder.and( //
+                        pBuilder.greaterThan(updated, markerUpdated) //
+                        , pBuilder.greaterThan(updated, contentUpdated) //
+                ) //
+                , updated) // when
+                //
+                .when( //
+                pBuilder.and( //
+                        pBuilder.greaterThan(markerUpdated, updated) //
+                        , pBuilder.greaterThan(markerUpdated, contentUpdated) //
+                ) //
+                , markerUpdated) // when
+                //
+                .when( //
+                pBuilder.and( //
+                        pBuilder.greaterThan(contentUpdated, updated) //
+                        , pBuilder.greaterThan(contentUpdated, markerUpdated) //
+                ) //
+                , contentUpdated) // when
+                .otherwise(updated);
+        return pSort.getSortRule() == SortRule.ASC ? pBuilder.asc(newestUpdated) : pBuilder.desc(newestUpdated);
     }
 }
