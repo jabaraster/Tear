@@ -1,0 +1,27 @@
+<!doctype html>
+<html>
+<head>
+  <title></title>
+  <meta charset="UTF-8" />
+</head>
+<body>
+
+<wicket:extend>
+
+ <div wicket:id="feedback"></div>
+  <form wicket:id="form">
+    <fieldset>
+      From: <input type="date" wicket:id="from" />
+      To: <input type="date" wicket:id="to" />
+      <button wicket:id="searcher" href="#" class="btn btn-primary">
+      <i class="glyphicon glyphicon-white glyphicon-search"></i>
+      ログを表示
+    </button>
+    </fieldset>
+  </form>
+  <table wicket:id="logs" class="table table-striped"></table>
+
+</wicket:extend>
+
+</body>
+</html>

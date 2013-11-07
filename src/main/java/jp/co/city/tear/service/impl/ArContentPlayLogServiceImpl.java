@@ -3,9 +3,19 @@
  */
 package jp.co.city.tear.service.impl;
 
+import jabara.general.ArgUtil;
+import jabara.general.ExceptionUtil;
+import jabara.general.NotFound;
+import jabara.general.Sort;
+import jabara.general.SortRule;
 import jabara.jpa.JpaDaoBase;
 import jabara.jpa.entity.EntityBase_;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -15,6 +25,8 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceException;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Order;
+import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 import jp.co.city.tear.entity.EArContentPlayLog;
@@ -38,6 +50,25 @@ public class ArContentPlayLogServiceImpl extends JpaDaoBase implements IArConten
     }
 
     /**
+     * @see jp.co.city.tear.service.IArContentPlayLogService#countAll()
+     */
+    @Override
+    public long countAll() {
+        final EntityManager em = getEntityManager();
+        final CriteriaBuilder builder = em.getCriteriaBuilder();
+        final CriteriaQuery<Long> query = builder.createQuery(Long.class);
+        final Root<EArContentPlayLog> root = query.from(EArContentPlayLog.class);
+
+        query.select(builder.count(root));
+
+        try {
+            return getSingleResult(em.createQuery(query)).longValue();
+        } catch (final NotFound e) {
+            throw ExceptionUtil.rethrow(e);
+        }
+    }
+
+    /**
      * @see jp.co.city.tear.service.IArContentPlayLogService#createDescriptor()
      */
     @Override
@@ -51,6 +82,38 @@ public class ArContentPlayLogServiceImpl extends JpaDaoBase implements IArConten
             }
         }
         throw new IllegalStateException("識別子が生成できませんでした."); //$NON-NLS-1$
+    }
+
+    /**
+     * @see jp.co.city.tear.service.IArContentPlayLogService#find(jp.co.city.tear.service.IArContentPlayLogService.FindCondition)
+     */
+    @Override
+    public List<EArContentPlayLog> find(final FindCondition pCondition) {
+        ArgUtil.checkNull(pCondition, "pCondition"); //$NON-NLS-1$
+
+        final EntityManager em = getEntityManager();
+        final CriteriaBuilder builder = em.getCriteriaBuilder();
+        final CriteriaQuery<EArContentPlayLog> query = builder.createQuery(EArContentPlayLog.class);
+        final Root<EArContentPlayLog> root = query.from(EArContentPlayLog.class);
+
+        final List<Predicate> where = new ArrayList<>();
+        if (pCondition.getFrom() != null) {
+            where.add(builder.greaterThanOrEqualTo(root.get(EArContentPlayLog_.playDatetime), omitSecond(pCondition.getFrom())));
+        }
+        if (pCondition.getTo() != null) {
+            where.add(builder.lessThan(root.get(EArContentPlayLog_.playDatetime), omitSecond(addDay(pCondition.getTo(), 1))));
+        }
+        query.where(where.toArray(EMPTY_PREDICATE));
+
+        final Sort sort = pCondition.getSort();
+        if (sort != null) {
+            final Order order = sort.getSortRule() == SortRule.ASC //
+            ? builder.asc(root.get(sort.getColumnName())) //
+                    : builder.desc(root.get(sort.getColumnName()));
+            query.orderBy(order);
+        }
+
+        return em.createQuery(query).setFirstResult(pCondition.getFirst()).setMaxResults(pCondition.getCount()).getResultList();
     }
 
     /**
@@ -93,5 +156,25 @@ public class ArContentPlayLogServiceImpl extends JpaDaoBase implements IArConten
         em.flush(); // DBの重複チェックを実行させる.
 
         return d;
+    }
+
+    private static Date addDay(final Date pDate, final int pValue) {
+        final Calendar cal = Calendar.getInstance();
+        cal.setTime(pDate);
+        cal.add(Calendar.DAY_OF_MONTH, pValue);
+        return cal.getTime();
+    }
+
+    /**
+     * @param pDate
+     * @return pDateの秒以下を0にした値.
+     */
+    private static Date omitSecond(final Date pDate) {
+        final SimpleDateFormat fmt = new SimpleDateFormat("yyyyMMdd"); //$NON-NLS-1$
+        try {
+            return fmt.parse(fmt.format(pDate));
+        } catch (final ParseException e) {
+            throw ExceptionUtil.rethrow(e);
+        }
     }
 }
