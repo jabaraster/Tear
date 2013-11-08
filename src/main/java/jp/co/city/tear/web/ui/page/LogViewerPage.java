@@ -4,6 +4,7 @@
 package jp.co.city.tear.web.ui.page;
 
 import jabara.bean.BeanProperties;
+import jabara.bean.annotation.Localized;
 import jabara.general.Sort;
 import jabara.wicket.ComponentCssHeaderItem;
 import jabara.wicket.Models;
@@ -214,6 +215,7 @@ public class LogViewerPage extends AdministrationPageBase {
          * @see jp.co.city.tear.entity.EArContentPlayLog#getArContentId()
          */
         @SuppressWarnings("unused")
+        @Localized("ARコンテンツID")
         public Long getArContentId() {
             return this.log.getArContentId();
         }
@@ -239,6 +241,7 @@ public class LogViewerPage extends AdministrationPageBase {
          * @see jp.co.city.tear.entity.EArContentPlayLog#getLatitude()
          */
         @SuppressWarnings("unused")
+        @Localized("緯度")
         public Double getLatitude() {
             return this.log.getLatitude();
         }
@@ -248,6 +251,7 @@ public class LogViewerPage extends AdministrationPageBase {
          * @see jp.co.city.tear.entity.EArContentPlayLog#getLongitude()
          */
         @SuppressWarnings("unused")
+        @Localized("経度")
         public Double getLongitude() {
             return this.log.getLongitude();
         }
@@ -257,6 +261,7 @@ public class LogViewerPage extends AdministrationPageBase {
          * @see jp.co.city.tear.entity.EArContentPlayLog#getPlayDatetime()
          */
         @SuppressWarnings("unused")
+        @Localized("動作再生日時")
         public Date getPlayDatetime() {
             return this.log.getPlayDatetime();
         }
@@ -266,6 +271,7 @@ public class LogViewerPage extends AdministrationPageBase {
          * @see jp.co.city.tear.entity.EArContentPlayLog#getTrackingDescriptor()
          */
         @SuppressWarnings("unused")
+        @Localized("トラッキング用識別子")
         public String getTrackingDescriptor() {
             return this.log.getTrackingDescriptor();
         }

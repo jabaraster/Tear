@@ -12,6 +12,7 @@ import jp.co.city.tear.Environment;
 import jp.co.city.tear.model.FailAuthentication;
 import jp.co.city.tear.web.ui.AppSession;
 import jp.co.city.tear.web.ui.component.CopyrightPanel;
+import jp.co.city.tear.web.ui.component.DescriptionPanel;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
@@ -40,6 +41,7 @@ public class LoginPage extends WebPageBase {
     private TextField<String> userId;
     private PasswordTextField password;
     private AjaxButton        submitter;
+    private DescriptionPanel  description;
     private CopyrightPanel    copyright;
 
     /**
@@ -48,6 +50,7 @@ public class LoginPage extends WebPageBase {
     public LoginPage() {
         this.add(getApplicationName());
         this.add(getForm());
+        this.add(getDescription());
         this.add(getCopyright());
     }
 
@@ -124,6 +127,13 @@ public class LoginPage extends WebPageBase {
             this.copyright = new CopyrightPanel("copyright"); //$NON-NLS-1$
         }
         return this.copyright;
+    }
+
+    private DescriptionPanel getDescription() {
+        if (this.description == null) {
+            this.description = new DescriptionPanel("description"); //$NON-NLS-1$
+        }
+        return this.description;
     }
 
     private class Handler implements Serializable {
