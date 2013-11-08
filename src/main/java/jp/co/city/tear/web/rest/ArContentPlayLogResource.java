@@ -116,6 +116,10 @@ public class ArContentPlayLogResource {
     @Path("new")
     public void postLog(final ArContentPlayLog pLog) {
         ArgUtil.checkNull(pLog, "pLog"); //$NON-NLS-1$
-        this.arContentPlayLogService.insert(pLog);
+        try {
+            this.arContentPlayLogService.insert(pLog);
+        } catch (final Exception e) {
+            throw new WebApplicationException(e, Status.BAD_REQUEST);
+        }
     }
 }
