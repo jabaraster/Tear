@@ -25,6 +25,11 @@ public final class Environment {
     /**
      * 
      */
+    public static final String         PARAM_DATA_STORE_DIRECTORY   = PARAM_PREFIX + "dataStoreDirectory";
+
+    /**
+     * 
+     */
     public static final String         PARAM_AWS_BUCKET_NAME        = PARAM_PREFIX + "awsBucketName";
 
     /**
@@ -107,16 +112,14 @@ public final class Environment {
      * @return -
      */
     public static File getDataStoreDirectory() {
-        final File file = new File("~/." + APPLICATION_NAME_LOWER + "/data"); //$NON-NLS-1$
+        final File file = new File(getDataStoreDirectoryPath()); //$NON-NLS-1$
         if (!_dataStoreDirectoryCreated.get()) {
             file.mkdirs();
+            if (!file.isDirectory()) {
+                throw new IllegalStateException();
+            }
+            _dataStoreDirectoryCreated.compareAndSet(false, true);
         }
-        if (!file.isDirectory()) {
-            throw new IllegalStateException();
-        }
-
-        _dataStoreDirectoryCreated.compareAndSet(false, true);
-
         return file;
     }
 
@@ -125,6 +128,10 @@ public final class Environment {
      */
     public static DataStoreMode getDataStoreMode() {
         return DataStoreMode.valueOf(getString(PARAM_DATA_STORE_MODE, DataStoreMode.FILE));
+    }
+
+    private static String getDataStoreDirectoryPath() {
+        return getString(PARAM_DATA_STORE_DIRECTORY, "~/." + APPLICATION_NAME_LOWER + "/data");
     }
 
     private static String getString(final String pParameterName, final Object pDefaultValue) {
