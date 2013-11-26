@@ -9,12 +9,14 @@ import jabara.jpa.entity.EntityBase_;
 import jabara.wicket.ComponentCssHeaderItem;
 import jabara.wicket.Models;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import javax.inject.Inject;
 
+import jp.co.city.tear.Environment;
 import jp.co.city.tear.entity.EUser;
 import jp.co.city.tear.entity.EUser_;
 import jp.co.city.tear.model.LoginUser;
@@ -27,12 +29,17 @@ import jp.co.city.tear.web.ui.component.DeleteLinkColumn;
 import jp.co.city.tear.web.ui.component.EditLinkColumn;
 import jp.co.city.tear.web.ui.component.LinkPanel;
 
+import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.markup.html.form.AjaxButton;
+import org.apache.wicket.extensions.ajax.markup.html.IndicatingAjaxButton;
 import org.apache.wicket.extensions.ajax.markup.html.repeater.data.table.AjaxFallbackDefaultDataTable;
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.extensions.markup.html.repeater.util.SortParam;
 import org.apache.wicket.extensions.markup.html.repeater.util.SortableDataProvider;
 import org.apache.wicket.markup.head.IHeaderResponse;
+import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.model.IModel;
@@ -43,9 +50,10 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
  * @author jabaraster
  */
 public class UserListPage extends AdministrationPageBase {
-    private static final long                           serialVersionUID     = 1125709413157102080L;
+    private static final long                           serialVersionUID = 1125709413157102080L;
 
-    private static final int                            DEFAULT_ROW_PER_PAGE = 20;
+    @SuppressWarnings("synthetic-access")
+    private final Handler                               handler          = new Handler();
 
     @Inject
     IUserService                                        userService;
@@ -53,12 +61,19 @@ public class UserListPage extends AdministrationPageBase {
     private AjaxFallbackDefaultDataTable<EUser, String> users;
     private Link<?>                                     adder;
 
+    private TextField<Integer>                          rowCountPerPage;
+    private AjaxButton                                  rowRefresher;
+    private Form<?>                                     rowCountPerPageForm;
+
     /**
      * 
      */
     public UserListPage() {
         this.add(getAdder());
         this.add(getUsers());
+
+        this.add(getRowCountPerPageForm());
+
     }
 
     /**
@@ -86,6 +101,40 @@ public class UserListPage extends AdministrationPageBase {
         return this.adder;
     }
 
+    @SuppressWarnings({ "boxing" })
+    private TextField<Integer> getRowCountPerPage() {
+        if (this.rowCountPerPage == null) {
+            this.rowCountPerPage = new TextField<>( //
+                    "rowCountPerPage" // //$NON-NLS-1$
+                    , Models.of(Environment.getUserListRowCountPerPage()) //
+                    , Integer.class);
+        }
+        return this.rowCountPerPage;
+    }
+
+    private Form<?> getRowCountPerPageForm() {
+        if (this.rowCountPerPageForm == null) {
+            this.rowCountPerPageForm = new Form<Object>("rowCountPerPageForm"); //$NON-NLS-1$
+            this.rowCountPerPageForm.add(getRowCountPerPage());
+            this.rowCountPerPageForm.add(getRowRefresher());
+        }
+        return this.rowCountPerPageForm;
+    }
+
+    @SuppressWarnings("serial")
+    private AjaxButton getRowRefresher() {
+        if (this.rowRefresher == null) {
+            this.rowRefresher = new IndicatingAjaxButton("rowRefresher") { //$NON-NLS-1$
+                @SuppressWarnings("synthetic-access")
+                @Override
+                protected void onSubmit(final AjaxRequestTarget pTarget, @SuppressWarnings("unused") final Form<?> pForm) {
+                    UserListPage.this.handler.onRowCountPerPageChange(pTarget);
+                }
+            };
+        }
+        return this.rowRefresher;
+    }
+
     @SuppressWarnings("serial")
     private AjaxFallbackDefaultDataTable<EUser, String> getUsers() {
         if (this.users == null) {
@@ -109,10 +158,20 @@ public class UserListPage extends AdministrationPageBase {
                     "users" // //$NON-NLS-1$
                     , columns //
                     , new UserDataProvider(this.userService) //
-                    , DEFAULT_ROW_PER_PAGE //
+                    , Environment.getUserListRowCountPerPage() //
             );
         }
         return this.users;
+    }
+
+    @SuppressWarnings("synthetic-access")
+    private class Handler implements Serializable {
+        private static final long serialVersionUID = 7691696315532851463L;
+
+        void onRowCountPerPageChange(final AjaxRequestTarget pTarget) {
+            getUsers().setItemsPerPage(getRowCountPerPage().getModelObject().longValue());
+            pTarget.add(getUsers());
+        }
     }
 
     private static class UserDataProvider extends SortableDataProvider<EUser, String> {
