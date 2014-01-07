@@ -149,6 +149,10 @@ public final class Environment {
         /**
          * 
          */
+        LOB,
+        /**
+         * 
+         */
         S3;
     }
 }
