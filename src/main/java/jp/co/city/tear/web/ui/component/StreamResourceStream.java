@@ -13,7 +13,7 @@ import org.apache.wicket.util.resource.AbstractResourceStream;
 public class StreamResourceStream extends AbstractResourceStream {
     private static final long serialVersionUID = 6106999405854759923L;
 
-    private final InputStream in;
+    private InputStream       in;
     private final String      contentType;
 
     /**
@@ -33,6 +33,7 @@ public class StreamResourceStream extends AbstractResourceStream {
     @Override
     public void close() {
         IoUtil.close(this.in);
+        this.in = null;
     }
 
     /**

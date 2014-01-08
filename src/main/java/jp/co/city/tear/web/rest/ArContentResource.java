@@ -35,6 +35,7 @@ import jp.co.city.tear.Environment;
 import jp.co.city.tear.entity.EArContent;
 import jp.co.city.tear.service.IArContentService;
 import jp.co.city.tear.service.ILargeDataService;
+import jp.co.city.tear.web.WebUtil;
 import jp.co.city.tear.web.rest.trackingData.Connection;
 import jp.co.city.tear.web.rest.trackingData.Sensor;
 import jp.co.city.tear.web.rest.trackingData.SensorCOS;
@@ -230,15 +231,11 @@ public class ArContentResource {
             sb.append(content.getId().longValue()) //
                     .append(separator).append(fmt.format(content.getUpdated())) //
                     .append(separator).append(buildMarkerAbsoluteUrl(content)) //
-                    .append(separator).append(buildContentAbsoluteUrl(content)) //
+                    .append(separator).append(WebUtil.buildContentAbsoluteUrl(content.getId().longValue())) //
                     .append(lineSeparator);
         }
 
         return new String(sb);
-    }
-
-    private static String buildContentAbsoluteUrl(final EArContent pArContent) {
-        return Environment.getAbsoluteRestUrlRoot() + "arContent/" + pArContent.getId().longValue() + "/content"; //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     private static String buildContentDisposition(final String pDisposition, final String pFileName) {
@@ -281,7 +278,7 @@ public class ArContentResource {
         public ArContent(final EArContent pContent) {
             ArgUtil.checkNull(pContent, "pContent"); //$NON-NLS-1$
             this.contentFileName = pContent.getContent().getDataName();
-            this.contentUrl = buildContentAbsoluteUrl(pContent);
+            this.contentUrl = WebUtil.buildContentAbsoluteUrl(pContent.getId().longValue());
             this.markerFileName = pContent.getMarker().getDataName();
             this.markerUrl = buildMarkerAbsoluteUrl(pContent);
             this.title = pContent.getTitle();

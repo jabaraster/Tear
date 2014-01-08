@@ -23,15 +23,18 @@ import jp.co.city.tear.entity.EArContent_;
 import jp.co.city.tear.entity.ELargeData;
 import jp.co.city.tear.entity.EUser_;
 import jp.co.city.tear.service.IArContentService;
+import jp.co.city.tear.web.WebUtil;
 import jp.co.city.tear.web.ui.AppSession;
 import jp.co.city.tear.web.ui.component.AttributeColumn;
 import jp.co.city.tear.web.ui.component.BodyCssHeaderItem;
 import jp.co.city.tear.web.ui.component.DateTimeColumn;
 import jp.co.city.tear.web.ui.component.DeleteLinkColumn;
 import jp.co.city.tear.web.ui.component.EditLinkColumn;
+import jp.co.city.tear.web.ui.component.MarkerImageResourceStream;
 
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.extensions.ajax.markup.html.repeater.data.table.AjaxFallbackDefaultDataTable;
+import org.apache.wicket.extensions.markup.html.image.resource.ThumbnailImageResource;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.AbstractColumn;
@@ -40,13 +43,17 @@ import org.apache.wicket.extensions.markup.html.repeater.data.table.PropertyColu
 import org.apache.wicket.extensions.markup.html.repeater.util.SortParam;
 import org.apache.wicket.extensions.markup.html.repeater.util.SortableDataProvider;
 import org.apache.wicket.markup.head.IHeaderResponse;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.image.Image;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.link.Link;
+import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
+import org.apache.wicket.request.resource.ResourceStreamResource;
 
 /**
  * @author jabaraster
@@ -54,7 +61,7 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 public class ArContentListPage extends RestrictedPageBase {
     private static final long                                serialVersionUID      = 5244239824791113862L;
 
-    private static final int                                 DEFAULT_ROWS_PER_PAGE = 20;
+    private static final int                                 DEFAULT_ROWS_PER_PAGE = 10;
 
     @Inject
     IArContentService                                        arContentService;
@@ -102,13 +109,14 @@ public class ArContentListPage extends RestrictedPageBase {
             columns.add(new AttributeColumn<EArContent>(EArContent.getMeta(), EntityBase_.id));
             columns.add(new AttributeColumn<EArContent>(EArContent.getMeta(), EArContent_.title));
             columns.add(new OwnerColumn());
+            columns.add(new MarkerImageColumn(Models.readOnly("マーカ画像")));
 
-            columns.add(new DataColumn("マーカ画像", new IProducer2<EArContent, ELargeData>() {
-                @Override
-                public ELargeData produce(final EArContent pArgument) {
-                    return pArgument.getMarker();
-                }
-            }));
+            // columns.add(new DataColumn("マーカ画像", new IProducer2<EArContent, ELargeData>() {
+            // @Override
+            // public ELargeData produce(final EArContent pArgument) {
+            // return pArgument.getMarker();
+            // }
+            // }));
             columns.add(new DataColumn("コンテンツ", new IProducer2<EArContent, ELargeData>() {
                 @Override
                 public ELargeData produce(final EArContent pArgument) {
@@ -177,7 +185,57 @@ public class ArContentListPage extends RestrictedPageBase {
         public long size() {
             return ArContentListPage.this.arContentService.count(AppSession.get().getLoginUser());
         }
+    }
 
+    private static class ContentPanel extends Panel {
+        private static final long  serialVersionUID = -215758806035680909L;
+
+        private final EArContent   content;
+
+        private Label              label;
+        private WebMarkupContainer downloadLink;
+        private Label              description;
+
+        ContentPanel(final String pId, final EArContent pContent) {
+            super(pId);
+            this.content = pContent;
+            this.add(getLabel());
+            this.add(getDownloadLink());
+            this.add(getDescription());
+        }
+
+        private Label getDescription() {
+            if (this.description == null) {
+                this.description = new Label("description", this.content.getContentDescription()); //$NON-NLS-1$
+            }
+            return this.description;
+        }
+
+        private WebMarkupContainer getDownloadLink() {
+            if (this.downloadLink == null) {
+                this.downloadLink = new WebMarkupContainer("downloadLink") { //$NON-NLS-1$
+                    private static final long serialVersionUID = 3476418772502673965L;
+
+                    @SuppressWarnings("synthetic-access")
+                    @Override
+                    public boolean isVisible() {
+                        return ContentPanel.this.content.getContent().hasData();
+                    }
+                };
+                this.downloadLink.add(AttributeModifier.append("href", WebUtil.buildContentAbsoluteUrl(this.content.getId().longValue()))); //$NON-NLS-1$
+            }
+            return this.downloadLink;
+        }
+
+        private Label getLabel() {
+            if (this.label == null) {
+                final boolean hasData = this.content.getContent().hasData();
+                final String s = hasData ? "登録あり" : "登録なし"; //$NON-NLS-1$//$NON-NLS-2$
+                this.label = new Label("label", s); //$NON-NLS-1$
+                this.label.add(AttributeModifier.append("class", hasData ? "label label-success" : "label label-default")); //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
+            }
+            return this.label;
+        }
     }
 
     private static class DataColumn extends AbstractColumn<EArContent, String> {
@@ -192,11 +250,45 @@ public class ArContentListPage extends RestrictedPageBase {
 
         @Override
         public void populateItem(final Item<ICellPopulator<EArContent>> pCellItem, final String pComponentId, final IModel<EArContent> pRowModel) {
-            final ELargeData data = this.cellObjectProducer.produce(pRowModel.getObject());
-            final String s = data.hasData() ? "登録あり" : "登録なし"; //$NON-NLS-1$//$NON-NLS-2$
-            final Label l = new Label(pComponentId, s);
-            l.add(AttributeModifier.append("class", data.hasData() ? "label label-success" : "label label-default")); //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
-            pCellItem.add(l);
+            pCellItem.add(new ContentPanel(pComponentId, pRowModel.getObject()));
+            // final ELargeData data = this.cellObjectProducer.produce(pRowModel.getObject());
+            //            final String s = data.hasData() ? "登録あり" : "登録なし"; //$NON-NLS-1$//$NON-NLS-2$
+            // final Label l = new Label(pComponentId, s);
+            //            l.add(AttributeModifier.append("class", data.hasData() ? "label label-success" : "label label-default")); //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
+            // pCellItem.add(l);
+        }
+    }
+
+    private class ImagePanel extends Panel {
+        private static final long serialVersionUID = -4684544684054772480L;
+
+        ImagePanel(final String pId, final IModel<EArContent> pModel) {
+            super(pId);
+            final EArContent ar = pModel.getObject();
+            @SuppressWarnings("resource")
+            final MarkerImageResourceStream srs = new MarkerImageResourceStream(ArContentListPage.this.arContentService, ar);
+            final ThumbnailImageResource r = new ThumbnailImageResource(new ResourceStreamResource(srs), 128);
+            final Image markerImage = new Image("image", r); //$NON-NLS-1$
+            this.add(markerImage);
+        }
+    }
+
+    private class MarkerImageColumn extends AbstractColumn<EArContent, String> {
+        private static final long serialVersionUID = -8894278574933262462L;
+
+        MarkerImageColumn(final IModel<String> pDisplayModel) {
+            super(pDisplayModel);
+        }
+
+        @Override
+        public void populateItem(final Item<ICellPopulator<EArContent>> pCellItem, final String pComponentId, final IModel<EArContent> pRowModel) {
+            if (pRowModel.getObject().getMarker().hasData()) {
+                pCellItem.add(new ImagePanel(pComponentId, pRowModel));
+            } else {
+                final Label l = new Label(pComponentId, "登録なし"); //$NON-NLS-1$
+                l.add(AttributeModifier.append("class", "label label-default")); //$NON-NLS-1$//$NON-NLS-2$
+                pCellItem.add(l);
+            }
         }
     }
 

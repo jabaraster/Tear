@@ -31,6 +31,7 @@ import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
 import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.form.OnChangeAjaxBehavior;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.extensions.ajax.markup.html.IndicatingAjaxButton;
 import org.apache.wicket.markup.head.IHeaderResponse;
@@ -102,6 +103,7 @@ public class ArContentEditPage extends RestrictedPageBase {
     private FeedbackPanel       markerUploadFeedback;
 
     private Form<?>             contentForm;
+    private TextField<String>   contentDescription;
     private FileUploadPanel     contentUpload;
     private Label               contentLabel;
     private FeedbackPanel       contentUploadFeedback;
@@ -183,9 +185,28 @@ public class ArContentEditPage extends RestrictedPageBase {
         return this.submitter;
     }
 
+    private TextField<String> getContentDescription() {
+        if (this.contentDescription == null) {
+            this.contentDescription = new TextField<>( //
+                    EArContent_.contentDescription.getName() //
+                    , new PropertyModel<String>(this.arContent, EArContent_.contentDescription.getName()) //
+                    , String.class //
+            );
+            this.contentDescription.add(new OnChangeAjaxBehavior() {
+                @Override
+                protected void onUpdate(@SuppressWarnings("unused") final AjaxRequestTarget pTarget) {
+                    // 処理なし(Modelに値を突っ込んでほしいだけなので).
+                }
+            });
+            ValidatorUtil.setSimpleStringValidator(this.contentDescription, EArContent.class, EArContent_.contentDescription);
+        }
+        return this.contentDescription;
+    }
+
     private Form<?> getContentForm() {
         if (this.contentForm == null) {
             this.contentForm = new Form<>("contentForm"); //$NON-NLS-1$
+            this.contentForm.add(getContentDescription());
             this.contentForm.add(getContentUpload());
             this.contentForm.add(getContentLabel());
             this.contentForm.add(getContentUploadFeedback());
@@ -257,7 +278,6 @@ public class ArContentEditPage extends RestrictedPageBase {
         return this.markerForm;
     }
 
-    @SuppressWarnings("resource")
     private Image getMarkerImage() {
         if (this.markerImage == null) {
             this.markerImage = new NonCachingImage("markerImage", new ResourceStreamResource(new MarkerImageResourceStream())); //$NON-NLS-1$

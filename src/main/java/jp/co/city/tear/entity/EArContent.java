@@ -23,19 +23,24 @@ import javax.validation.constraints.Size;
  */
 @Entity
 public class EArContent extends TearEntityBase<EArContent> {
-    private static final long           serialVersionUID             = 9049354788625755282L;
+    private static final long           serialVersionUID                   = 9049354788625755282L;
 
-    private static final BeanProperties _properties                  = BeanProperties.getInstance(EArContent.class);
-
-    /**
-     * 
-     */
-    public static final int             MAX_CHAR_COUNT_TITLE         = 100;
+    private static final BeanProperties _properties                        = BeanProperties.getInstance(EArContent.class);
 
     /**
      * 
      */
-    public static final float           DEFAULT_SIMILARITY_THRESHOLD = 0.7f;
+    public static final int             MAX_CHAR_COUNT_TITLE               = 100;
+
+    /**
+     * 
+     */
+    public static final int             MAX_CHAR_COUNT_CONTENT_DESCRIPTION = 100;
+
+    /**
+     * 
+     */
+    public static final float           DEFAULT_SIMILARITY_THRESHOLD       = 0.7f;
 
     /**
      * 
@@ -55,21 +60,27 @@ public class EArContent extends TearEntityBase<EArContent> {
     /**
      * 
      */
-    protected float                     similarityThreshold          = DEFAULT_SIMILARITY_THRESHOLD;
+    protected float                     similarityThreshold                = DEFAULT_SIMILARITY_THRESHOLD;
 
     /**
      * 
      */
     @OneToOne
     @JoinColumn(nullable = false)
-    protected ELargeData                marker                       = new ELargeData();
+    protected ELargeData                marker                             = new ELargeData();
 
     /**
      * 
      */
     @OneToOne
     @JoinColumn(nullable = false)
-    protected ELargeData                content                      = new ELargeData();
+    protected ELargeData                content                            = new ELargeData();
+
+    /**
+     * 
+     */
+    @Column(nullable = true, length = MAX_CHAR_COUNT_CONTENT_DESCRIPTION * 3)
+    protected String                    contentDescription;
 
     /**
      * @param pOperation -
@@ -86,6 +97,13 @@ public class EArContent extends TearEntityBase<EArContent> {
      */
     public ELargeData getContent() {
         return this.content;
+    }
+
+    /**
+     * @return the contentDescription
+     */
+    public String getContentDescription() {
+        return this.contentDescription;
     }
 
     /**
@@ -168,6 +186,13 @@ public class EArContent extends TearEntityBase<EArContent> {
         if (this.marker != null) {
             pOperation.run(this.marker);
         }
+    }
+
+    /**
+     * @param pContentDescription the contentDescription to set
+     */
+    public void setContentDescription(final String pContentDescription) {
+        this.contentDescription = pContentDescription;
     }
 
     /**

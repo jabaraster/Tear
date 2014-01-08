@@ -7,7 +7,9 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.persistence.EntityManagerFactory;
 import javax.servlet.DispatcherType;
 import javax.servlet.Filter;
 import javax.servlet.FilterRegistration.Dynamic;
@@ -19,6 +21,7 @@ import jp.co.city.tear.Environment;
 import jp.co.city.tear.service.IDataStore;
 import jp.co.city.tear.service.IUserService;
 import jp.co.city.tear.service.impl.FileDataStore;
+import jp.co.city.tear.service.impl.LobDataStore;
 import jp.co.city.tear.service.impl.S3DataStore;
 import jp.co.city.tear.web.rest.RestApplication;
 import jp.co.city.tear.web.ui.WicketApplication;
@@ -208,16 +211,25 @@ public class WebInitializer extends GuiceServletContextListener {
     }
 
     private static class DataStoreProvider implements Provider<IDataStore> {
+        private EntityManagerFactory entityManagerFactory;
+
         @Override
         public IDataStore get() {
             switch (Environment.getDataStoreMode()) {
             case FILE:
                 return new FileDataStore();
+            case LOB:
+                return new LobDataStore(this.entityManagerFactory);
             case S3:
                 return new S3DataStore();
             default:
                 throw new IllegalStateException();
             }
+        }
+
+        @Inject
+        void set(final EntityManagerFactory pEntityManagerFactory) {
+            this.entityManagerFactory = pEntityManagerFactory;
         }
 
     }

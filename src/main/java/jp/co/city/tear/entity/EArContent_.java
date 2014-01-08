@@ -5,7 +5,7 @@ import javax.annotation.Generated;
 import javax.persistence.metamodel.SingularAttribute;
 import javax.persistence.metamodel.StaticMetamodel;
 
-@Generated(value="Dali", date="2013-10-11T21:38:58.150+0900")
+@Generated(value="Dali", date="2014-01-08T08:57:40.665+0900")
 @StaticMetamodel(EArContent.class)
 public class EArContent_ extends EntityBase_ {
 	public static volatile SingularAttribute<EArContent, EUser> owner;
@@ -13,4 +13,5 @@ public class EArContent_ extends EntityBase_ {
 	public static volatile SingularAttribute<EArContent, Float> similarityThreshold;
 	public static volatile SingularAttribute<EArContent, ELargeData> marker;
 	public static volatile SingularAttribute<EArContent, ELargeData> content;
+	public static volatile SingularAttribute<EArContent, String> contentDescription;
 }
