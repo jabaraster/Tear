@@ -20,7 +20,6 @@ import javax.inject.Inject;
 
 import jp.co.city.tear.entity.EArContent;
 import jp.co.city.tear.entity.EArContent_;
-import jp.co.city.tear.entity.ELargeData;
 import jp.co.city.tear.entity.EUser_;
 import jp.co.city.tear.service.IArContentService;
 import jp.co.city.tear.web.WebUtil;
@@ -111,21 +110,9 @@ public class ArContentListPage extends RestrictedPageBase {
             columns.add(new OwnerColumn());
             columns.add(new MarkerImageColumn(Models.readOnly("マーカ画像")));
 
-            // columns.add(new DataColumn("マーカ画像", new IProducer2<EArContent, ELargeData>() {
-            // @Override
-            // public ELargeData produce(final EArContent pArgument) {
-            // return pArgument.getMarker();
-            // }
-            // }));
-            columns.add(new DataColumn("コンテンツ", new IProducer2<EArContent, ELargeData>() {
-                @Override
-                public ELargeData produce(final EArContent pArgument) {
-                    return pArgument.getContent();
-                }
-            }));
+            columns.add(new ContentColumn("コンテンツ"));
             columns.add(new AttributeColumn<EArContent>(EArContent.getMeta(), EArContent_.similarityThreshold));
             columns.add(new DateTimeColumn<EArContent>(EArContent.getMeta(), EntityBase_.created));
-            // columns.add(new DateTimeColumn<EArContent>(EArContent.getMeta(), EntityBase_.updated));
 
             final String newestUpdatedColumnName = "newestUpdated";
             columns.add(new PropertyColumn<EArContent, String>( //
@@ -187,6 +174,19 @@ public class ArContentListPage extends RestrictedPageBase {
         }
     }
 
+    private static class ContentColumn extends AbstractColumn<EArContent, String> {
+        private static final long serialVersionUID = 4151926507136485310L;
+
+        ContentColumn(final String pDisplayLabel) {
+            super(Models.readOnly(pDisplayLabel));
+        }
+
+        @Override
+        public void populateItem(final Item<ICellPopulator<EArContent>> pCellItem, final String pComponentId, final IModel<EArContent> pRowModel) {
+            pCellItem.add(new ContentPanel(pComponentId, pRowModel.getObject()));
+        }
+    }
+
     private static class ContentPanel extends Panel {
         private static final long  serialVersionUID = -215758806035680909L;
 
@@ -235,27 +235,6 @@ public class ArContentListPage extends RestrictedPageBase {
                 this.label.add(AttributeModifier.append("class", hasData ? "label label-success" : "label label-default")); //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
             }
             return this.label;
-        }
-    }
-
-    private static class DataColumn extends AbstractColumn<EArContent, String> {
-        private static final long                        serialVersionUID = 4151926507136485310L;
-
-        private final IProducer2<EArContent, ELargeData> cellObjectProducer;
-
-        DataColumn(final String pDisplayLabel, final IProducer2<EArContent, ELargeData> pCellObjectProducer) {
-            super(Models.readOnly(pDisplayLabel));
-            this.cellObjectProducer = pCellObjectProducer;
-        }
-
-        @Override
-        public void populateItem(final Item<ICellPopulator<EArContent>> pCellItem, final String pComponentId, final IModel<EArContent> pRowModel) {
-            pCellItem.add(new ContentPanel(pComponentId, pRowModel.getObject()));
-            // final ELargeData data = this.cellObjectProducer.produce(pRowModel.getObject());
-            //            final String s = data.hasData() ? "登録あり" : "登録なし"; //$NON-NLS-1$//$NON-NLS-2$
-            // final Label l = new Label(pComponentId, s);
-            //            l.add(AttributeModifier.append("class", data.hasData() ? "label label-success" : "label label-default")); //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
-            // pCellItem.add(l);
         }
     }
 
