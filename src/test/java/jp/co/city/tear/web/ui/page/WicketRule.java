@@ -52,6 +52,7 @@ public class WicketRule extends WicketTester implements TestRule {
     public static WicketRule loggedin(final Class<? extends WebPage> pStartPageType) {
         WebStarter.initializeDataSource(Mode.UNIT_TEST);
         System.setProperty("hibernate.hbm2ddl.auto", "create");
+        System.setProperty("HIBERNATE_HBM2DDL_AUTO", "create");
 
         final WicketRule ret = new WicketRule();
         ret.startPage(LoginPage.class);
