@@ -84,10 +84,10 @@ public class RangeField<C extends Comparable<C> & Serializable> extends FormComp
     protected void onComponentTag(final ComponentTag pTag) {
         super.onComponentTag(pTag);
 
-        pTag.put("value", s(getModel())); //$NON-NLS-1$
-        pTag.put("min", s(this.minModel)); //$NON-NLS-1$
-        pTag.put("max", s(this.maxModel)); //$NON-NLS-1$
-        pTag.put("step", s(this.stepModel)); //$NON-NLS-1$
+        pTag.put("value", s(getModel().getObject())); //$NON-NLS-1$
+        pTag.put("min", s(this.minModel.getObject())); //$NON-NLS-1$
+        pTag.put("max", s(this.maxModel.getObject())); //$NON-NLS-1$
+        pTag.put("step", s(this.stepModel.getObject())); //$NON-NLS-1$
     }
 
     private C c(final IModel<C> pModel) {

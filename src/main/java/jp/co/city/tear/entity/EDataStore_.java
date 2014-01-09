@@ -5,7 +5,7 @@ import javax.annotation.Generated;
 import javax.persistence.metamodel.SingularAttribute;
 import javax.persistence.metamodel.StaticMetamodel;
 
-@Generated(value="Dali", date="2014-01-08T08:26:11.256+0900")
+@Generated(value="Dali", date="2014-01-09T10:17:33.181+0900")
 @StaticMetamodel(EDataStore.class)
 public class EDataStore_ extends EntityBase_ {
 	public static volatile SingularAttribute<EDataStore, Long> dataId;
