@@ -3,6 +3,8 @@
  */
 package jp.co.city.tear.web.ui.page;
 
+import jp.co.city.tear.WebStarter;
+import jp.co.city.tear.WebStarter.Mode;
 import jp.co.city.tear.entity.EUser;
 import jp.co.city.tear.web.WebInitializer;
 import jp.co.city.tear.web.ui.WicketApplication;
@@ -48,15 +50,20 @@ public class WicketRule extends WicketTester implements TestRule {
      */
     @SuppressWarnings("nls")
     public static WicketRule loggedin(final Class<? extends WebPage> pStartPageType) {
+        WebStarter.initializeDataSource(Mode.UNIT_TEST);
+        System.setProperty("hibernate.hbm2ddl.auto", "create");
+
         final WicketRule ret = new WicketRule();
         ret.startPage(LoginPage.class);
+        ret.assertRenderedPage(LoginPage.class);
 
-        final LoginPage ids = new LoginPage();
+        final LoginPage ids = (LoginPage) ret.getLastRenderedPage();
 
-        final FormTester formTester = ret.newFormTester("form");
+        final FormTester formTester = ret.newFormTester(ids.getForm().getId());
         formTester.setValue(ids.getUserId(), EUser.DEFAULT_ADMINISTRATOR_USER_ID);
         formTester.setValue(ids.getPassword(), EUser.DEFAULT_ADMINISTRATOR_PASSWORD);
-        formTester.submit(ids.getSubmitter().getId());
+        // formTester.submit(ids.getSubmitter()); ←AjaxButtonのサブミットはこちらではダメ.
+        ret.executeAjaxEvent(ids.getSubmitter(), "click");
 
         ret.startPage(pStartPageType);
         return ret;

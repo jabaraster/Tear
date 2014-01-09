@@ -44,7 +44,7 @@ import jp.co.city.tear.entity.EArContentPlayLog_;
 import jp.co.city.tear.entity.EPlayLogTrackingDescriptor;
 import jp.co.city.tear.model.ArContentPlayLog;
 import jp.co.city.tear.service.IArContentPlayLogService;
-import jp.co.city.tear.web.ui.component.PagingCondition;
+import jp.co.city.tear.service.PagingCondition;
 
 /**
  * @author jabaraster
@@ -100,7 +100,7 @@ public class ArContentPlayLogServiceImpl extends JpaDaoBase implements IArConten
 
     /**
      * @see jp.co.city.tear.service.IArContentPlayLogService#find(jp.co.city.tear.service.IArContentPlayLogService.FindCondition,
-     *      jp.co.city.tear.web.ui.component.PagingCondition, jabara.general.Sort)
+     *      jp.co.city.tear.service.PagingCondition, jabara.general.Sort)
      */
     @Override
     public List<EArContentPlayLog> find(final FindCondition pCondition, final PagingCondition pPagingCondition, final Sort pSort) {

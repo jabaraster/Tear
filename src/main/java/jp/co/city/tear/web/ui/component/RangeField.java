@@ -20,16 +20,9 @@ import org.apache.wicket.validation.validator.RangeValidator;
 public class RangeField<C extends Comparable<C> & Serializable> extends FormComponent<C> {
     private static final long serialVersionUID = 8160930587883797894L;
 
-    private IModel<C>         minModel;
-    private IModel<C>         maxModel;
-    private IModel<C>         stepModel;
-
-    /**
-     * @param pId -
-     */
-    public RangeField(final String pId) {
-        super(pId);
-    }
+    private final IModel<C>   minModel;
+    private final IModel<C>   maxModel;
+    private final IModel<C>   stepModel;
 
     /**
      * @param pId -
@@ -62,14 +55,8 @@ public class RangeField<C extends Comparable<C> & Serializable> extends FormComp
     }
 
     /**
-     * @param pId -
-     * @param pValueModel -
-     */
-    public RangeField(final String pId, final IModel<C> pValueModel) {
-        super(pId, pValueModel);
-    }
-
-    /**
+     * コンストラクタで指定された最小値、最大値に従ったバリデータを設定します. <br>
+     * 
      * @return このオブジェクト自身.
      */
     public RangeField<C> setRangeValidator() {
@@ -97,10 +84,10 @@ public class RangeField<C extends Comparable<C> & Serializable> extends FormComp
     protected void onComponentTag(final ComponentTag pTag) {
         super.onComponentTag(pTag);
 
-        putIfNotNull(pTag, getModel(), "value"); //$NON-NLS-1$
-        putIfNotNull(pTag, this.minModel, "min"); //$NON-NLS-1$
-        putIfNotNull(pTag, this.maxModel, "max"); //$NON-NLS-1$
-        putIfNotNull(pTag, this.stepModel, "step"); //$NON-NLS-1$
+        pTag.put("value", s(getModel())); //$NON-NLS-1$
+        pTag.put("min", s(this.minModel)); //$NON-NLS-1$
+        pTag.put("max", s(this.maxModel)); //$NON-NLS-1$
+        pTag.put("step", s(this.stepModel)); //$NON-NLS-1$
     }
 
     private C c(final IModel<C> pModel) {
@@ -108,12 +95,6 @@ public class RangeField<C extends Comparable<C> & Serializable> extends FormComp
             return null;
         }
         return pModel.getObject();
-    }
-
-    private static <T> void putIfNotNull(final ComponentTag pTag, final IModel<T> pModel, final String pAttributeName) {
-        if (pModel != null) {
-            pTag.put(pAttributeName, s(pModel.getObject()));
-        }
     }
 
     private static CharSequence s(final Object o) {

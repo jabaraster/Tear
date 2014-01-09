@@ -13,7 +13,6 @@ import java.util.List;
 import jp.co.city.tear.entity.EArContentPlayLog;
 import jp.co.city.tear.model.ArContentPlayLog;
 import jp.co.city.tear.service.impl.ArContentPlayLogServiceImpl;
-import jp.co.city.tear.web.ui.component.PagingCondition;
 
 import com.google.inject.ImplementedBy;
 

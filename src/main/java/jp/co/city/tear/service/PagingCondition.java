@@ -1,7 +1,7 @@
 /**
  * 
  */
-package jp.co.city.tear.web.ui.component;
+package jp.co.city.tear.service;
 
 import java.io.Serializable;
 
