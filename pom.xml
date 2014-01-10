@@ -4,7 +4,7 @@
     <groupId>jp.co.city</groupId>
     <artifactId>Tear</artifactId>
     <packaging>war</packaging>
-    <version>1.0-SNAPSHOT</version>
+    <version>2.0</version>
     <name>Tear Webapp</name>
     <url>http://maven.apache.org</url>
 
