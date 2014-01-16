@@ -229,7 +229,7 @@ public class ArContentResource {
         final String separator = ","; //$NON-NLS-1$
         for (final EArContent content : this.arContentService.getAll()) {
             sb.append(content.getId().longValue()) //
-                    .append(separator).append(fmt.format(content.getUpdated())) //
+                    .append(separator).append(fmt.format(content.getNewestUpdated())) //
                     .append(separator).append(buildMarkerAbsoluteUrl(content)) //
                     .append(separator).append(WebUtil.buildContentAbsoluteUrl(content.getId().longValue())) //
                     .append(lineSeparator);
