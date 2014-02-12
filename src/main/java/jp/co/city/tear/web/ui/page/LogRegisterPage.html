@@ -1,0 +1,41 @@
+<!doctype html>
+<html>
+<head>
+  <title></title>
+  <meta charset="UTF-8" />
+</head>
+<body>
+
+<wicket:extend>
+
+  <p>
+  トラッキング用識別子はページを表示する度にランダム生成しています。
+  </p>
+  <p>
+  ボタンに書かれた数字はARコンテンツのIDです。ボタンを押すとログが登録されます。
+  </p>
+  <fieldset>
+    <legend>ログウィンドウ</legend>
+    <button id="logClearer">Clear</button>
+    <div id="logAreaContainer">
+      <div id="logArea"></div>
+    </div>
+  </fieldset>
+  <form wicket:id="form">
+    <ul>
+      <li wicket:id="descriptors">
+        トラッキング用識別子：<label wicket:id="descriptor"></label>
+        <div wicket:id="arContentIds">
+          <button wicket:id="registerer" class="btn btn-primary">
+            <i class="glyphicon glyphicon-white glyphicon-ok"></i>
+            <span wicket:id="id"></span>
+          </button>
+        </div>
+      </li>
+    </ul>
+  </form>
+
+</wicket:extend>
+
+</body>
+</html>

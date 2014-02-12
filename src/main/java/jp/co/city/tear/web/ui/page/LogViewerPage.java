@@ -24,12 +24,13 @@ import javax.inject.Inject;
 import jp.co.city.tear.entity.EArContentPlayLog;
 import jp.co.city.tear.entity.EArContentPlayLog_;
 import jp.co.city.tear.service.IArContentPlayLogService;
-import jp.co.city.tear.service.PagingCondition;
 import jp.co.city.tear.service.IArContentPlayLogService.FindCondition;
+import jp.co.city.tear.service.PagingCondition;
 import jp.co.city.tear.web.ui.component.AttributeColumn;
 import jp.co.city.tear.web.ui.component.BodyCssHeaderItem;
 import jp.co.city.tear.web.ui.component.DateField;
 import jp.co.city.tear.web.ui.component.DateTimeColumn;
+import jp.co.city.tear.web.ui.component.RangeField;
 import jp.co.city.tear.web.ui.component.StreamResourceStream;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -44,8 +45,8 @@ import org.apache.wicket.extensions.markup.html.repeater.util.SortParam;
 import org.apache.wicket.extensions.markup.html.repeater.util.SortableDataProvider;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.Form;
-import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
@@ -74,7 +75,8 @@ public class LogViewerPage extends AdministrationPageBase {
     private DateField                                                     from;
     private DateField                                                     to;
     private AjaxButton                                                    searcher;
-    private Link<?>                                                       csvDownloader;
+    private RangeField<Byte>                                              validPlayLogPeriod;
+    private Button                                                        csvDownloader;
     private AjaxFallbackDefaultDataTable<IndexedArContentPlayLog, String> logs;
 
     /**
@@ -104,11 +106,11 @@ public class LogViewerPage extends AdministrationPageBase {
         return Models.readOnly("ログを見る"); //$NON-NLS-1$
     }
 
-    private Link<?> getCsvDownloader() {
+    private Button getCsvDownloader() {
         if (this.csvDownloader == null) {
-            this.csvDownloader = new Link<Object>("csvDownloader") { //$NON-NLS-1$
+            this.csvDownloader = new Button("csvDownloader") { //$NON-NLS-1$
                 @Override
-                public void onClick() {
+                public void onSubmit() {
                     LogViewerPage.this.handler.onCsvDownload();
                 }
             };
@@ -129,6 +131,7 @@ public class LogViewerPage extends AdministrationPageBase {
             this.form.add(getFrom());
             this.form.add(getTo());
             this.form.add(getSearcher());
+            this.form.add(getValidPlayLogPeriod());
             this.form.add(getCsvDownloader());
         }
         return this.form;
@@ -180,12 +183,26 @@ public class LogViewerPage extends AdministrationPageBase {
         return this.to;
     }
 
+    @SuppressWarnings("boxing")
+    private RangeField<Byte> getValidPlayLogPeriod() {
+        if (this.validPlayLogPeriod == null) {
+            final IModel<Byte> valueModel = Models.of((byte) 1);
+            final IModel<Byte> minModel = Models.readOnly((byte) 1);
+            final IModel<Byte> maxModel = Models.readOnly((byte) 120);
+            final IModel<Byte> stepModel = Models.readOnly((byte) 1);
+            this.validPlayLogPeriod = new RangeField<>("validPlayLogPeriod", Byte.class, valueModel, minModel, maxModel, stepModel); //$NON-NLS-1$
+            this.validPlayLogPeriod.setRangeValidator();
+        }
+        return this.validPlayLogPeriod;
+    }
+
     private class Handler implements Serializable {
 
         @SuppressWarnings("resource")
         void onCsvDownload() {
             final FindCondition condition = new FindCondition(getFrom().getModelObject(), getTo().getModelObject());
-            final InputStream in = LogViewerPage.this.arContentPlayLogService.makeCsv(condition);
+            final int validPlayLogPeriodSecond = getValidPlayLogPeriod().getModelObject().intValue();
+            final InputStream in = LogViewerPage.this.arContentPlayLogService.makeCsv(validPlayLogPeriodSecond, condition);
             final String fileName = new SimpleDateFormat("yyyyMMddHHmmss").format(Calendar.getInstance().getTime()) + ".csv"; //$NON-NLS-1$ //$NON-NLS-2$
             @SuppressWarnings("hiding")
             final ResourceStreamRequestHandler handler = new ResourceStreamRequestHandler(new StreamResourceStream(in, "text/csv"), fileName); //$NON-NLS-1$

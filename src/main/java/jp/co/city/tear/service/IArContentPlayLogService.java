@@ -26,7 +26,7 @@ public interface IArContentPlayLogService {
      * @param pCondition -
      * @return 件数.
      */
-    long countAll(FindCondition pCondition);
+    long countAll(final FindCondition pCondition);
 
     /**
      * @return -
@@ -39,25 +39,26 @@ public interface IArContentPlayLogService {
      * @param pSort -
      * @return -
      */
-    List<EArContentPlayLog> find(FindCondition pCondition, PagingCondition pPagingCondition, Sort pSort);
+    List<EArContentPlayLog> find(final FindCondition pCondition, final PagingCondition pPagingCondition, final Sort pSort);
 
     /**
      * @param pFirst -
      * @param pCount -
      * @return -
      */
-    List<EArContentPlayLog> get(int pFirst, int pCount);
+    List<EArContentPlayLog> get(final int pFirst, final int pCount);
 
     /**
      * @param pLog -
      */
-    void insert(ArContentPlayLog pLog);
+    void insert(final ArContentPlayLog pLog);
 
     /**
+     * @param pValidPlayLogPeriodSecond この秒数以内に、同一コンテンツを同一人物が再生していた場合、無効とマークする.
      * @param pCondition -
      * @return -
      */
-    InputStream makeCsv(FindCondition pCondition);
+    InputStream makeCsv(final int pValidPlayLogPeriodSecond, final FindCondition pCondition);
 
     /**
      * @author jabaraster

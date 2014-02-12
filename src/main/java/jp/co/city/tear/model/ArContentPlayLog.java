@@ -4,10 +4,7 @@
 package jp.co.city.tear.model;
 
 import java.io.Serializable;
-import java.util.Calendar;
 import java.util.Date;
-
-import net.arnx.jsonic.JSON;
 
 /**
  * @author jabaraster
@@ -112,29 +109,5 @@ public class ArContentPlayLog implements Serializable {
     public String toString() {
         return "ArContentPlayLog [playDatetime=" + this.playDatetime + ", arContentId=" + this.arContentId + ", latitude=" + this.latitude
                 + ", longitude=" + this.longitude + ", trackingDescriptor=" + this.trackingDescriptor + "]";
-    }
-
-    /**
-     * @return the serialversionuid
-     */
-    public static long getSerialversionuid() {
-        return serialVersionUID;
-    }
-
-    /**
-     * @param pArgs 起動引数.
-     */
-    public static void main(final String[] pArgs) {
-        final ArContentPlayLog log = new ArContentPlayLog();
-        log.setArContentId(3);
-        log.setLatitude(Double.valueOf(12.3939));
-        log.setLongitude(Double.valueOf(3939.3030));
-        log.setPlayDatetime(Calendar.getInstance().getTime());
-        log.setTrackingDescriptor("aaa"); //$NON-NLS-1$
-
-        final String json = JSON.encode(log, true);
-        System.out.println(json);
-
-        System.out.println(JSON.decode(json, ArContentPlayLog.class));
     }
 }

@@ -25,7 +25,10 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -155,11 +158,11 @@ public class ArContentPlayLogServiceImpl extends JpaDaoBase implements IArConten
     }
 
     /**
-     * @see jp.co.city.tear.service.IArContentPlayLogService#makeCsv(jp.co.city.tear.service.IArContentPlayLogService.FindCondition)
+     * @see jp.co.city.tear.service.IArContentPlayLogService#makeCsv(int, jp.co.city.tear.service.IArContentPlayLogService.FindCondition)
      */
     @SuppressWarnings("nls")
     @Override
-    public InputStream makeCsv(final FindCondition pCondition) {
+    public InputStream makeCsv(final int pValidPlayLogPeriod, final FindCondition pCondition) {
         ArgUtil.checkNull(pCondition, "pCondition"); //$NON-NLS-1$
 
         File temp = null;
@@ -169,6 +172,10 @@ public class ArContentPlayLogServiceImpl extends JpaDaoBase implements IArConten
                     BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out, Charset.forName("UTF-8"))) // //$NON-NLS-1$
             ) {
                 final BeanProperties meta = EArContentPlayLog.getMeta();
+
+                writer.append("有効な再生である可能性が");
+
+                writer.append(",");
                 writer.append(meta.get(EArContentPlayLog_.playDatetime.getName()).getLocalizedName());
 
                 writer.append(",");
@@ -186,7 +193,11 @@ public class ArContentPlayLogServiceImpl extends JpaDaoBase implements IArConten
                 writer.newLine();
 
                 final DateFormat fmt = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-                for (final EArContentPlayLog log : find(pCondition)) {
+                for (final PlayLogWithFlag l : find(pValidPlayLogPeriod, pCondition)) {
+                    writer.append(l.isTruePlay() ? "高い" : "低い");
+
+                    final EArContentPlayLog log = l.getLog();
+                    writer.append(",");
                     writer.append(fmt.format(log.getPlayDatetime()));
 
                     writer.append(",");
@@ -215,6 +226,57 @@ public class ArContentPlayLogServiceImpl extends JpaDaoBase implements IArConten
         }
     }
 
+    List<PlayLogWithFlag> find(final int pValidPlayLogPeriod, final FindCondition pCondition) {
+        final EntityManager em = getEntityManager();
+        final CriteriaBuilder builder = em.getCriteriaBuilder();
+        final CriteriaQuery<EArContentPlayLog> query = builder.createQuery(EArContentPlayLog.class);
+        final Root<EArContentPlayLog> root = query.from(EArContentPlayLog.class);
+
+        // 実質再生回数の算出を楽にするために、短い時間の間に再生されたデータを
+        // グルーピングしやすくする.
+        // まず再生日付が新しい方から10,000件を上限として抽出し、
+        // その後トラッキング用識別子、再生日付の順にソートする.
+        // その上で短い時間の間に再生されたデータのうち１つにフラグを付ける.
+        query.where(buildFindWhere(pCondition, builder, root));
+        query.orderBy(builder.desc(root.get(EArContentPlayLog_.playDatetime)));
+
+        // TODO 最大件数の扱いをどうするか・・・
+        final List<EArContentPlayLog> list = em.createQuery(query).setMaxResults(10000).getResultList();
+
+        if (list.isEmpty()) {
+            return new ArrayList<>();
+        }
+        if (list.size() == 1) {
+            return Arrays.asList(new PlayLogWithFlag(list.get(0), true));
+        }
+
+        // トラッキング識別子→再生日付(降順)にソート
+        Collections.sort(list, new Comparator<EArContentPlayLog>() {
+            @Override
+            public int compare(final EArContentPlayLog o1, final EArContentPlayLog o2) {
+                final int i = o1.getTrackingDescriptor().compareTo(o2.getTrackingDescriptor());
+                if (i != 0) {
+                    return i;
+                }
+                return o2.getPlayDatetime().compareTo(o1.getPlayDatetime());
+            }
+        });
+
+        // 一定時間内に再生されたログのうち１つだけにフラグを付ける.
+        final List<PlayLogWithFlag> ret = new ArrayList<>(list.size());
+        EArContentPlayLog pre = list.get(0);
+        for (int i = 1; i < list.size(); i++) {
+            final EArContentPlayLog current = list.get(i);
+            ret.add(new PlayLogWithFlag(pre, !isTryPlaySameContent(current, pre, pValidPlayLogPeriod)));
+            pre = current;
+        }
+
+        // 最後の要素は必ず実質再生とみなせる
+        ret.add(new PlayLogWithFlag(list.get(list.size() - 1), true));
+
+        return ret;
+    }
+
     private String createDescriptorCore() {
         final String d = UUID.randomUUID().toString();
         final EPlayLogTrackingDescriptor descriptor = new EPlayLogTrackingDescriptor();
@@ -225,19 +287,6 @@ public class ArContentPlayLogServiceImpl extends JpaDaoBase implements IArConten
         em.flush(); // DBの重複チェックを実行させる.
 
         return d;
-    }
-
-    private List<EArContentPlayLog> find(final FindCondition pCondition) {
-        final EntityManager em = getEntityManager();
-        final CriteriaBuilder builder = em.getCriteriaBuilder();
-        final CriteriaQuery<EArContentPlayLog> query = builder.createQuery(EArContentPlayLog.class);
-        final Root<EArContentPlayLog> root = query.from(EArContentPlayLog.class);
-
-        query.where(buildFindWhere(pCondition, builder, root));
-        query.orderBy(builder.desc(root.get(EArContentPlayLog_.playDatetime)));
-
-        // TODO 最大件数の扱いをどうするか・・・
-        return em.createQuery(query).setMaxResults(10000).getResultList();
     }
 
     private static Date addDay(final Date pDate, final int pValue) {
@@ -258,6 +307,17 @@ public class ArContentPlayLogServiceImpl extends JpaDaoBase implements IArConten
         return where.toArray(EMPTY_PREDICATE);
     }
 
+    private static boolean isTryPlaySameContent( //
+            final EArContentPlayLog current //
+            , final EArContentPlayLog pre //
+            , final long pValidPlayLogPeriodSecond) {
+        if (pre.getTrackingDescriptor().equals(current.getTrackingDescriptor()) //
+                && pre.getArContentId().equals(current.getArContentId())) {
+            return pre.getPlayDatetime().getTime() - current.getPlayDatetime().getTime() < pValidPlayLogPeriodSecond * 1000;
+        }
+        return false;
+    }
+
     /**
      * @param pDate
      * @return pDateの秒以下を0にした値.
@@ -268,6 +328,34 @@ public class ArContentPlayLogServiceImpl extends JpaDaoBase implements IArConten
             return fmt.parse(fmt.format(pDate));
         } catch (final ParseException e) {
             throw ExceptionUtil.rethrow(e);
+        }
+    }
+
+    static class PlayLogWithFlag {
+        private final boolean           truePlay;
+        private final EArContentPlayLog log;
+
+        /**
+         * @param pLog
+         * @param pTruePlay
+         */
+        public PlayLogWithFlag(final EArContentPlayLog pLog, final boolean pTruePlay) {
+            this.truePlay = pTruePlay;
+            this.log = pLog;
+        }
+
+        /**
+         * @return logを返す.
+         */
+        public EArContentPlayLog getLog() {
+            return this.log;
+        }
+
+        /**
+         * @return truePlayを返す.
+         */
+        public boolean isTruePlay() {
+            return this.truePlay;
         }
     }
 

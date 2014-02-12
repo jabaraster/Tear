@@ -1,0 +1,20 @@
+[
+{ "playDatetime": 1331536879000,
+  "arContentId": 1,
+  "trackingDescriptor": "td_01" },
+{ "playDatetime": 1331536878000,
+  "arContentId": 1,
+  "trackingDescriptor": "td_01" },
+{ "playDatetime": 1331536877000,
+  "arContentId": 2,
+  "trackingDescriptor": "td_01" },
+{ "playDatetime": 1331536876000,
+  "arContentId": 2,
+  "trackingDescriptor": "td_02" },
+{ "playDatetime": 1331536866000,
+  "arContentId": 2,
+  "trackingDescriptor": "td_02" },
+{ "playDatetime": 1331536865000,
+  "arContentId": 2,
+  "trackingDescriptor": "td_02" }
+]

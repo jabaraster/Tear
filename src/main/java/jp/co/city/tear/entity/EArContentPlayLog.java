@@ -51,6 +51,7 @@ public class EArContentPlayLog extends TearEntityBase<EArContentPlayLog> {
      */
     @Column(nullable = true)
     protected Double              longitude;
+
     /**
      * 同じ端末で再生されたARに付与される識別子.
      */
@@ -138,5 +139,4 @@ public class EArContentPlayLog extends TearEntityBase<EArContentPlayLog> {
     public static BeanProperties getMeta() {
         return _properties;
     }
-
 }

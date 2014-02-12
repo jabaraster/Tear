@@ -13,15 +13,18 @@
     <fieldset>
       From: <input type="date" wicket:id="from" />
       To: <input type="date" wicket:id="to" />
-
+      (yyyy-MM-dd形式)
       <button wicket:id="searcher" href="#" class="btn btn-primary">
         <i class="glyphicon glyphicon-white glyphicon-search"></i>
         ログを表示
       </button>
-      <a wicket:id="csvDownloader" href="#" class="btn btn-info">
-        <i class="glyphicon glyphicon-white glyphicon-download"></i>
-        CSVダウンロード
-      </a>
+      <div>
+        <input type="number" wicket:id="validPlayLogPeriod" />秒以内に同じコンテンツを見ているログを無効とマークした上で
+        <button wicket:id="csvDownloader" class="btn btn-info">
+          CSVダウンロード
+        </button>
+        する(最大10,000件)
+      </div>
     </fieldset>
   </form>
 

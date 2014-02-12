@@ -18,6 +18,7 @@ import jp.co.city.tear.web.ui.page.ArContentEditPage;
 import jp.co.city.tear.web.ui.page.ArContentInsertPage;
 import jp.co.city.tear.web.ui.page.ArContentListPage;
 import jp.co.city.tear.web.ui.page.ArContentUpdatePage;
+import jp.co.city.tear.web.ui.page.LogRegisterPage;
 import jp.co.city.tear.web.ui.page.LogViewerPage;
 import jp.co.city.tear.web.ui.page.LoginPage;
 import jp.co.city.tear.web.ui.page.LogoutPage;
@@ -55,6 +56,7 @@ public class WicketApplication extends WebApplication {
     private static final List<MenuInfo> _menuInfoList  = Arrays.asList(new MenuInfo(Models.readOnly("ユーザ一覧"), UserListPage.class) //
                                                                , new MenuInfo(Models.readOnly("ARコンテンツ一覧"), ArContentListPage.class) //
                                                                , new MenuInfo(Models.readOnly("ログを見る"), LogViewerPage.class) //
+                                                               , new MenuInfo(Models.readOnly("テストログ登録"), LogRegisterPage.class) //
                                                        );
 
     private static final String         ENC            = "UTF-8";              //$NON-NLS-1$
@@ -187,6 +189,7 @@ public class WicketApplication extends WebApplication {
 
         this.mountPage("log/", LogViewerPage.class);
         this.mountPage("log/index", LogViewerPage.class);
+        this.mountPage("log/register", LogRegisterPage.class);
 
         this.mountPage("content/", ArContentListPage.class);
         this.mountPage("content/index", ArContentListPage.class);
